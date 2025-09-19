@@ -506,11 +506,11 @@ export default function ProductDetailsClient({ product: initialProduct }) {
 
   const items = [
     { label: "Home", href: "/" },
-    { label: "Marketplace", href: "/marketplace" },
-    {
-      label: product.category?.name || "Category",
-      href: `/marketplace/${product.category?.slug}?categoryId=${product.category?.id}`,
-    },
+    { label: "Motors", href: "/motors" },
+    // {
+    //   label: product.category?.name || "Category",
+    //   href: `/marketplace/${product.category?.slug}?categoryId=${product.category?.id}`,
+    // },
     { label: product.title || "Product" },
   ];
   const { t, i18n } = useTranslation();
