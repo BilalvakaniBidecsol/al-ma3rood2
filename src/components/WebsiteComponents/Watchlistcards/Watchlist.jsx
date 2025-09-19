@@ -189,12 +189,14 @@ import { Image_NotFound, Image_URL } from "@/config/constants";
 import { useWatchlistStore } from "@/lib/stores/watchlistStore";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { useTranslation } from 'react-i18next';
+import { useAuthStore } from "@/lib/stores/authStore";
 
 
 const Watchlist = () => {
     const { watchlist, fetchWatchlist } = useWatchlistStore();
     const scrollRef = useRef(null);
     const { t, i18n } = useTranslation();
+      const token = useAuthStore
 
     const isRTL = i18n.dir() === "rtl";
 
@@ -202,7 +204,9 @@ const Watchlist = () => {
     const [isAtEnd, setIsAtEnd] = useState(false);
 
     useEffect(() => {
+        if(token){
         fetchWatchlist();
+        }
     }, []);
 
     const limitedWatchlist = watchlist?.slice(0, 5) || [];
