@@ -1,0 +1,560 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { useForm } from "react-hook-form";
+import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
+import Button from "../ReuseableComponenets/Button";
+import { useProfileStore } from "@/lib/stores/profileStore";
+import { toast } from "react-toastify";
+import { userApi } from "@/lib/api/user";
+import { useAuthStore } from "@/lib/stores/authStore";
+import { useTranslation } from "react-i18next";
+import { Country, State, City } from "country-state-city";
+import Select from "react-select";
+
+const schema = yup.object().shape({
+  firstname: yup.string().required("Firstname is required"),
+  lastname: yup.string().required("Lastname is required"),
+  // phone: yup
+  // .number().optional,
+  // .typeError("Landline must be a number")
+  // .integer("Landline must be an integer")
+  // .required("Landline is required"),
+
+  // mobile: yup
+  //   .number().optional,
+  // .typeError("Mobile must be a number")
+  // .integer("Mobile must be an integer")
+  // .required("Mobile is required"),
+
+  gender: yup.string().required("Gender is required"),
+  country: yup.string().required("Country is required"),
+  accountType: yup.string().required("Account type is required"),
+  businessName: yup.string().required("Business name is required"),
+  addressFinder: yup.string().required("Address finder is required"),
+  addressLine1: yup.string().required("Address line 1 is required"),
+  addressLine2: yup.string().required("Address line 2 is required"),
+  suburb: yup.string().required("Suburb is required"),
+  city: yup.string().required("City is required"),
+  postCode: yup.string().required("Post code is required"),
+  closestDistrict: yup.string().required("Closest district is required"),
+});
+
+const EditContactDetails = () => {
+  const hideComponent = useProfileStore((state) => state.hideComponent);
+  const { user, logout, updateUser } = useAuthStore();
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = useForm({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      firstname: user?.first_name || "",
+      lastname: user?.last_name || "",
+      name: `${user?.firstname} ${user?.lastname}` || "",
+      phone: user?.phone || "",
+      landline: user?.landline || "",
+      gender: user?.gender || "",
+      accountType: user?.account_type || "",
+      country: user?.country || "",
+      businessName: user?.business_name || "",
+      addressFinder: user?.address_finder || "",
+      addressLine1: user?.address_1 || "",
+      addressLine2: user?.address_2 || "",
+      suburb: user?.suburb || "",
+      postCode: user?.post_code || "",
+      closestDistrict: user?.closest_district || "",
+      city: user?.city || "",
+    },
+  });
+
+  const onSubmit = async (data) => {
+    const formData = new FormData();
+
+    formData.append("first_name", data.firstname);
+    formData.append("last_name", data.lastname);
+    formData.append("name", `${data.firstname} ${data.lastname}`);
+    // formData.append("email", "abdullah@example.com"); // Replace with dynamic value if needed
+    formData.append("phone", data.mobile || "");
+    formData.append("landline", data.phone || "");
+    formData.append("gender", data.gender || "");
+    formData.append("account_type", data.accountType || "");
+    formData.append("country", data.country || "");
+    formData.append("business_name", data.businessName || "");
+    // formData.append("country", country);
+    formData.append("address_finder", data.addressFinder);
+    formData.append("address_1", data.addressLine1);
+    formData.append("address_2", data.addressLine2);
+    formData.append("suburb", data.suburb);
+    formData.append("post_code", data.postCode || "");
+    formData.append("closest_district", data.closestDistrict || "");
+    // formData.append(
+    //   "billing_address",
+    //   data.billingAddress || "Ma3rood Billing, XYZ Plaza"
+    // );
+    // formData.append("street_address", data.streetAddress || "Shahrah-e-Faisal");
+    // formData.append("apartment", data.apartment || "Apartment 12B");
+    formData.append("city", data.city || "");
+    // formData.append("state", data.state || "Sindh");
+    formData.append("zip_code", data.postCode || "");
+    formData.append("state", selectedState?.label || "");
+    formData.append("city", selectedCity?.label || "");
+
+    try {
+      const res = await userApi.contactDetail(user.id, formData);
+      // updateUser({
+      //   occupation: res.occupation,
+      //   favourite_quote: res.favourite_quote,
+      //   about_me: res.about_me
+      //  });
+      toast.success("Contact Detail updated successfully!");
+      updateUser({
+        first_name: res.data.firstname || "",
+        last_name: res.data.lastname || "",
+        name: `${res.data.firstname} ${res.data.lastname}` || "",
+        landline: res.data.landline || "",
+        landline: res.data.landline || "",
+        gender: res.data.gender || "",
+        account_type: res.data.account_type || "",
+        country: res.data.country || "",
+        business_name: res.data.business_name || "",
+        address_finder: res.data.address_finder || "",
+        address_1: res.data.address_1 || "",
+        address_2: res.data.address_2 || "",
+        suburb: res.data.suburb || "",
+        post_code: res.data.post_code || "",
+        closest_district: res.data.closest_district || "",
+        city: res.data.city || "",
+      });
+      reset();
+    } catch (err) {
+      const errorMessage =
+        err?.response?.data?.message ||
+        "Something went wrong. Please try again.";
+      toast.error(errorMessage);
+      console.error("Contact Detail update error:", err);
+    }
+  };
+  const { t } = useTranslation();
+  const [selectedCountry, setSelectedCountry] = useState({
+    label: "Saudi Arabia",
+    value: "SA",
+  });
+  const [selectedState, setSelectedState] = useState(null);
+  const [selectedCity, setSelectedCity] = useState(null);
+
+  const [states, setStates] = useState([]);
+  const [cities, setCities] = useState([]);
+  useEffect(() => {
+    const allStates = State.getStatesOfCountry(selectedCountry.value);
+    setStates(
+      allStates.map((state) => ({
+        label: state.name,
+        value: state.isoCode,
+      }))
+    );
+    const defaultCities = City.getCitiesOfCountry("SA");
+    // setCities(
+    //   defaultCities.map((city) => ({
+    //     label: city.name,
+    //     value: city.isoCode,
+    //   }))
+    // ); 
+      const uniqueCities = defaultCities.filter(
+    (city, index, self) =>
+      index === self.findIndex((c) => c.name === city.name)
+  );
+
+  // setCities(uniqueCities);
+      setCities(
+        uniqueCities.map((city) => ({
+          label: city.name,
+          value: city.name,
+        }))
+      );   
+    const selectedCities = defaultCities.find((s) => s.name == user.city);
+    // console.log("User",user.city)
+
+    // console.log("Sele",selectedCities)
+    const city = {
+      label: selectedCities.name,
+      value: selectedCities.name
+    }
+    setSelectedCity(city);
+
+    // console.log("final", city)
+    // setSelectedState(null);
+    // setCities([]);
+  }, [selectedCountry]);
+  // useEffect(() => {
+  //   const selectedCities = cities.find((s) => s.name == user.city);
+  //   setSelectedCity(selectedCities);
+  //   console.log("selected", selectedCities);
+  // }, [cities]);
+  useEffect(() => {
+    if (selectedState) {
+      const allCities = City.getCitiesOfState(
+        selectedCountry.value,
+        selectedState.value
+      );
+                // Remove duplicate cities by name
+  const uniqueCities = allCities.filter(
+    (city, index, self) =>
+      index === self.findIndex((c) => c.name === city.name)
+  );
+
+  // setCities(uniqueCities);
+      setCities(
+        uniqueCities.map((city) => ({
+          label: city.name,
+          value: city.name,
+        }))
+      );
+      // setSelectedCity(null);
+    }
+  }, [selectedState]);
+
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="mt-4 ">
+      <h2 className="text-2xl font-semibold mb-6">
+        {t("Edit contact details")}
+      </h2>
+
+      <div className="-mt-3 p-6 bg-gray-50 rounded-lg">
+        {/* Account Type */}
+        <h3 className="text-1xl font-semibold mb-2">{t("Account type")}</h3>
+        <div className="mb-6 mt-2 p-4 bg-white rounded border border-gray-300">
+          <div className="space-y-2">
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                {...register("accountType")}
+                value="personal"
+              />
+              <span>{t("Personal use")}</span>
+            </label>
+            <label className="flex items-center space-x-2">
+              <input
+                type="radio"
+                {...register("accountType")}
+                value="business"
+              />
+              <span>{t("Business use")}</span>
+            </label>
+            {errors.accountType && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.accountType.message}
+              </p>
+            )}
+
+            <p className="text-sm mt-3">
+              {t(
+                "Your account will have in-trade status, requiring additional obligations to buyers. A business account can't be manually changed back to a personal account"
+              )}
+            </p>
+          </div>
+        </div>
+
+        {/* Primary Contact Person */}
+        <h3 className="text-md font-semibold mb-4">
+          {t("Primary contact person")}
+        </h3>
+        <div className="mb-6 p-4 bg-white rounded border border-gray-300">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label
+                htmlFor="firstname"
+                className="block text-sm font-semibold mb-1"
+              >
+                {t("Firstname")} <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="firstname"
+                {...register("firstname")}
+                className="w-full border border-gray-300 rounded-[10px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              {errors.firstname && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.firstname.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <label
+                htmlFor="lastname"
+                className="block text-sm font-semibold mb-1"
+              >
+                {t("Lastname")} <span className="text-red-500">*</span>
+              </label>
+              <input
+                id="lastname"
+                {...register("lastname")}
+                className="w-full border border-gray-300 rounded-[10px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+              />
+              {errors.lastname && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.lastname.message}
+                </p>
+              )}
+            </div>
+          </div>
+
+          {/* Gender */}
+          <div className="mt-4">
+            <h4 className="text-sm font-semibold mb-2">{t("Gender")}</h4>
+            <div className="flex flex-wrap gap-6 items-center">
+              <label className="flex items-center space-x-2">
+                <input type="radio" {...register("gender")} value="male" />
+                <span>{t("Male")}</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input type="radio" {...register("gender")} value="female" />
+                <span>{t("Female")}</span>
+              </label>
+              <label className="flex items-center space-x-2">
+                <input type="radio" {...register("gender")} value="notSay" />
+                <span>{t("Rather not say")}</span>
+              </label>
+            </div>
+            {errors.gender && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.gender.message}
+              </p>
+            )}
+          </div>
+
+          {/* Landline */}
+          <div className="mt-4">
+            <h4 className="text-sm font-semibold mb-2">
+              {t("Landline")} (optional)
+            </h4>
+            <div className="flex items-center gap-2">
+              <select
+                className="border border-gray-300 px-1 py-2 w-24 rounded-[10px]"
+                defaultValue=""
+              >
+                <option value="">{t("Select")}</option>
+                <option value="+92">+92</option>
+                <option value="+91">+91</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+              </select>
+              <input
+                type="text"
+                {...register("phone")}
+                className="w-52 border border-gray-300 rounded-[10px] px-2 py-1"
+              />
+            </div>
+            {/* {errors.phone && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.phone.message}
+              </p>
+            )} */}
+          </div>
+
+          {/* Mobile */}
+          <div className="mt-4">
+            <h4 className="text-sm font-semibold mb-2">
+              {t("Mobile")} (optional)
+            </h4>
+            <div className="flex items-center gap-2">
+              <select className="border border-gray-300 px-1 py-2 w-24 rounded-[10px]">
+                <option value="+92">+92</option>
+                <option value="+91">+91</option>
+                <option value="+1">+1</option>
+                <option value="+44">+44</option>
+              </select>
+              <input
+                type="text"
+                {...register("mobile")}
+                className="w-52 border border-gray-300 rounded-[10px] px-2 py-1"
+              />
+            </div>
+            {/* {errors.mobile && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.mobile.message}
+              </p>
+            )} */}
+          </div>
+        </div>
+
+        {/* Business Name */}
+        <h3 className="text-md font-semibold mb-2">{t("Business details")}</h3>
+        <div className="mb-6 p-4 bg-white rounded border border-gray-300">
+          <h3 className="text-md font-semibold mb-2">{t("Business Name")}</h3>
+          <input
+            type="text"
+            {...register("businessName")}
+            placeholder={t("Business name")}
+            className="border border-gray-300 rounded-[10px] px-3 py-2 w-64"
+          />
+          {errors.businessName && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.businessName.message}
+            </p>
+          )}
+        </div>
+
+        {/* Street address */}
+        <h3 className="text-md font-semibold mb-2">{t("Street address")}</h3>
+        <div className="mb-6 p-4 bg-white rounded border border-gray-300">
+          <div className="mb-4">
+            <label className="text-sm font-semibold mb-1 block">
+              {t("Country")}
+            </label>
+            <Select
+              isDisabled
+              value={selectedCountry}
+  options={[{ label: t("Saudi Arabia"), value: "SA" }]}
+              className="w-64"
+              onChange={setSelectedCountry}
+            />
+          </div>
+
+          <div className="mt-6 space-y-4">
+            <div>
+              <h4 className="text-sm font-semibold mb-1">
+                {t("Address Finder")}
+              </h4>
+              <input
+                type="text"
+                {...register("addressFinder")}
+                placeholder={t("Search for your address")}
+                className="w-64 border border-gray-300 rounded-[10px] px-3 py-2"
+              />
+              {errors.addressFinder && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.addressFinder.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold mb-1">{t("Address")}</h4>
+              <input
+                type="text"
+                {...register("addressLine1")}
+                placeholder={t("Address line 1")}
+                className="w-64 border border-gray-300 rounded-[10px] px-3 py-2"
+              />
+              {errors.addressLine1 && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.addressLine1.message}
+                </p>
+              )}
+
+              <br />
+              <input
+                type="text"
+                {...register("addressLine2")}
+                placeholder={t("Address line 2")}
+                className="w-64 border mt-3 border-gray-300 rounded-[10px] px-3 py-2"
+              />
+              {errors.addressLine2 && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.addressLine2.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold mb-1">
+                {t("Suburb (optional)")}
+              </h4>
+              <input
+                type="text"
+                {...register("suburb")}
+                placeholder={t("Suburb")}
+                className="w-64 border border-gray-300 rounded-[10px] px-3 py-2"
+              />
+              {errors.suburb && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.suburb.message}
+                </p>
+              )}
+            </div>
+            {/* <div>
+              <h4 className="text-sm font-semibold mb-1">{t("City")}</h4>
+              <input
+                type="text"
+                {...register("city")}
+                placeholder={t("City")}
+                className="w-64 border border-gray-300 rounded-[10px] px-3 py-2"
+              />
+              {errors.city && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.city.message}
+                </p>
+              )}
+            </div> */}
+            <div>
+              <h4 className="text-sm font-semibold mb-1">{t("State")}</h4>
+              <Select
+                options={states}
+                value={selectedState}
+                onChange={setSelectedState}
+                className="w-64"
+                placeholder="Select state"
+                isSearchable
+              />
+            </div>
+
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold mb-1">{t("City")}</h4>
+              <Select
+                options={cities}
+                value={selectedCity}
+                onChange={setSelectedCity}
+                className="w-64"
+                placeholder="Select city"
+                isSearchable
+              />
+            </div>
+
+            <div>
+              <h4 className="text-sm font-semibold mb-1">{t("Post Code")}</h4>
+              <input
+                type="text"
+                {...register("postCode")}
+                placeholder={t("Post Code")}
+                className="w-64 border border-gray-300 rounded-[10px] px-3 py-2"
+              />
+              {errors.postCode && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.postCode.message}
+                </p>
+              )}
+            </div>
+            <div>
+              <h4 className="text-sm font-semibold mb-1">
+                {t("Closest District")}
+              </h4>
+              <input
+                type="text"
+                {...register("closestDistrict")}
+                placeholder={t("Closest District")}
+                className="w-64 border border-gray-300 rounded-[10px] px-3 py-2"
+              />
+              {errors.closestDistrict && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.closestDistrict.message}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="md:col-span-2 flex gap-3">
+          <Button type="submit">{t("Save")}</Button>
+          <Button type="button" onClick={hideComponent}>
+            {t("Go Back")}
+          </Button>
+        </div>
+      </div>
+    </form>
+  );
+};
+
+export default EditContactDetails;
