@@ -7,6 +7,9 @@ import { fetchAllListings, fetchListingsByReservePrice } from "@/lib/api/listing
 import MarketplaceCard from "./marketplace/MarketplaceCard";
 import CoolAuctions from "@/components/WebsiteComponents/HomePageComponents/CoolAuctions";
 import { fetchAllCategories } from "@/lib/api/category.server";
+import { useAuthStore } from "@/lib/stores/authStore";
+import Watch from "@/components/WebsiteComponents/HomePageComponents/Watch";
+
 
 // const dummyCards = [
 //   {
@@ -80,9 +83,14 @@ export default async function Home({ params, searchParams }) {
     fetchAllCategories(),
     fetchAllListings(categoryId, categoryIdFilter, search, city),
   ]);
+  const {token} = useAuthStore
+console.log('tok', token)
+
+
 
   return (
     <>
+    
       <div className="bg-white">
         <GridLayout />
       </div>
@@ -116,7 +124,11 @@ export default async function Home({ params, searchParams }) {
             </div>
           </div>
         </div> */}
-        <Watchlist />
+        {/* <Watchlist /> */}
+         {token !== undefined ?
+          <Watch />
+          : ""
+        }
         {/* <MarketplaceCard
           heading="Deals"
           cards={listings?.data?.data.slice(0, 8) || []}
