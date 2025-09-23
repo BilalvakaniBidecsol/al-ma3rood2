@@ -4,7 +4,6 @@ import { Car, Calendar, Gauge, Fuel, Settings, MapPin, Heart, Eye } from 'lucide
 import { Image_URL } from '@/config/constants';
 
 const MotorListingCard = ({ listing, viewMode }) => {
-  // Extract motor-specific attributes
   const getAttributeValue = (key) => {
     const attribute = listing.attributes?.find(attr => attr.key === key);
     return attribute ? attribute.value : null;
@@ -50,7 +49,6 @@ const MotorListingCard = ({ listing, viewMode }) => {
 
   return (
     <Link href={`/search/${listing.slug}`} className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden ${viewMode !== 'grid' ? 'flex flex-row' : "flex flex-col"}`}>
-      {/* Image Section */}
       <div className={`relative ${viewMode == "grid" ? 'h-48' : 'w-96  h-58'} bg-gray-200`}>
         {listing.images && listing.images.length > 0 ? (
           <img

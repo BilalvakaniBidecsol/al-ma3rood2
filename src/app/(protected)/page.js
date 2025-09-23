@@ -90,7 +90,6 @@ console.log('tok', token)
 
   return (
     <>
-    
       <div className="bg-white">
         <GridLayout />
       </div>
@@ -124,7 +123,6 @@ console.log('tok', token)
             </div>
           </div>
         </div> */}
-        {/* <Watchlist /> */}
          {token !== undefined ?
           <Watch />
           : ""
