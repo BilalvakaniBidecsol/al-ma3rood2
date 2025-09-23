@@ -137,14 +137,33 @@ function LoginPageContent() {
   const router = useRouter();
   const { t } = useTranslation();
 
-  const handleLogin = async (credentials) => {
-    try {
-      await login(credentials.email, credentials.password);
+  // const handleLogin = async (credentials) => {
+  //   try {
+  //     const res = await login(credentials.email, credentials.password);
+
+  //   if (res.success && res.user) {
+  //     window.location.href = "/";
+  //   } else if (res.requireVerification) {
+  //     router.push(`/verification?email=${encodeURIComponent(res.email)}`);
+  //   }
+  //   } catch (err) {
+  //     console.log("Login failed:", err);
+  //   }
+  // };
+const handleLogin = async (credentials) => {
+  try {
+    const res = await login(credentials.email, credentials.password);
+console.log('Res', res);
+("Login response:", res);
+    if (res.success && res.user) {
       window.location.href = "/";
-    } catch (err) {
-      console.log("Login failed:", err);
+    } else if (res.error == 'Emails is not verified yet' && res.email) {
+      router.push(`/verification?email=${encodeURIComponent(res.email)}`);
     }
-  };
+  } catch (err) {
+    console.log("Unexpected login error:", err);
+  }
+};
 
   return (
     <div className="flex flex-col md:flex-row w-full h-screen">

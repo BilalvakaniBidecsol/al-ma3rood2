@@ -147,7 +147,7 @@ export default function VerificationPage() {
             {code.map((digit, index) => (
               <input
                 key={index}
-                id={`code - ${index}`}
+                id={`code-${index}`}
                 type="text"
                 maxLength="1"
                 value={digit}

@@ -15,28 +15,28 @@ export const useAuthStore = create(
       // Reset errors
       resetError: () => set({ error: null }),
 
-      login: async (email, password) => {
-        set({ isLoading: true, error: null });
-        try {
-          const { data: user, token } = await authApi.login({
-            email,
-            password,
-          });
-          setAuthToken(token);
-          set({ user, token, isLoading: false });
-          // Fetch and set watchlist after login
-          try {
-            const { data } = await watchlistApi.getWatchlist();
-            useWatchlistStore.getState().setWatchlist(data?.data || []);
-          } catch (e) {
-            useWatchlistStore.getState().setWatchlist([]);
-          }
-          return user;
-        } catch (error) {
-          set({ error: error?.message || "Login Failed", isLoading: false });
-          throw error;
-        }
-      },
+      // login: async (email, password) => {
+      //   set({ isLoading: true, error: null });
+      //   try {
+      //     const { data: user, token } = await authApi.login({
+      //       email,
+      //       password,
+      //     });
+      //     setAuthToken(token);
+      //     set({ user, token, isLoading: false });
+      //     // Fetch and set watchlist after login
+      //     try {
+      //       const { data } = await watchlistApi.getWatchlist();
+      //       useWatchlistStore.getState().setWatchlist(data?.data || []);
+      //     } catch (e) {
+      //       useWatchlistStore.getState().setWatchlist([]);
+      //     }
+      //     return user;
+      //   } catch (error) {
+      //     set({ error: error?.message || "Login Failed", isLoading: false });
+      //     throw error;
+      //   }
+      // },
 
       // register: async (userData) => {
       //   set({ isLoading: true, error: null });
@@ -67,6 +67,48 @@ export const useAuthStore = create(
       //     throw error;
       //   }
       // },
+login: async (email, password) => {
+  set({ isLoading: true, error: null });
+
+  try {
+    const res = await authApi.login({ email, password });
+
+    // ✅ If success
+    if (res?.token) {
+      const { data: user, token } = res;
+      setAuthToken(token);
+      set({ user, token });
+
+      // Fetch watchlist
+      try {
+        const { data } = await watchlistApi.getWatchlist();
+        useWatchlistStore.getState().setWatchlist(data?.data || []);
+      } catch {
+        useWatchlistStore.getState().setWatchlist([]);
+      }
+
+      return { success: true, user };
+    }
+
+    throw new Error(res?.message || "Login failed");
+  } catch (error) {
+    
+    set({ error: error.data?.message, isLoading: false });
+    return {
+      success: false,
+      email: error?.data?.email || null,
+      error: error?.message || "Login Failed",
+    };
+
+  } finally {
+    // ✅ Always stop loader
+    set({ isLoading: false });
+  }
+},
+
+
+
+
       register: async (userData) => {
         set({ isLoading: true, error: null });
         try {

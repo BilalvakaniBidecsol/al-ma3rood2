@@ -2,12 +2,11 @@ import AuctionGrid from "@/components/WebsiteComponents/HomePageComponents/Aucti
 import GridLayout from "@/components/WebsiteComponents/HomePageComponents/GridLayout";
 // import TrendingCategories from "@/components/WebsiteComponents/HomePageComponents/TrendingCategories";
 import LatestNews from "@/components/WebsiteComponents/ReuseableComponenets/LatestNews";
+import Watchlist from "@/components/WebsiteComponents/Watchlistcards/Watchlist";
 import { fetchAllListings, fetchListingsByReservePrice } from "@/lib/api/listings.server";
 import MarketplaceCard from "./marketplace/MarketplaceCard";
 import CoolAuctions from "@/components/WebsiteComponents/HomePageComponents/CoolAuctions";
 import { fetchAllCategories } from "@/lib/api/category.server";
-import { useAuthStore } from "@/lib/stores/authStore";
-import { Watch } from "@/components/WebsiteComponents/HomePageComponents/Watch";
 
 // const dummyCards = [
 //   {
@@ -71,7 +70,7 @@ export default async function Home({ params, searchParams }) {
   // Fetch $1 reserve listings
   const reserveListings = await fetchListingsByReservePrice(1);
   const reserveCards = reserveListings?.data?.data || [];
-  const { categoryId } = await searchParams;
+    const { categoryId } = await searchParams;
   const categoryIdFilter = searchParams?.category_id || "";
   const search = searchParams?.search || "";
   const city = searchParams?.city || "";
@@ -81,10 +80,6 @@ export default async function Home({ params, searchParams }) {
     fetchAllCategories(),
     fetchAllListings(categoryId, categoryIdFilter, search, city),
   ]);
-
-  const {token} = useAuthStore
-
-console.log('tok', token)
 
   return (
     <>
@@ -121,10 +116,11 @@ console.log('tok', token)
             </div>
           </div>
         </div> */}
-        {token !== undefined ?
-          <Watch />
-          : ""
-        }
+        <Watchlist />
+        {/* <MarketplaceCard
+          heading="Deals"
+          cards={listings?.data?.data.slice(0, 8) || []}
+        /> */}
         {reserveCards.length > 0 && (
           <AuctionGrid
 
@@ -133,10 +129,10 @@ console.log('tok', token)
           />
         )}
         <div className="mt-5" id="marketplace-deals">
-          <MarketplaceCard
-            heading="Cool Auction"
-            cards={listings?.data?.data.slice(0, 6) || []}
-          />
+        <MarketplaceCard
+          heading="Cool Auction"
+          cards={listings?.data?.data.slice(0, 6) || []}
+        />
         </div>
         <LatestNews />
       </div>
