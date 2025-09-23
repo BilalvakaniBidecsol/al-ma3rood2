@@ -64,7 +64,7 @@ const Market = ({
           cards.map((card, index) => (
             <Link
               key={index}
-              href={`/marketplace/${card.category?.slug || "unknown"}/${
+              href={`/marketplace/${card.category?.slug?.split("/").pop()  || "unknown"}/${
                 card.slug
               }`}
               className={
