@@ -24,7 +24,7 @@ const AuctionGrid = ({ heading, cards, centerHeading = false }) => {
           cards.map((card, index) => (
             <Link
               key={index}
-              href={`/marketplace/${card.category?.slug || "unknown"}/${card.slug
+              href={`/marketplace/${card.category?.slug?.split("/").pop()  || "unknown"}/${card.slug
                 }`}
               className="block bg-[#FBFBFB] p-1 md:p-2 rounded hover:shadow-lg transition-shadow w-full"
             >
