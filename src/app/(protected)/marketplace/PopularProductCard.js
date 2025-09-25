@@ -756,7 +756,9 @@ const PopularProductCard = ({
                 return (
                   <Link
                     key={index}
-                    href={`/marketplace/${card.category?.slug || "unknown"}/${card.slug}`}
+                    // href={`/marketplace/${card.category?.slug || "unknown"}/${card.slug}`}
+                       href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug
+                }`}
                     className="flex-shrink-0 block bg-[#FBFBFB] p-2 rounded hover:shadow-lg transition-shadow w-60 snap-start"
                   >
                     <img
