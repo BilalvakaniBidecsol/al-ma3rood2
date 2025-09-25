@@ -237,7 +237,7 @@ const Page = () => {
           {/* Tabs section - blended with hero color */}
           <div className="bg-white rounded-lg  overflow-hidden">
             {/* Tabs section - flush with top of card */}
-            <div className="flex border-b border-gray-200">
+            {/* <div className="flex border-b border-gray-200">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -258,7 +258,32 @@ const Page = () => {
                 </button>
               ))}
 
-            </div>
+            </div> */}
+            {/* Tabs Section */}
+<div className="flex border-b border-gray-200 
+                overflow-x-auto sm:overflow-visible">
+  {tabs.map((tab) => (
+    <button
+      key={tab.key}
+      onClick={() => {
+        setActiveTab(tab.key);
+        setFilters({ ...filters, category_id: null });
+      }}
+      className={`flex-none shrink-0 text-sm font-medium 
+        h-10 px-4 text-center whitespace-nowrap
+        ${activeTab === tab.key
+          ? "bg-white text-[#175f48]"
+          : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+        } border-r border-gray-200 last:border-r-0`}
+    >
+      <div className="flex items-center justify-center gap-2 h-full">
+        <img src={tab.icon} alt={tab.name} className="w-5 h-5 object-contain" />
+        <span>{tab.name}</span>
+      </div>
+    </button>
+  ))}
+</div>
+
           </div>
 
           {/* <div className="px-6 py-4">
@@ -604,8 +629,8 @@ const Page = () => {
           </div>
         ) : motorListings.length > 0 ? (
           <div className={`grid gap-6 ${viewMode === 'grid'
-              ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-              : 'grid-cols-1 md:mx-10'
+                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+                : 'grid-cols-1 md:mx-10'
             }`}>
             {sortedListings.map((listing) => (
               <MotorListingCard key={listing.id} listing={listing} viewMode={viewMode} />
