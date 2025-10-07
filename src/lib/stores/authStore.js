@@ -127,7 +127,13 @@ login: async (email, password) => {
             billing_address: userData.billing_address,
             city: userData.city,
             state: userData.state,
+            region: userData.region,
+            governorate: userData.governorate,
             password: userData.password,
+                country_id: userData.country_id,
+    region_id: userData.region_id,
+    governorate_id: userData.governorate_id,
+    // city_id: userData.city_id,
           });
 
           // res looks like: { success, message, email }
@@ -136,10 +142,10 @@ login: async (email, password) => {
             set({ user: null, token: null, isLoading: false });
             return res; // return the response to handle in your component
           } else {
-            throw new Error(res?.message || "Registration failed");
+            throw new Error(res?.data.error || "Registration failed");
           }
         } catch (error) {
-          set({ error: error.message || "Registration failed", isLoading: false });
+          set({ error: error?.message || "Registration failed", isLoading: false });
           throw error;
         }
       },

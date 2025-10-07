@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Car, Calendar, Gauge, Fuel, Settings, MapPin, Heart, Eye } from 'lucide-react';
 import { Image_URL } from '@/config/constants';
 
-const MotorListingCard = ({ listing, viewMode }) => {
+const MotorListingCard = ({ key, listing, viewMode }) => {
   const getAttributeValue = (key) => {
     const attribute = listing.attributes?.find(attr => attr.key === key);
     return attribute ? attribute.value : null;
@@ -96,7 +96,7 @@ const MotorListingCard = ({ listing, viewMode }) => {
         {/* Title and Price */}
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 line-clamp-2 truncate w-32 md:w-72">
+            <h3 className={`text-lg font-semibold text-gray-900 line-clamp-2 truncate ${viewMode !== 'grid' ? 'w-32 md:w-64' : "w-32 md:w-72"}`}>
               {year && `${year} `}{make && `${make} `}{model || listing.title}
             </h3>
             {listing?.body_style && (

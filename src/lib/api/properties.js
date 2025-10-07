@@ -1,6 +1,6 @@
 import axiosClient from "./axiosClient";
 
-export const motorsApi = {
+export const propertiesApi = {
   // Get motor listings with specific filters
   getMotorListings: async (params = {}) => {
     const filteredParams = Object.fromEntries(
@@ -17,9 +17,9 @@ export const motorsApi = {
     return response.data;
   },
 
-    getMotorsByFilter: async (payload, search) => {
+    getPropertiesByFilter: async (payload, search) => {
    const formattedPayload = {
-        listing_type: "motors",
+        listing_type: "property",
     filters: {},
         pagination: {
           page: payload?.pagination?.page || 1,
@@ -79,19 +79,19 @@ export const motorsApi = {
         formattedPayload.search = payload.search;
       }
   
-      // ✅ add min_price if present
-      if (payload?.min_price !== undefined && payload?.min_price !== null) {
-        formattedPayload.min_price = payload.min_price;
-      }
+      // // ✅ add min_price if present
+      // if (payload?.min_price !== undefined && payload?.min_price !== null) {
+      //   formattedPayload.min_price = payload.min_price;
+      // }
 
          if (payload?.category_id !== undefined && payload?.category_id !== null) {
         formattedPayload.category_id = payload.category_id;
       }
   
       // ✅ add max_price if present
-      if (payload?.max_price !== undefined && payload?.max_price !== null) {
-        formattedPayload.max_price = payload.max_price;
-      }
+      // if (payload?.max_price !== undefined && payload?.max_price !== null) {
+      //   formattedPayload.max_price = payload.max_price;
+      // }
   
       // ✅ add filters if present
       // if (payload?.filters && Object.keys(payload.filters).length > 0) {
@@ -217,4 +217,4 @@ export const motorSearchFilters = {
   ]
 };
 
-export default motorsApi; 
+export default propertiesApi; 

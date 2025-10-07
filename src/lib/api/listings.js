@@ -38,7 +38,7 @@ export const listingsApi = {
       listing_type: "marketplace",
       pagination: {
         page: payload?.pagination?.page || 1,
-        per_page: payload?.pagination?.per_page || 10,
+        per_page: payload?.pagination?.per_page || 30,
       },
     };
 
@@ -90,6 +90,26 @@ export const listingsApi = {
     );
     return response.data;
   },
+  // Listing Filter By All Categories
+  getListingsFilterByAllCategories: async (params = {}) => {
+        const filteredParams = Object.fromEntries(
+      Object.entries(params).filter(([_, v]) => v !== undefined)
+    );
+    const searchParams = new URLSearchParams(filteredParams).toString();
+    console.log("Check Listing:", searchParams)
+    const response = await axiosClient.get(
+      `/listings/suggestions${searchParams ? `?${searchParams}&status=1` : "?status=1"}`
+    );
+    return{
+      web_suggestions: response?.web_suggestions || [],
+      past_searches: response?.past_searches || [],
+    };
+  },
+
+  listingsSearchHistory(params) {
+  return axiosClient.get("listings/search", { params });
+},
+
 
   getListingBySlug: async (productSlug) => {
     const response = await axiosClient.get(`/listings/${productSlug}/show`);

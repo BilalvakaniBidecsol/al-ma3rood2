@@ -13,12 +13,13 @@ import UploadPhotos from "@/components/WebsiteComponents/listingforms/UploadPhot
 import PriceAndPayment from "@/components/WebsiteComponents/listingforms/PriceAndPayment";
 import { useCategoryStore } from "@/lib/stores/categoryStore";
 import { listingsApi } from "@/lib/api/listings";
-import { useRouter } from "next/navigation";
 import SuccessToast from "@/components/WebsiteComponents/listingforms/SuccessToast";
 import ListingForm from "@/components/WebsiteComponents/listingforms/ListingForm";
 import MotorListingForm from "@/components/WebsiteComponents/listingforms/MotorListingForm";
+import Properties from "@/components/WebsiteComponents/listingforms/Properties";
 import { toast } from "react-toastify";
-import { Car, Package } from "lucide-react";
+import { Car, HomeIcon, Package } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function toFieldName(label) {
   return label
@@ -136,6 +137,7 @@ const Page = () => {
   const [showListingTypeSelection, setShowListingTypeSelection] =
     useState(true);
   const router = useRouter();
+
   const handleCreateListing = async (data) => {
     try {
       const newListing = await listingsApi.createListing(data);
@@ -148,15 +150,22 @@ const Page = () => {
     }
   };
 
-  const handleListingTypeSelect = (type) => {
+const handleListingTypeSelect = (type) => {
+  if (type === "property_type") {
+    setListingType("property_type"); 
+    setShowListingTypeSelection(false);
+  } else {
     setListingType(type);
     setShowListingTypeSelection(false);
-  };
+  }
+};
 
   const handleBackToListingType = () => {
     setListingType(null);
     setShowListingTypeSelection(true);
   };
+
+  
 
   if (showListingTypeSelection) {
     return (
@@ -172,7 +181,7 @@ const Page = () => {
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {/* General Item Option */}
+            
             <div
               className="bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-blue-500 transition-all duration-300 cursor-pointer group"
               onClick={() => handleListingTypeSelect("general")}
@@ -195,7 +204,7 @@ const Page = () => {
               </div>
             </div>
 
-            {/* Motor Option */}
+            {/* motor Option */}
             <div
               className="bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-green-500 transition-all duration-300 cursor-pointer group"
               onClick={() => handleListingTypeSelect("motor")}
@@ -214,6 +223,27 @@ const Page = () => {
                 <div className="text-sm text-gray-500">
                   Specialized forms for vehicle details, specifications, and
                   documentation
+                </div>
+              </div>
+            </div>
+            {/* Properties Option */}
+
+            <div
+              className="bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-green-500 transition-all duration-300 cursor-pointer group"
+              onClick={() => handleListingTypeSelect("property_type")}
+            >
+              <div className="text-center">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-200 transition-colors">
+                  <HomeIcon className="w-10 h-10 text-green-600" />
+                </div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                  Properties
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  List houses, apartments, plots, commercial spaces, and rental properties
+                </p>
+                <div className="text-sm text-gray-500">
+                  Specialized forms for property type, location, price, size, and amenities
                 </div>
               </div>
             </div>
@@ -243,7 +273,28 @@ const Page = () => {
               Back to listing type selection
             </button>
           </div>
-          <MotorListingForm />
+          <MotorListingForm mode="create"/>
+        </div>
+      </div>
+    );
+  }
+
+  if (listingType === "property_type") {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="mb-6">
+            <button
+              onClick={handleBackToListingType}
+              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+            >
+              <IoIosArrowForward className="w-4 h-4 rotate-180 mr-2" />
+              Back to listing type selection
+            </button>
+          </div>
+          <Properties/>
+
+          {/* <PropertyListingForm onSubmit={handleCreateListing} /> */}
         </div>
       </div>
     );

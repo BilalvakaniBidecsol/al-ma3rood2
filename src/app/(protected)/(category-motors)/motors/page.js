@@ -10,6 +10,7 @@ import Link from "next/link";
 import motorsApi, { motorSearchFilters } from "@/lib/api/motors";
 import { FaTh, FaThList } from "react-icons/fa";
 import MotorListingCard from "@/components/WebsiteComponents/MotorListingCard";
+import { useTranslation } from "react-i18next";
 
 const allowedTabs = [
   { key: "Cars", name: "Cars", icon: "./car.png" },
@@ -70,6 +71,7 @@ const Page = () => {
     search: "",
     category_id: null,
   });
+  const { t } = useTranslation();
 
   const modelsByMake = {
     Toyota: ["Corolla", "Camry", "Yaris"],
@@ -95,7 +97,7 @@ const Page = () => {
         sort: sortBy,
         pagination: {
           page: currentPage,
-          per_page: 10
+          per_page: 30
         }
       };
 
@@ -226,18 +228,22 @@ const Page = () => {
         style={{ background: "rgb(23, 95, 72)" }}
       >
         <div className="max-w-6xl mx-auto w-full">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug mb-6 sm:mb-8">
-            SHOP NEW & USED ITEMS <br /> FOR SALE
-          </h1>
+          <h1
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug mb-6 sm:mb-8"
+            dangerouslySetInnerHTML={{
+              __html: t("SHOP NEW & USED ITEMS <br /> FOR SALE"),
+            }}
+          />
         </div>
       </div>
+      {/* {t("Your Marketplace. Your Kingdom.")} */}
       {/* Filter Card with Blended Tabs */}
       <div className="max-w-5xl mx-auto -mt-20 relative z-10 px-4">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Tabs section - blended with hero color */}
           <div className="bg-white rounded-lg  overflow-hidden">
             {/* Tabs section - flush with top of card */}
-            {/* <div className="flex border-b border-gray-200">
+            <div className="flex border-b border-gray-200">
               {tabs.map((tab) => (
                 <button
                   key={tab.key}
@@ -258,32 +264,7 @@ const Page = () => {
                 </button>
               ))}
 
-            </div> */}
-            {/* Tabs Section */}
-<div className="flex border-b border-gray-200 
-                overflow-x-auto sm:overflow-visible">
-  {tabs.map((tab) => (
-    <button
-      key={tab.key}
-      onClick={() => {
-        setActiveTab(tab.key);
-        setFilters({ ...filters, category_id: null });
-      }}
-      className={`flex-none shrink-0 text-sm font-medium 
-        h-10 px-4 text-center whitespace-nowrap
-        ${activeTab === tab.key
-          ? "bg-white text-[#175f48]"
-          : "bg-gray-50 text-gray-600 hover:bg-gray-100"
-        } border-r border-gray-200 last:border-r-0`}
-    >
-      <div className="flex items-center justify-center gap-2 h-full">
-        <img src={tab.icon} alt={tab.name} className="w-5 h-5 object-contain" />
-        <span>{tab.name}</span>
-      </div>
-    </button>
-  ))}
-</div>
-
+            </div>
           </div>
 
           {/* <div className="px-6 py-4">
@@ -300,14 +281,14 @@ const Page = () => {
                 {/* Condition */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Condition
+                    {t("Condition")}
                   </label>
                   <select
                     value={filters.condition}
                     onChange={(e) => handleFilterChange('condition', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">All Conditions</option>
+                    <option value="">{t("All Conditions")}</option>
                     {motorSearchFilters.conditions.map(condition => (
                       <option key={condition} value={condition} className="capitalize">
                         {condition}
@@ -318,14 +299,14 @@ const Page = () => {
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Make
+                    {t("Make")}
                   </label>
                   <select
                     value={filters.make}
                     onChange={(e) => handleFilterChange("make", e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">Select Make</option>
+                    <option value="">{t("Select Make")}</option>
                     {["Toyota", "Honda", "BMW", "Mercedes", "Ford", "Audi"].map((make) => (
                       <option key={make} value={make}>
                         {make}
@@ -337,7 +318,7 @@ const Page = () => {
                 {/* Model */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Model
+                    {t("Model")}
                   </label>
                   <select
                     value={filters.model}
@@ -345,7 +326,7 @@ const Page = () => {
                     disabled={!filters.make}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">Select Model</option>
+                    <option value="">{t("Select Model")}</option>
                     {filters.make &&
                       modelsByMake[filters.make]?.map((model) => (
                         <option key={model} value={model}>
@@ -358,7 +339,7 @@ const Page = () => {
                 {/* Price Range */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Price Range
+                    {t("Price Range")}
                     {/* <span className="price">$</span> */}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -367,7 +348,7 @@ const Page = () => {
                       onChange={(e) => handleFilterChange("price_min", e.target.value)}
                       className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      <option value="">Min</option>
+                      <option value="">{t("Min")}</option>
                       {[0, 500, 1000, 5000, 10000, 20000, 50000].map((price) => (
                         <option key={price} value={price}>
                           ${price.toLocaleString()}
@@ -380,7 +361,7 @@ const Page = () => {
                       onChange={(e) => handleFilterChange("price_max", e.target.value)}
                       className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      <option value="">Max</option>
+                      <option value="">{t("Max")}</option>
                       {[1000, 5000, 10000, 20000, 50000, 100000].map((price) => (
                         <option key={price} value={price}>
                           <span className="price">$</span>{price.toLocaleString()}
@@ -394,7 +375,7 @@ const Page = () => {
                 {/* Year Range */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Year
+                    {t("Year")}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
                     <select
@@ -402,7 +383,7 @@ const Page = () => {
                       onChange={(e) => handleFilterChange("year_min", e.target.value)}
                       className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      <option value="">Min</option>
+                      <option value="">{t("Min")}</option>
                       {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => 1900 + i)
                         .map((year) => (
                           <option key={year} value={year}>
@@ -416,7 +397,7 @@ const Page = () => {
                       onChange={(e) => handleFilterChange("year_max", e.target.value)}
                       className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
-                      <option value="">Max</option>
+                      <option value="">{t("Max")}</option>
                       {Array.from({ length: new Date().getFullYear() - 1899 }, (_, i) => 1900 + i)
                         .map((year) => (
                           <option key={year} value={year}>
@@ -431,14 +412,13 @@ const Page = () => {
                 {/* Fuel Type */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Fuel Type
-                  </label>
+                    {t("Fuel Type")}                  </label>
                   <select
                     value={filters.fuel_type}
                     onChange={(e) => handleFilterChange('fuel_type', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">All Fuel Types</option>
+                    <option value="">{t("All Fuel Types")}</option>
                     {motorSearchFilters.fuelTypes.map(fuel => (
                       <option key={fuel} value={fuel}>
                         {fuel}
@@ -450,14 +430,14 @@ const Page = () => {
                 {/* Transmission */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Transmission
+                    {t("Transmission")}
                   </label>
                   <select
                     value={filters.transmission}
                     onChange={(e) => handleFilterChange('transmission', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">All Transmissions</option>
+                    <option value="">{t("All Transmissions")}</option>
                     {motorSearchFilters.transmissions.map(trans => (
                       <option key={trans} value={trans}>
                         {trans}
@@ -469,14 +449,14 @@ const Page = () => {
                 {/* Body Style */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Body Style
+                    {t("Body Style")}
                   </label>
                   <select
                     value={filters.body_style}
                     onChange={(e) => handleFilterChange('body_style', e.target.value)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
-                    <option value="">All Body Styles</option>
+                    <option value="">{t("All Body Styles")}</option>
                     {motorSearchFilters.bodyStyles.map(style => (
                       <option key={style} value={style}>
                         {style}
@@ -491,7 +471,7 @@ const Page = () => {
             {activeTab !== "allcat" && (
               <div className="mb-6">
                 <label className="block text-sm font-semibold text-[#444] mb-2">
-                  Keywords
+                  {t("Keywords")}
                 </label>
                 <div
                   className={`relative ${showMoreOptions ? "w-full" : "w-full sm:w-[300px]"
@@ -500,7 +480,7 @@ const Page = () => {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Search using keywords"
+                    placeholder={t("Search using keywords")}
                     value={filters.search || ""}
                     onChange={(e) =>
                       setFilters({ ...filters, search: e.target.value })
@@ -519,7 +499,7 @@ const Page = () => {
                     loadMotorListings()
                   }}
                   type="button" className="w-full sm:w-auto bg-[#175f48] hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors text-center">
-                  View listings
+                  {t("View listings")}
                 </button>
               </div>
             )}
@@ -531,8 +511,8 @@ const Page = () => {
                     {/* ✅ Parent Category */}
                     <h3
                       className={`text-lg font-semibold mb-3 cursor-pointer hover:underline ${filters.category_id === parent.id
-                          ? "text-blue-600 underline" // 🔵 Highlight parent differently
-                          : "text-[#175f48]"
+                        ? "text-blue-600 underline" // 🔵 Highlight parent differently
+                        : "text-[#175f48]"
                         }`}
                       onClick={() => {
                         setFilters({ ...filters, category_id: parent.id });
@@ -550,8 +530,8 @@ const Page = () => {
                             setFilters({ ...filters, category_id: child.id });
                           }}
                           className={`block text-sm cursor-pointer hover:underline ${filters.category_id === child.id
-                              ? "text-green-600 font-semibold" // 🟢 Different from parent
-                              : "text-gray-700"
+                            ? "text-green-600 font-semibold" // 🟢 Different from parent
+                            : "text-gray-700"
                             }`}
                         >
                           {child.name}
@@ -578,7 +558,7 @@ const Page = () => {
               ''
             ) : (
               <>
-                Showing <span className="font-semibold">{motorListings.length || 0}</span> Results
+                {t("Showing")} <span className="font-semibold">{motorListings.length || 0}</span> {t("Results")}
               </>
             )}
           </p>
@@ -589,10 +569,10 @@ const Page = () => {
               className="border border-gray-300 rounded px-2 py-1 text-sm"
             >
               {/* <option value="featured">Sort: Featured First</option> */}
-              <option value="price_low">Price: Low to High</option>
-              <option value="price_high">Price: High to Low</option>
-              <option value="year_new">Newest First</option>
-              <option value="year_old">Oldest First</option>
+              <option value="price_low">{t("Price: Low to High")}</option>
+              <option value="price_high">{t("Price: High to Low")}</option>
+              <option value="year_new">{t("Newest First")}</option>
+              <option value="year_old">{t("Oldest First")}</option>
               {/* <option value="odometer_low">Mileage: Low to High</option> */}
             </select>
             <div className="flex justify-center gap-2">
@@ -605,7 +585,7 @@ const Page = () => {
                 aria-pressed={viewMode === "list"}
               >
                 <FaThList />
-                <span>{"List"}</span>
+                <span>{t("List")}</span>
               </button>
               <button
                 className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${viewMode === "grid"
@@ -616,14 +596,14 @@ const Page = () => {
                 aria-pressed={viewMode === "grid"}
               >
                 <FaTh />
-                <span>{"Grid"}</span>
+                <span>{t("Grid")}</span>
               </button>
             </div>
           </div>
         </div>
 
         {/* Motor listings */}
-        {isLoading ? (
+            {isLoading ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
           </div>
@@ -661,7 +641,7 @@ const Page = () => {
                   onClick={() => setCurrentPage(currentPage - 1)}
                   className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                 >
-                  Previous
+                  {t("Previous")}
                 </button>
               )}
 
@@ -675,8 +655,8 @@ const Page = () => {
                     key={pageNum}
                     onClick={() => setCurrentPage(pageNum)}
                     className={`px-4 py-2 border border-gray-300 rounded-md ${currentPage === pageNum
-                        ? 'bg-green-600 text-white'
-                        : 'hover:bg-gray-50'
+                      ? 'bg-green-600 text-white'
+                      : 'hover:bg-gray-50'
                       }`}
                   >
                     {pageNum}
@@ -689,7 +669,7 @@ const Page = () => {
                   onClick={() => setCurrentPage(currentPage + 1)}
                   className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
                 >
-                  Next
+                  {t("Next")}
                 </button>
               )}
             </div>

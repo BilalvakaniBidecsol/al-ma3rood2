@@ -42,7 +42,7 @@ const Map = ({ onLocationSelect }) => {
   };
 
   return (
-    <div className="relative w-full h-96 border border-gray-300 rounded-lg overflow-hidden">
+    <div className="relative w-full h-72 sm:h-80 md:h-96 border border-gray-300 rounded-lg overflow-hidden">
       <iframe
         src="https://maps.google.com/maps?q=London,UK&z=10&output=embed"
         title="UK Map"
@@ -82,15 +82,16 @@ const MapSchoolList = () => {
   }, [schoolTypeFilter, showSchools, selectedLocation]);
 
   return (
-    <div className=" mx-auto p-4 px-18 font-sans">
-      <div className="flex justify-end space-x-3 mb-4">
+    <div className="mx-auto p-4 sm:px-6 md:px-10 font-sans max-w-6xl">
+      {/* Toggle Buttons */}
+      <div className="flex flex-wrap justify-center sm:justify-end gap-3 mb-4">
         <button
           onClick={() => {
             setShowSchools(false);
             setSelectedLocation(null);
             setSchoolTypeFilter("All");
           }}
-          className={`px-4 py-2 rounded border ${
+          className={`px-4 py-2 rounded border text-sm sm:text-base ${
             !showSchools
               ? "bg-green-600 text-white border-green-600"
               : "bg-white text-green-600 border-green-600"
@@ -107,7 +108,7 @@ const MapSchoolList = () => {
               alert("Please select a location on the map first.");
             }
           }}
-          className={`px-4 py-2 rounded border ${
+          className={`px-4 py-2 rounded border text-sm sm:text-base ${
             showSchools
               ? "bg-green-600 text-white border-green-600"
               : "bg-white text-green-600 border-green-600"
@@ -118,27 +119,31 @@ const MapSchoolList = () => {
         </button>
       </div>
 
+      {/* Map */}
       <Map onLocationSelect={setSelectedLocation} />
 
+      {/* Selected Location */}
       {selectedLocation && (
-        <div className="mt-3 text-gray-700 font-medium">
+        <div className="mt-3 text-gray-700 font-medium text-sm sm:text-base">
           Selected Location:{" "}
           <span className="font-semibold">{selectedLocation.name}</span>
         </div>
       )}
 
+      {/* Schools List */}
       {showSchools && (
         <div className="mt-8">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-900">
             Local Schools
           </h2>
 
-          <div className="flex  border-gray-300 mb-6 space-x-4">
+          {/* Filter Buttons */}
+          <div className="flex flex-wrap gap-3 mb-6">
             {["All", "Primary", "Secondary", "Intermediate"].map((type) => (
               <button
                 key={type}
                 onClick={() => setSchoolTypeFilter(type)}
-                className={`px-5 py-2 w-44 text-sm font-medium rounded-md transition-all duration-200 cursor-pointer ${
+                className={`px-4 sm:px-5 py-2 min-w-[110px] text-sm font-medium rounded-md transition-all duration-200 cursor-pointer ${
                   schoolTypeFilter === type
                     ? "bg-[#469BDB] text-white"
                     : "bg-gray-200 text-gray-700"
@@ -149,10 +154,14 @@ const MapSchoolList = () => {
             ))}
           </div>
 
-          <div className="space-y-6 w-[1000px]">
+          {/* Schools */}
+          <div className="space-y-6 w-full">
             {filteredSchools.length > 0 ? (
               filteredSchools.map((school) => (
-                <div key={school.id} className="pb-4 border-b border-gray-300">
+                <div
+                  key={school.id}
+                  className="pb-4 border-b border-gray-300"
+                >
                   {/* Zone Button */}
                   <div className="mb-2">
                     <button className="text-white px-3 py-1 rounded text-sm bg-[#626262]">
@@ -161,20 +170,22 @@ const MapSchoolList = () => {
                   </div>
 
                   {/* School Info */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900">
                         {school.name}
                       </h3>
-                      <p className="text-gray-600">{school.address}</p>
-                      <p className="text-sm text-gray-500 mt-1">
+                      <p className="text-gray-600 text-sm sm:text-base">
+                        {school.address}
+                      </p>
+                      <p className="text-xs sm:text-sm text-gray-500 mt-1">
                         Type:{" "}
                         <span className="font-medium">
                           {school.type.join(", ")}
                         </span>
                       </p>
                     </div>
-                    <div className="text-gray-900 font-semibold mt-3 sm:mt-0">
+                    <div className="text-gray-900 font-semibold text-sm sm:text-base">
                       {school.distance}m
                     </div>
                   </div>
@@ -187,12 +198,13 @@ const MapSchoolList = () => {
             )}
           </div>
 
+          {/* Footer */}
           <div className="mt-6 text-gray-500 text-sm">
-            <Button title="Show all school  +"/>
+            <Button title="Show all schools +" />
             <p className="mt-5">
               While we've done our best to correctly list schools in this
-              location, school zone information<br></br> may not be exact, so please
-              double check with the school.{" "}
+              location, school zone information may not be exact, so please
+              double check with the school.
             </p>
           </div>
         </div>

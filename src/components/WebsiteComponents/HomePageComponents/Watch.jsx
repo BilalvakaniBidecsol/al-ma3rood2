@@ -6,8 +6,6 @@ const Watch = () => {
     return (
         <div>
             <Watchlist />
-
-
         </div>
     )
 }

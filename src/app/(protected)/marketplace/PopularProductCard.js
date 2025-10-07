@@ -709,7 +709,7 @@ const PopularProductCard = ({
           {/* Left Arrow */}
           <button
             onClick={scrollLeft}
-          // className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow rounded-full p-2 z-10 bg-white shadow-md hover:bg-gray-100"
+            // className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow rounded-full p-2 z-10 bg-white shadow-md hover:bg-gray-100"
           >
             {/* <FaChevronLeft size={22} /> */}
           </button>
@@ -729,9 +729,9 @@ const PopularProductCard = ({
                   return (
                     <Link
                       key="see-more"
-                      href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug
-                        }`}
                       // href={`/marketplace/${card.category?.slug || "unknown"}?categoryId=${card.category?.id || ""}`}
+                         href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug
+                }`}
                       className="min-w-[250px] max-w-[250px] flex flex-col items-center justify-center 
                         bg-[#F5F5F5] border-2 border-gray-300 rounded-xl shadow-sm 
                         hover:shadow-md transition-all duration-300  

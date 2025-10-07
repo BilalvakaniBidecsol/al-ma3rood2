@@ -66,6 +66,8 @@ const ListingForm = ({ initialValues, mode = "create", onSubmit }) => {
   const [currentCategories, setCurrentCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   const { t } = useTranslation();
 
   // Helper to get parent category name (for extra fields logic)
@@ -79,44 +81,44 @@ const ListingForm = ({ initialValues, mode = "create", onSubmit }) => {
   //   );
   //   return merged;
   // }, [parentCategoryName]);
-//   const fullSchema = useMemo(() => {
-//   const categorySchema = getCategorySchema(parentCategoryName);
+  //   const fullSchema = useMemo(() => {
+  //   const categorySchema = getCategorySchema(parentCategoryName);
 
-//   return baseListingSchema
-//     .merge(categorySchema)
-//     .refine(
-//       (data) => {
-//         if (!data.start_price) {
-//           return !!data.buy_now_price;
-//         }
-//         return true;
-//       },
-//       {
-//         message: "Buy now price is required if start price is not provided",
-//         path: ["buy_now_price"],
-//       }
-//     );
-// }, [parentCategoryName]);
+  //   return baseListingSchema
+  //     .merge(categorySchema)
+  //     .refine(
+  //       (data) => {
+  //         if (!data.start_price) {
+  //           return !!data.buy_now_price;
+  //         }
+  //         return true;
+  //       },
+  //       {
+  //         message: "Buy now price is required if start price is not provided",
+  //         path: ["buy_now_price"],
+  //       }
+  //     );
+  // }, [parentCategoryName]);
 
-const fullSchema = useMemo(() => {
-  const categorySchema = getCategorySchema(parentCategoryName);
+  const fullSchema = useMemo(() => {
+    const categorySchema = getCategorySchema(parentCategoryName);
 
-  return baseListingSchema
-    .merge(categorySchema)
-    .refine(
-      (data) => {
-        if (!data.buy_now_price) {
-          return !!data.start_price && !!data.reserve_price;
+    return baseListingSchema
+      .merge(categorySchema)
+      .refine(
+        (data) => {
+          if (!data.buy_now_price) {
+            return !!data.start_price && !!data.reserve_price;
+          }
+          return true;
+        },
+        {
+          message:
+            "Start price and Reserve price are required if Buy now price is not provided",
+          path: ["start_price"],
         }
-        return true;
-      },
-      {
-        message:
-          "Start price and Reserve price are required if Buy now price is not provided",
-        path: ["start_price"],
-      }
-    );
-}, [parentCategoryName]);
+      );
+  }, [parentCategoryName]);
 
   const normalizedInitialValues = useMemo(() => {
     if (!initialValues) return {};
@@ -132,6 +134,7 @@ const fullSchema = useMemo(() => {
     resolver: zodResolver(fullSchema),
     defaultValues: normalizedInitialValues || {},
     mode: "onTouched",
+
   });
   const { handleSubmit, setValue, watch, reset } = methods;
 
@@ -260,6 +263,7 @@ const fullSchema = useMemo(() => {
   // Form submit
   const internalSubmit = async (data) => {
     try {
+      setIsSubmitting(true);
       const formData = new FormData();
       formData.append("title", data.title);
       if (data.subtitle) formData.append("subtitle", data.subtitle);
@@ -299,14 +303,25 @@ const fullSchema = useMemo(() => {
       // }
 
       await onSubmit(formData);
+      const logFormData = (formData) => {
+        for (let [key, value] of formData.entries()) {
+          console.log("valuesssss", `${key}:`, value);
+        }
+      };
+      console.log("formdtaaa", logFormData(formData));
+
+
+
       // TODO: Show success toast, redirect, or reset form as needed
     } catch (error) {
       console.error("Error submitting listing:", error);
       // TODO: Show error toast or message
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
-  // Render step content
+
   const renderStep = () => {
     switch (activeStep) {
       case 0:
@@ -371,9 +386,19 @@ const fullSchema = useMemo(() => {
             <Button title={t("Next")} type="button" onClick={handleNext} />
           ) : (
             <Button
-              title={t(mode === "edit" ? "Update Listing" : "Create Listing")}
-              onClick={() => handleSubmit(internalSubmit)()}
-              // type="submit"
+              title={
+                isSubmitting ? (
+                  <div className="flex items-center gap-2">
+                    {/* Spinning circle loader */}
+                    <span className="h-5 w-5 border-2 border-white border-t-transparent rounded-full animate-spin"></span>
+                    {t(mode === "edit" ? "Updating..." : "Creating...")}
+                  </div>
+                ) : (
+                  t(mode === "edit" ? "Update Listing" : "Create Listing")
+                )
+              }
+              onClick={handleSubmit(internalSubmit)}
+              disabled={isSubmitting}
             />
           )}
         </div>

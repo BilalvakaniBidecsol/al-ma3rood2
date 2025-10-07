@@ -2,6 +2,8 @@
 import { Image_NotFound, Image_URL } from "@/config/constants";
 import Link from "next/link";
 import { useTranslation } from "react-i18next";
+import { useAuthStore } from "@/lib/stores/authStore";
+import Watch from "@/components/WebsiteComponents/HomePageComponents/Watch";
 
 const AuctionGrid = ({ heading, cards, centerHeading = false }) => {
   const { t } = useTranslation();
@@ -24,8 +26,9 @@ const AuctionGrid = ({ heading, cards, centerHeading = false }) => {
           cards.map((card, index) => (
             <Link
               key={index}
-              href={`/marketplace/${card.category?.slug?.split("/").pop()  || "unknown"}/${card.slug
+              href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug
                 }`}
+
               className="block bg-[#FBFBFB] p-1 md:p-2 rounded hover:shadow-lg transition-shadow w-full"
             >
               <div className="relative w-full h-44 rounded-t overflow-hidden">

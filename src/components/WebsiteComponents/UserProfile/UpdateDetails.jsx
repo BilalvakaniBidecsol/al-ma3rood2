@@ -20,7 +20,7 @@ const UpdateDetails = () => {
 
   const updateOptions = [
     { id: "editProfile", icon: FaUser, label: "My Profile" },
-    { id: "changeEmail", icon: FaEnvelope, label: "Change Email Address" },
+    // { id: "changeEmail", icon: FaEnvelope, label: "Change Email Address" },
     { id: "changePassword", icon: FaKey, label: "Change Password" },
     { id: "changeUsername", icon: FaUserEdit, label: "Change Fullname" },
     {

@@ -26,9 +26,8 @@ const Market = ({
   return (
     <div className="">
       <h2
-        className={`text-2xl font-semibold pb-1 mb-6 ${
-          centerHeading ? "text-center" : ""
-        }`}
+        className={`text-2xl font-semibold pb-1 mb-6 ${centerHeading ? "text-center" : ""
+          }`}
       >
         <span className="inline-block border-b-2 border-gray-400">
           {t(
@@ -64,9 +63,8 @@ const Market = ({
           cards.map((card, index) => (
             <Link
               key={index}
-              href={`/marketplace/${card.category?.slug?.split("/").pop()  || "unknown"}/${
-                card.slug
-              }`}
+              href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug
+                }`}
               className={
                 layout === "grid"
                   ? "block bg-[#FBFBFB] p-2 rounded hover:shadow-lg transition-shadow w-full"
@@ -128,15 +126,15 @@ const Market = ({
                     <div className="flex justify-between mt-1">
                       {(card.creator?.city ||
                         card.creator?.billing_address) && (
-                        <div className="text-gray-700">
-                          <div className="text-[10px] text-gray-400  tracking-wide">
-                            {t("City")}:{" "}
+                          <div className="text-gray-700">
+                            <div className="text-[10px] text-gray-400  tracking-wide">
+                              {t("City")}:{" "}
+                            </div>
+                            <div className="font-bold text-xs">
+                              {card.creator.city || card.creator.billing_address}
+                            </div>
                           </div>
-                          <div className="font-bold text-xs">
-                            {card.creator.city || card.creator.billing_address}
-                          </div>
-                        </div>
-                      )}
+                        )}
 
                       {card.buy_now_price && (
                         <div className="text-right text-gray-700 flex flex-col items-end">

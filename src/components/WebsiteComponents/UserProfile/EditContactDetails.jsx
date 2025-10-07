@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Button from "../ReuseableComponenets/Button";
@@ -12,6 +12,7 @@ import { useAuthStore } from "@/lib/stores/authStore";
 import { useTranslation } from "react-i18next";
 import { Country, State, City } from "country-state-city";
 import Select from "react-select";
+import { useLocationStore } from "@/lib/stores/locationStore";
 
 const schema = yup.object().shape({
   firstname: yup.string().required("Firstname is required"),
@@ -36,7 +37,9 @@ const schema = yup.object().shape({
   addressLine1: yup.string().required("Address line 1 is required"),
   addressLine2: yup.string().required("Address line 2 is required"),
   suburb: yup.string().required("Suburb is required"),
-  city: yup.string().required("City is required"),
+  // city: yup.string().required("City is required"),
+  region: yup.string().required("Region is required"),
+  governorate: yup.string().required("Governorate is required"),
   postCode: yup.string().required("Post code is required"),
   closestDistrict: yup.string().required("Closest district is required"),
 });
@@ -44,11 +47,14 @@ const schema = yup.object().shape({
 const EditContactDetails = () => {
   const hideComponent = useProfileStore((state) => state.hideComponent);
   const { user, logout, updateUser } = useAuthStore();
+    const { locations, getAllLocations } = useLocationStore();
 
   const {
     register,
     handleSubmit,
     reset,
+    control,
+    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
@@ -75,17 +81,21 @@ const EditContactDetails = () => {
   const onSubmit = async (data) => {
     const formData = new FormData();
 
+    const regions_id = regions.find((r) => r.name == data.region);
+    const governorates_id = governorates.find((r) => r.name == data.governorate);
     formData.append("first_name", data.firstname);
     formData.append("last_name", data.lastname);
     formData.append("name", `${data.firstname} ${data.lastname}`);
     // formData.append("email", "abdullah@example.com"); // Replace with dynamic value if needed
-    formData.append("phone", data.mobile || "");
-    formData.append("landline", data.phone || "");
+    formData.append("phone", data.phone || "");
+    formData.append("landline", data.mobile || "");
     formData.append("gender", data.gender || "");
     formData.append("account_type", data.accountType || "");
     formData.append("country", data.country || "");
     formData.append("business_name", data.businessName || "");
-    // formData.append("country", country);
+    formData.append("country_id", 1);
+    formData.append("regions_id", regions_id.id);
+    formData.append("governorates_id", governorates_id.id);
     formData.append("address_finder", data.addressFinder);
     formData.append("address_1", data.addressLine1);
     formData.append("address_2", data.addressLine2);
@@ -98,11 +108,11 @@ const EditContactDetails = () => {
     // );
     // formData.append("street_address", data.streetAddress || "Shahrah-e-Faisal");
     // formData.append("apartment", data.apartment || "Apartment 12B");
-    formData.append("city", data.city || "");
+    // formData.append("city", data.city || "");
     // formData.append("state", data.state || "Sindh");
     formData.append("zip_code", data.postCode || "");
     formData.append("state", selectedState?.label || "");
-    formData.append("city", selectedCity?.label || "");
+    // formData.append("city", selectedCity?.label || "");
 
     try {
       const res = await userApi.contactDetail(user.id, formData);
@@ -147,76 +157,88 @@ const EditContactDetails = () => {
   const [selectedState, setSelectedState] = useState(null);
   const [selectedCity, setSelectedCity] = useState(null);
 
-  const [states, setStates] = useState([]);
-  const [cities, setCities] = useState([]);
-  useEffect(() => {
-    const allStates = State.getStatesOfCountry(selectedCountry.value);
-    setStates(
-      allStates.map((state) => ({
-        label: state.name,
-        value: state.isoCode,
-      }))
-    );
-    const defaultCities = City.getCitiesOfCountry("SA");
-    // setCities(
-    //   defaultCities.map((city) => ({
-    //     label: city.name,
-    //     value: city.isoCode,
-    //   }))
-    // ); 
-      const uniqueCities = defaultCities.filter(
-    (city, index, self) =>
-      index === self.findIndex((c) => c.name === city.name)
-  );
+  // const [states, setStates] = useState([]);
+  // const [cities, setCities] = useState([]);
+const country = locations.find((c) => c.id == 1); // Saudi Arabia
+const regions = country?.regions || [];
 
-  // setCities(uniqueCities);
-      setCities(
-        uniqueCities.map((city) => ({
-          label: city.name,
-          value: city.name,
-        }))
-      );   
-    const selectedCities = defaultCities.find((s) => s.name == user.city);
-    // console.log("User",user.city)
+const governorates =
+  regions.find((r) => r.name === watch("region"))?.governorates || [];
 
-    // console.log("Sele",selectedCities)
-    const city = {
-      label: selectedCities.name,
-      value: selectedCities.name
-    }
-    setSelectedCity(city);
+const cities =
+  governorates.find((g) => g.name === watch("governorate"))?.cities || [];
 
-    // console.log("final", city)
-    // setSelectedState(null);
-    // setCities([]);
-  }, [selectedCountry]);
+        useEffect(() => {
+    getAllLocations(); 
+  }, [getAllLocations]);
+  // useEffect(() => {
+  //   const allStates = State.getStatesOfCountry(selectedCountry.value);
+  //   setStates(
+  //     allStates.map((state) => ({
+  //       label: state.name,
+  //       value: state.isoCode,
+  //     }))
+  //   );
+  //   const defaultCities = City.getCitiesOfCountry("SA");
+  //   // setCities(
+  //   //   defaultCities.map((city) => ({
+  //   //     label: city.name,
+  //   //     value: city.isoCode,
+  //   //   }))
+  //   // ); 
+  //     const uniqueCities = defaultCities.filter(
+  //   (city, index, self) =>
+  //     index === self.findIndex((c) => c.name === city.name)
+  // );
+
+  // // setCities(uniqueCities);
+  //     setCities(
+  //       uniqueCities.map((city) => ({
+  //         label: city.name,
+  //         value: city.name,
+  //       }))
+  //     );   
+  //   const selectedCities = defaultCities.find((s) => s.name == user.city);
+  //   // console.log("User",user.city)
+
+  //   // console.log("Sele",selectedCities)
+  //   const city = {
+  //     label: selectedCities.name,
+  //     value: selectedCities.name
+  //   }
+  //   setSelectedCity(city);
+
+  //   // console.log("final", city)
+  //   // setSelectedState(null);
+  //   // setCities([]);
+  // }, [selectedCountry]);
   // useEffect(() => {
   //   const selectedCities = cities.find((s) => s.name == user.city);
   //   setSelectedCity(selectedCities);
   //   console.log("selected", selectedCities);
   // }, [cities]);
-  useEffect(() => {
-    if (selectedState) {
-      const allCities = City.getCitiesOfState(
-        selectedCountry.value,
-        selectedState.value
-      );
-                // Remove duplicate cities by name
-  const uniqueCities = allCities.filter(
-    (city, index, self) =>
-      index === self.findIndex((c) => c.name === city.name)
-  );
+  // useEffect(() => {
+  //   if (selectedState) {
+  //     const allCities = City.getCitiesOfState(
+  //       selectedCountry.value,
+  //       selectedState.value
+  //     );
+  //               // Remove duplicate cities by name
+  // const uniqueCities = allCities.filter(
+  //   (city, index, self) =>
+  //     index === self.findIndex((c) => c.name === city.name)
+  // );
 
-  // setCities(uniqueCities);
-      setCities(
-        uniqueCities.map((city) => ({
-          label: city.name,
-          value: city.name,
-        }))
-      );
-      // setSelectedCity(null);
-    }
-  }, [selectedState]);
+  // // setCities(uniqueCities);
+  //     setCities(
+  //       uniqueCities.map((city) => ({
+  //         label: city.name,
+  //         value: city.name,
+  //       }))
+  //     );
+  //     // setSelectedCity(null);
+  //   }
+  // }, [selectedState]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="mt-4 ">
@@ -402,7 +424,7 @@ const EditContactDetails = () => {
         {/* Street address */}
         <h3 className="text-md font-semibold mb-2">{t("Street address")}</h3>
         <div className="mb-6 p-4 bg-white rounded border border-gray-300">
-          <div className="mb-4">
+          <div className="mb-4 w-64">
             <label className="text-sm font-semibold mb-1 block">
               {t("Country")}
             </label>
@@ -413,6 +435,70 @@ const EditContactDetails = () => {
               className="w-64"
               onChange={setSelectedCountry}
             />
+          </div>
+
+ <div className="mb-4 w-64">
+            <label className="text-sm font-semibold mb-1 block">
+              {t("Region")}
+            </label>
+             <Controller
+    name="region"
+    control={control} // from useForm()
+    render={({ field }) => (
+      <Select
+        {...field}
+        value={
+          field.value ? { value: field.value, label: field.value } : null
+        }
+        onChange={(selected) => field.onChange(selected?.value || "")}
+        options={regions.map((g) => ({
+          value: g.name,
+          label: g.name,
+        }))}
+        placeholder={t("Select a Region")}
+        className="text-sm"
+        classNamePrefix="react-select"
+        isClearable
+      />
+    )}
+  />
+    {errors.region && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.region.message}
+            </p>
+          )}
+          </div>
+
+          <div className="mb-4 w-64">
+            <label className="text-sm font-semibold mb-1 block">
+              {t("Governorate")}
+            </label>
+             <Controller
+    name="governorate"
+    control={control} // from useForm()
+    render={({ field }) => (
+      <Select
+        {...field}
+        value={
+          field.value ? { value: field.value, label: field.value } : null
+        }
+        onChange={(selected) => field.onChange(selected?.value || "")}
+        options={governorates.map((g) => ({
+          value: g.name,
+          label: g.name,
+        }))}
+        placeholder={t("Select a Governorate")}
+        className="text-sm"
+        classNamePrefix="react-select"
+        isClearable
+      />
+    )}
+  />
+    {errors.governorate && (
+            <p className="text-red-500 text-xs mt-1">
+              {errors.governorate.message}
+            </p>
+          )}
           </div>
 
           <div className="mt-6 space-y-4">
@@ -489,7 +575,7 @@ const EditContactDetails = () => {
                 </p>
               )}
             </div> */}
-            <div>
+            {/* <div>
               <h4 className="text-sm font-semibold mb-1">{t("State")}</h4>
               <Select
                 options={states}
@@ -499,9 +585,9 @@ const EditContactDetails = () => {
                 placeholder="Select state"
                 isSearchable
               />
-            </div>
+            </div> */}
 
-            <div className="mt-4">
+            {/* <div className="mt-4">
               <h4 className="text-sm font-semibold mb-1">{t("City")}</h4>
               <Select
                 options={cities}
@@ -511,7 +597,7 @@ const EditContactDetails = () => {
                 placeholder="Select city"
                 isSearchable
               />
-            </div>
+            </div> */}
 
             <div>
               <h4 className="text-sm font-semibold mb-1">{t("Post Code")}</h4>

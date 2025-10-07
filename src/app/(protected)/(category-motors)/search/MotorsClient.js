@@ -455,7 +455,7 @@ return (
                   <option value="year_old">Oldest First</option>
                   {/* <option value="odometer_low">Mileage: Low to High</option> */}
                 </select>
-                <div className="flex justify-center gap-2">
+                {/* <div className="flex justify-center gap-2">
                             <button
                               className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${viewMode === "list"
                                 ? "bg-green-100 text-green-700"
@@ -478,7 +478,7 @@ return (
                               <FaTh />
                               <span>{"Grid"}</span>
                             </button>
-                          </div>
+                          </div> */}
               </div>
             </div>
 
@@ -494,7 +494,7 @@ return (
                   : 'grid-cols-1'
               }`}>
                 {sortedListings.map((listing) => (
-                  <MotorListingCard key={listing.id} listing={listing} />
+                  <MotorListingCard key={listing.id} listing={listing} viewMode={viewMode}/>
                 ))}
               </div>
             ) : (

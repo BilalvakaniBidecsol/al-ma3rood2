@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 
 const getMaxDate = () => {
   const today = new Date();
+ 
   today.setDate(today.getDate() + 60);
   return today;
 };
@@ -25,6 +26,7 @@ const PriceAndPayment = () => {
   const start_price = watch("start_price");
   const reserve_price = watch("reserve_price");
   const expire_at = watch("expire_at");
+
 
   const handleQuantityChange = (delta) => {
     setValue("quantity", Math.max(1, Number(quantity) + delta), {
@@ -231,11 +233,10 @@ const PriceAndPayment = () => {
           {...register("buy_now_price")}
           className={`w-full border pl-8 pr-4 py-2 rounded focus:outline-none focus:ring appearance-none
         [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
-        ${
-          errors.buy_now_price
-            ? "border-red-500 focus:border-red-500"
-            : "border-gray-300 focus:border-green-400"
-        }`}
+        ${errors.buy_now_price
+              ? "border-red-500 focus:border-red-500"
+              : "border-gray-300 focus:border-green-400"
+            }`}
         />
         {errors.buy_now_price && (
           <p className="text-red-500 text-sm mt-1">
@@ -279,15 +280,20 @@ const PriceAndPayment = () => {
           /> */}
           <input
             type="number"
-            {...register("start_price", { required: true })}
+            {...register("start_price", {
+              validate: (value) =>
+                !buy_now_price || value ? true : "Start price is required if Buy Now price is not provided",
+            })}
             placeholder="$"
-            className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring ${
-              errors.start_price
+            className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring 
+    [&::-webkit-inner-spin-button]:appearance-none 
+    [&::-webkit-outer-spin-button]:appearance-none 
+    [appearance:textfield]
+    ${errors.start_price
                 ? "border-red-500 focus:border-red-500"
                 : "border-gray-300 focus:border-green-400"
-            } placeholder-price`}
+              } placeholder-price`}
           />
-
           {errors.start_price && (
             <p className="text-red-500 text-sm mt-1">
               {errors.start_price.message}
@@ -300,13 +306,19 @@ const PriceAndPayment = () => {
           </label>
           <input
             type="number"
-            {...register("reserve_price", { required: true })}
+            {...register("reserve_price", {
+              validate: (value) =>
+                !buy_now_price || value ? true : "Reserve price is required if Buy Now price is not provided",
+            })}
             placeholder="$"
-            className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring ${
-              errors.reserve_price
+            className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring
+    [&::-webkit-inner-spin-button]:appearance-none 
+    [&::-webkit-outer-spin-button]:appearance-none 
+    [appearance:textfield] 
+    ${errors.reserve_price
                 ? "border-red-500 focus:border-red-500"
                 : "border-gray-300 focus:border-green-400"
-            } placeholder-price`}
+              } placeholder-price`}
           />
           {errors.reserve_price && (
             <p className="text-red-500 text-sm mt-1">
@@ -340,11 +352,10 @@ const PriceAndPayment = () => {
               maxDate={getMaxDate()}
               className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring
             [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
-            ${
-              errors.expire_at
-                ? "border-red-500 focus:border-red-500"
-                : "border-gray-300 focus:border-green-400"
-            }`}
+            ${errors.expire_at
+                  ? "border-red-500 focus:border-red-500"
+                  : "border-gray-300 focus:border-green-400"
+                }`}
               placeholderText={t("Select date and time")}
             />
           )}

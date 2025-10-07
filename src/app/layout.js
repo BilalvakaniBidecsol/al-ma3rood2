@@ -16,6 +16,9 @@ import Toaster from "@/components/WebsiteComponents/Toaster";
 export const metadata = {
   title: "Ma3rood",
   description: "Ma3rood - The Kingdom's marketplace for everything from household items and cars to homes, jobs, and services.",
+other: {
+    "google-site-verification": "QOcVF2O0EwymmQj0mtALBvLdFn8PN1QjHWk2pIKwaME",
+  },
 };
 
 export default async function RootLayout({ children }) {

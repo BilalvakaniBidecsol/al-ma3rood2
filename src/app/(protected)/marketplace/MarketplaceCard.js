@@ -393,7 +393,14 @@ const MarketplaceCard = ({
             return (
               <Link
                 key={index}
-                href={`/marketplace/${lastSlug}/${card.slug}`}
+                // href={`/marketplace/${lastSlug}/${card.slug}`}
+                 href={
+    card.listing_type === "motors"
+      ? `/search/${card.slug}`
+      : card.listing_type === "property"
+      ? `/property/${card.slug}`
+      : `/marketplace/${lastSlug}/${card.slug}`
+  }
                 className="min-w-[250px] max-w-[250px] bg-[#FBFBFB] p-2 rounded hover:shadow-lg transition-shadow flex-shrink-0"
               >
                 <img

@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { listingsApi } from "@/lib/api/listings";
 import ListingForm from "@/components/WebsiteComponents/listingforms/ListingForm";
 import { toast } from "react-toastify";
+import MotorListingForm from "@/components/WebsiteComponents/listingforms/MotorListingForm";
+import Properties from "@/components/WebsiteComponents/listingforms/Properties";
 
 
 const EditListingPage = ({ params: paramsPromise }) => {
@@ -35,11 +37,28 @@ const EditListingPage = ({ params: paramsPromise }) => {
   };
 
   return (
-    <ListingForm
-      initialValues={listing}
-      mode="edit"
-      onSubmit={handleUpdate}
-    />
+      <div className="p-6">
+      {listing?.type === "marketplace" ? (
+        <ListingForm
+          initialValues={listing}
+          mode="edit"
+          onSubmit={handleUpdate}
+        />
+      ) :  listing?.type === "motors" ?  (
+        <MotorListingForm
+          initialValues={listing}
+          mode="edit"
+          onSubmit={handleUpdate}
+        />
+      ) : 
+       (
+        <Properties
+          initialValues={listing}
+          mode="edit"
+          onSubmit={handleUpdate}
+        />
+      )}
+    </div>
   );
 };
 

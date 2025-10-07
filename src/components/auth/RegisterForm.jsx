@@ -9,7 +9,11 @@ import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import debounce from "lodash.debounce"; // install: npm i lodash.debounce
 import { authApi } from "@/lib/api/auth";
+import { FaCheckCircle, FaTimesCircle } from "react-icons/fa";
+import { ImSpinner2 } from "react-icons/im";
+import { useLocationStore } from "@/lib/stores/locationStore";
 export default function RegisterForm({ onSubmit, isLoading }) {
+  const { locations, getAllLocations } = useLocationStore();
   const [formData, setFormData] = useState({
     name: "",
     first_name: "",
@@ -18,8 +22,10 @@ export default function RegisterForm({ onSubmit, isLoading }) {
     email: "",
     phone: "",
     // billing_address: "",
-    country: "Saudi Arabia", // ISO code for Saudi Arabia
+    country: "Saudi Arabia", 
+    governorate: '',
     city: "",
+    region: "",
     state: "",
     password: "",
     confirmPassword: "",
@@ -29,49 +35,64 @@ export default function RegisterForm({ onSubmit, isLoading }) {
   const [usernameSuggestions, setUsernameSuggestions] = useState([]);
   const [apiResponse, setApiResponse] = useState(null);
 
-  const [cities, setCities] = useState([]);
-  const [states, setStates] = useState([])
+  // const [cities, setCities] = useState([]);
+  // const [states, setStates] = useState([])
+  const country = locations.find((c) => c.id == 1);
+  const regions = country?.regions || [];
+  const selectedRegion = regions.find((r) => r.name === formData.region);
+  const governorates =
+    regions.find((r) => r.name == formData.region)?.governorates || [];
+    const selectedGovernorate = governorates.find(
+  (g) => g.name == formData.governorate
+);
+  const cities =
+    governorates.find((g) => g.name === formData.city)?.cities || [];
+    const selectedCity = cities.find((c) => c.name === formData.area);
   const [errors, setErrors] = useState({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { t, i18n } = useTranslation();
   const isArabic = i18n.language === "ar";
 
-  useEffect(() => {
-    const allCountries = Country.getAllCountries();
-    setCountries(allCountries);
+    useEffect(() => {
+    getAllLocations(); 
+  }, [getAllLocations]);
+console.log('res', formData.region)
+  // useEffect(() => {
+  //   const allCountries = Country.getAllCountries();
+  //   setCountries(allCountries);
 
-    const defaultCities = City.getCitiesOfCountry("SA");
-    // setCities(defaultCities);
-    // Remove duplicate cities by name
-    const uniqueCities = defaultCities.filter(
-      (city, index, self) =>
-        index === self.findIndex((c) => c.name === city.name)
-    );
+  //   const defaultCities = City.getCitiesOfCountry("SA");
+  //   // setCities(defaultCities);
+  //   // Remove duplicate cities by name
+  //   const uniqueCities = defaultCities.filter(
+  //     (city, index, self) =>
+  //       index === self.findIndex((c) => c.name === city.name)
+  //   );
 
-    setCities(uniqueCities);
-    const defaultStates = State.getStatesOfCountry("SA");
-    // Remove duplicate cities by name
-    const uniqueStates = defaultStates.filter(
-      (state, index, self) =>
-        index === self.findIndex((s) => s.name === state.name)
-    );
+  //   setCities(uniqueCities);
+  //   const defaultStates = State.getStatesOfCountry("SA");
+  //   // Remove duplicate cities by name
+  //   const uniqueStates = defaultStates.filter(
+  //     (state, index, self) =>
+  //       index === self.findIndex((s) => s.name === state.name)
+  //   );
 
-    setStates(uniqueStates);
-    // setStates(defaultStates);
-  }, []);
-  useEffect(() => {
-    if (formData.state) {
-      const selectedState = states.find((s) => s.name == formData.state);
-      const selectedCountry = countries.find((s) => s.name == formData.country);
-      const allCities = City.getCitiesOfState(
-        selectedCountry.isoCode,
-        selectedState.isoCode
-      );
+  //   setStates(uniqueStates);
+  //   // setStates(defaultStates);
+  // }, []);
+  // useEffect(() => {
+  //   if (formData.state) {
+  //     const selectedState = states.find((s) => s.name == formData.state);
+  //     const selectedCountry = countries.find((s) => s.name == formData.country);
+  //     const allCities = City.getCitiesOfState(
+  //       selectedCountry.isoCode,
+  //       selectedState.isoCode
+  //     );
 
-      setCities(allCities);
-    }
-  }, [formData.state]);
+  //     setCities(allCities);
+  //   }
+  // }, [formData.state]);
 
 
 
@@ -238,8 +259,10 @@ export default function RegisterForm({ onSubmit, isLoading }) {
     // if (!formData.billing_address)
     //   newErrors.billing_address = "Address is required";
     if (!formData.country) newErrors.country = "Country is required";
-    if (!formData.city) newErrors.city = "City is required";
-    if (!formData.state) newErrors.state = "State is required";
+    // if (!formData.city) newErrors.city = "City is required";
+    if (!formData.region) newErrors.region = "Region is required";
+    if (!formData.governorate) newErrors.governorate = "Governorate is required";
+
 
 
     if (!formData.password) {
@@ -288,12 +311,15 @@ export default function RegisterForm({ onSubmit, isLoading }) {
       case "country":
         if (!value) error = "Country is required";
         break;
-      case "state":
-        if (!value) error = "State is required";
+      case "region":
+        if (!value) error = "Region is required";
         break;
-      case "city":
-        if (!value) error = "City is required";
+          case "governorate":
+        if (!value) error = "Governorate is required";
         break;
+      // case "city":
+      //   if (!value) error = "City is required";
+      //   break;
 
       case "password":
         if (!value) {
@@ -316,10 +342,14 @@ export default function RegisterForm({ onSubmit, isLoading }) {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    console.log(selectedGovernorate)
     const updatedFormData = {
       ...formData,
       name: `${formData.first_name} ${formData.last_name}`.trim(),
-      // city: formData.city,
+      country_id: country?.id || null,
+    region_id: selectedRegion?.id || null,
+    governorate_id: selectedGovernorate?.id || null,
+    // city_id: selectedCity?.id || null,
     };
     console.log(updatedFormData);
     if (validate()) {
@@ -328,7 +358,7 @@ export default function RegisterForm({ onSubmit, isLoading }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-2">
       {/* Name Field */}
       <div className="flex gap-4">
         <div className="w-1/2">
@@ -370,56 +400,78 @@ export default function RegisterForm({ onSubmit, isLoading }) {
       <div className="flex gap-4">
 
 
-        <div className="md:w-1/3 md:mt-3 relative">
-          <label className="block mb-1 text-sm font-medium">{t("Username")}</label>
-          <input
-            type="text"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            required
-            minLength={3}
-            className={`w-full p-2 border rounded-md ${errors.username ? "border-red-500" : "border-gray-300"
-              }`}
-          />
+      <div className="md:w-1/3 relative">
+  <label className="block mb-1 text-sm font-medium">
+    {t("Username")}
+  </label>
 
-          {checkingUsername && (
-            <span className="absolute right-2 top-9 text-gray-500 text-sm">
-              Checking...
-            </span>
-          )}
+  <div className="relative">
+    <input
+      type="text"
+      name="username"
+      value={formData.username}
+      onChange={handleChange}
+      required
+      minLength={3}
+      className={`w-full p-2 border rounded-md
+        ${errors.username
+          ? "border-red-500"
+          : "border-gray-300"
+        }`}
+    />
 
-          {errors.username && (
-            <p className="mt-1 text-sm text-red-600">{errors.username}</p>
-          )}
+    {/* Loader / Success / Error Icons */}
+    {checkingUsername && (
+      <ImSpinner2 className="absolute right-3 top-3 text-gray-400 animate-spin text-lg" />
+    )}
 
-          {errors.username && usernameSuggestions.length > 0 && (
-            <div className="mt-1 text-sm">
-              <p className="text-gray-600">
-                {formData.username} is already taken, try one of these:
-              </p>              <div className="flex gap-2 wifull">
-                {usernameSuggestions.slice(0, 3).map((sug, i) => (
-                  <button
-                    key={i}
-                    type="button"
-                    onClick={() => {
-                      setFormData((prev) => ({ ...prev, username: sug }));
-                      setErrors((prev) => ({ ...prev, username: "" }));
-                      setUsernameSuggestions([]);
-                    }}
-                    className="px-2 py-1 rounded-md text-sm bg-green-100 text-green-700 hover:bg-green-200 whitespace-nowrap"
-                  >
-                    {sug}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+    {!checkingUsername && !errors.username && formData.username && (
+      <FaCheckCircle className="absolute right-3 top-3 text-green-500 text-lg" />
+    )}
+
+    {!checkingUsername && errors.username && (
+      <FaTimesCircle className="absolute right-3 top-3 text-red-500 text-lg" />
+    )}
+  </div>
+
+  {/* Error + Suggestions */}
+  {!checkingUsername && errors.username && (
+    <div className="mt-2 ">
+      {/* <p className="text-red-600 flex items-center gap-1 mb-1">
+        ❌ {errors.username}
+      </p> */}
+
+      {usernameSuggestions.length > 0 && (
+        <>
+          <p className="text-gray-600 mb-1 text-xs">
+            Try one of these:
+          </p>
+          <div className="flex flex-wrap gap-1">
+            {usernameSuggestions.slice(0, 3).map((sug, i) => (
+              <button
+                key={i}
+                type="button"
+                onClick={() => {
+                  setFormData((prev) => ({ ...prev, username: sug }));
+                  setErrors((prev) => ({ ...prev, username: "" }));
+                  setUsernameSuggestions([]);
+                }}
+                className="px-2 py-1 rounded-full text-[10px] font-medium bg-green-100 text-green-700 
+                           hover:bg-green-200 transition-colors duration-200"
+              >
+                {sug}
+              </button>
+            ))}
+          </div>
+        </>
+      )}
+    </div>
+  )}
+</div>
 
 
 
-        <div className="md:w-1/3 md:mt-3">
+        <div className="md:w-1/3 ">
           <label className="block mb-1 text-sm font-medium">{t("Email")}</label>
           <input
             type="email"
@@ -456,7 +508,7 @@ export default function RegisterForm({ onSubmit, isLoading }) {
         </div> */}
 
         {/* Phone Number Field */}
-        <div className="md:w-1/3 md:mt-3">
+        <div className="md:w-1/3 ">
           <label className="block mb-1 text-sm font-medium">
             {t("Phone Number")}
           </label>
@@ -495,7 +547,7 @@ export default function RegisterForm({ onSubmit, isLoading }) {
 
 
       <div className="flex flex-col md:flex-row md:gap-4 w-full">
-        <div className="md:w-1/3 md:mt-3">
+        <div className="md:w-1/3 md:mt-1">
           <label className="block text-sm font-medium">{t("Country")}</label>
           <input
             type="text"
@@ -503,98 +555,99 @@ export default function RegisterForm({ onSubmit, isLoading }) {
             value="Saudi Arabia"
             disabled
             readOnly
-            className="w-full p-1.5 border border-gray-200 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+            className="w-full mt-0.5 p-1.5 border border-gray-200 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
           />
         </div>
 
-        {/* State Dropdown */}
-        {/* <div className="mt-4">
-        <label className="block mb-1 text-sm font-medium">{t("State")}</label>
-        <input
-          type="text"
-          name="state"
-          value={formData.state}
-          onChange={handleStateChange}
-          list="state-options"
-          className={`w-full p-2 border rounded-md ${
-            errors.state ? "border-red-500" : "border-gray-300"
-            
-          }`}
-          placeholder={t("Search for a state")}
-        />
-        <datalist id="state-options">
-          {states.map((state) => (
-            <option key={state.isoCode} value={state.name} />
-          ))}
-        </datalist>
-
-        {errors.state && (
-          <p className="mt-1 text-sm text-red-600">{errors.state}</p>
-        )}
-      </div> */}
-
-        <div className="mt-2 md:w-1/3">
-          <label className="block mb-1 text-sm font-medium">{t("State")}</label>
-          {states.length > 0 && (
+        <div className="md:w-1/3">
+          <label className="block mb-1 text-sm font-medium">{t("Region")}</label>
+          {/* {states.length > 0 && ( */}
             <Select
-              name="state"
-              value={
-                states.find((option) => option.name === formData.state)
-                  ? { value: formData.state, label: formData.state }
-                  : null
-              }
-              onChange={(selected) => {
-                setFormData((prev) => ({
-                  ...prev,
-                  state: selected?.value || "",
-                }));
-                if (errors.state) {
-                  setErrors((prev) => ({ ...prev, state: "" }));
-                }
-              }}
-              //  onChange={handleStateChange}
-
-              options={states.map((city) => ({
-                value: city.name,
-                label: city.name,
-              }))}
-              placeholder={t("Select a State")}
+              name="region"
+              value={formData.region ? { value: formData.region, label: formData.region } : null}
+          onChange={(selected) =>
+            setFormData((prev) => ({
+              ...prev,
+              region: selected?.value || "",
+              governorate: "",
+              city: "",
+            }))
+          }
+          options={regions.map((r) => ({ value: r.name, label: r.name }))}
+              placeholder={t("Select a Region")}
               className="text-sm"
               classNamePrefix="react-select"
               isClearable
             />
-          )}
-          {errors.state && (
-            <p className="mt-1 text-sm text-red-600">{errors.state}</p>
+          {/* )} */}
+          {errors.region && (
+            <p className="mt-1 text-sm text-red-600">{errors.region}</p>
           )}
         </div>
 
-        {/* City Dropdown */}
-        {/* <div className="mt-4">
-  <label className="block mb-1 text-sm font-medium">{t("City")}</label>
-  <select
-    name="city"
-    value={formData.city}
-    onChange={handleChange}
-    className={`w-full p-2 border rounded-md ${
-      errors.city ? "border-red-500" : "border-gray-300"
-    }`}
-  >
-    <option value="">{t("Select a city")}</option>
-    {cities.map((city, index) => (
-      <option key={index} value={city.name}>
-        {city.name}
-      </option>
-    ))}
-  </select>
-  {errors.city && (
-    <p className="mt-1 text-sm text-red-600">{errors.city}</p>
-  )}
-</div> */}
+        <div className="md:w-1/3">
+          <label className="block mb-1 text-sm font-medium">{t("Governorate")}</label>
+          {/* {cities.length > 0 && ( */}
+            <Select
+              name="governorate"
+              value={
+            formData.governorate
+              ? { value: formData.governorate, label: formData.governorate }
+              : null
+          }
+          onChange={(selected) =>
+            setFormData((prev) => ({
+              ...prev,
+              governorate: selected?.value || "",
+              city: "",
+            }))
+          }
+          options={governorates.map((g) => ({ value: g.name, label: g.name }))}
+              placeholder={t("Select a Governorate")}
+              className="text-sm"
+              classNamePrefix="react-select"
+              isClearable
+            />
+          {/* )} */}
+          {errors.governorate && (
+            <p className="mt-1 text-sm text-red-600">{errors.governorate}</p>
+          )}
+        </div>
+      </div>
 
-        <div className="mt-2 md:w-1/3">
+      {/* <div className="flex flex-col md:flex-row md:gap-4 w-full">
+<div className="mt-2 md:w-1/2">
+          <label className="block mb-1 text-sm font-medium">{t("Governorate")}</label>
+          
+            <Select
+              name="governorate"
+              value={
+            formData.governorate
+              ? { value: formData.governorate, label: formData.governorate }
+              : null
+          }
+          onChange={(selected) =>
+            setFormData((prev) => ({
+              ...prev,
+              governorate: selected?.value || "",
+              city: "",
+            }))
+          }
+          options={governorates.map((g) => ({ value: g.name, label: g.name }))}
+              placeholder={t("Select a Governorate")}
+              className="text-sm"
+              classNamePrefix="react-select"
+              isClearable
+            />
+       
+          {errors.governorate && (
+            <p className="mt-1 text-sm text-red-600">{errors.governorate}</p>
+          )}
+        </div>
+
+        <div className="mt-2 md:w-1/2">
           <label className="block mb-1 text-sm font-medium">{t("City")}</label>
-          {cities.length > 0 && (
+    
             <Select
               name="city"
               value={
@@ -620,28 +673,11 @@ export default function RegisterForm({ onSubmit, isLoading }) {
               classNamePrefix="react-select"
               isClearable
             />
-          )}
+      
           {errors.city && (
             <p className="mt-1 text-sm text-red-600">{errors.city}</p>
           )}
         </div>
-      </div>
-
-      {/* Address Field */}
-      {/* <div>
-        <label className="block mb-1 text-sm font-medium">{t("Address")}</label>
-        <textarea
-          name="billing_address"
-          value={formData.billing_address}
-          onChange={handleChange}
-          required
-          rows={2}
-          className={`w-full resize-none p-2 border rounded-md ${errors.billing_address ? "border-red-500" : "border-gray-300"
-            }`}
-        />
-        {errors.billing_address && (
-          <p className="mt-1 text-sm text-red-600">{errors.billing_address}</p>
-        )}
       </div> */}
 
       <div className="flex gap-4">

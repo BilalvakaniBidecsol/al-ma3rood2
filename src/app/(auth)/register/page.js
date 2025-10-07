@@ -87,11 +87,14 @@ export default function RegisterPage() {
 
       {/* Right side (Form section) */}
       <div className="w-full lg:w-[60%] flex items-center justify-center bg-white px-4 py-20 min-h-screen">
-        {/* <LanguageSwitcher
-          className="absolute "
-          buttonClassName="bg-green-600 text-green"
-        /> */}
+  
         <div className="w-full max-w-xl">
+            <div className="text-right -mt20">
+            <LanguageSwitcher
+              className="absolute  "
+              buttonClassName="bg-green-600 text-green"
+            />
+          </div>
           {error && (
             <div className="mb-4 p-3 bg-red-100 text-red-700 rounded relative">
               {error}
@@ -105,12 +108,7 @@ export default function RegisterPage() {
             </div>
           )}
 
-          <div className="text-right -mt-20">
-            <LanguageSwitcher
-              className="absolute  "
-              buttonClassName="bg-green-600 text-green"
-            />
-          </div>
+      
           <h2
             className={`text-2xl font-bold mb-6 text-center ${i18n.language === "ar" ? "text-right" : "lg:text-left"
               }`}

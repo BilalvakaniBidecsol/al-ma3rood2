@@ -13,17 +13,8 @@ export default function TabsPage() {
 
   const [activeTab, setActiveTab] = useState("sale");
 
-  const renderTabContent = () => {
-    return (
-      tabContentMap[activeTab] || (
-        <div className="p-6 text-sm text-gray-500">No content available</div>
-      )
-    );
-  };
-
   const tabContentMap = {
     sale: <Sale />,
-
     rent: (
       <div className="p-6 text-gray-600 text-sm">
         🏠 Browse rentals in your area
@@ -44,16 +35,25 @@ export default function TabsPage() {
     ),
   };
 
+  const renderTabContent = () => {
+    return (
+      tabContentMap[activeTab] || (
+        <div className="p-6 text-sm text-gray-500">No content available</div>
+      )
+    );
+  };
+
   return (
-    <div className="flex justify-center">
-      <div className="w-[1100px]  bg-white rounded-2xl shadow-sm">
+    <div className="flex justify-center px-2 sm:px-4">
+      <div className="w-full max-w-[1100px] bg-white rounded-2xl shadow-sm">
+        {/* Tabs */}
         <div className="border-b px-1 pt-1">
-          <div className="flex rounded-t overflow-hidden">
+          <div className="flex flex-wrap rounded-t overflow-hidden">
             {tabs.map((tab) => (
               <button
                 key={tab.key}
                 onClick={() => setActiveTab(tab.key)}
-                className={`flex-1 text-sm font-medium py-2 px-5 text-center border-r border-gray-300 last:border-r-0
+                className={`flex-1 min-w-[120px] text-sm font-medium py-2 px-3 text-center border-r border-gray-300 last:border-r-0
         ${activeTab === tab.key ? "" : "text-gray-600 hover:bg-gray-100"}`}
               >
                 <div className="flex items-center justify-center gap-2">
@@ -64,22 +64,23 @@ export default function TabsPage() {
                       className="w-5 h-5 object-contain"
                     />
                   )}
-                  <span>{tab.name}</span>
+                  <span className="truncate">{tab.name}</span>
                 </div>
               </button>
             ))}
           </div>
-
           <div className="mt-1 border-t border-gray-300" />
         </div>
 
-        <div className="px-6 py-4">
-          <h2 className="text-3xl font-semibold text-gray-800  leading-snug">
-            Search New Zealand&apos;s largest range of houses <br></br> and
-            properties for sale
+        {/* Heading */}
+        <div className="px-4 sm:px-6 py-4 text-center sm:text-left">
+          <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-gray-800 leading-snug">
+            Search New Zealand&apos;s largest range of houses <br className="hidden sm:block" /> 
+            and properties for sale
           </h2>
         </div>
 
+        {/* Tab Content */}
         {renderTabContent()}
       </div>
     </div>

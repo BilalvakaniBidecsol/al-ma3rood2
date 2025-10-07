@@ -46,6 +46,7 @@ const staticCategories = [
     colSpan: "md:col-span-5",
     rowSpan: "md:row-span-1",
     height: "h-[250px] md:h-full",
+        route: "/property",
     rounded: "rounded-xl",
   },
 ];
