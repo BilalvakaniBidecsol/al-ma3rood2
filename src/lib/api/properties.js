@@ -53,8 +53,8 @@ export const propertiesApi = {
   }
 
               // ✅ add body_style only if present
-  if (payload?.body_style) {
-    formattedPayload.filters.body_style = payload.body_style;
+  if (payload?.land_area) {
+    formattedPayload.filters.land_area = payload.land_area;
   }
   
         // ✅ add category_id conditionally

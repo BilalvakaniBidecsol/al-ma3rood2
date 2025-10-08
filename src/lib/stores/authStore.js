@@ -145,7 +145,7 @@ login: async (email, password) => {
             throw new Error(res?.data.error || "Registration failed");
           }
         } catch (error) {
-          set({ error: error?.message || "Registration failed", isLoading: false });
+          set({ error: error?.data?.error || "Registration failed", isLoading: false });
           throw error;
         }
       },

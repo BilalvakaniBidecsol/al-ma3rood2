@@ -40,7 +40,9 @@ const Page = () => {
 
   // Example details array (customize as needed)
   const details = [
-    { label: "Condition", value: listing.condition },
+    { label: "Condition", value: listing?.condition
+    ? listing.condition.replace(/_/g, " ").toUpperCase()
+    : "N/A" },
     { label: "Description", value: listing.description },
     { label: "Payment Options", value: "Cash" },
   ];
@@ -169,7 +171,7 @@ const Page = () => {
                     {/* {item.label} */}
                     {/* {t(`${item.label}`)} */}
                   </div>
-                  <div className="text-sm text-gray-700 max-w-md">
+                  <div className="text-sm  text-gray-700 max-w-md">
                     {item.label.toLowerCase() === "description" ? (
                       <div dangerouslySetInnerHTML={{ __html: item.value }} />
                     ) : (

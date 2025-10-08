@@ -38,13 +38,13 @@ const EditListingPage = ({ params: paramsPromise }) => {
 
   return (
       <div className="p-6">
-      {listing?.type === "marketplace" ? (
+      {listing?.listing_type === "marketplace" ? (
         <ListingForm
           initialValues={listing}
           mode="edit"
           onSubmit={handleUpdate}
         />
-      ) :  listing?.type === "motors" ?  (
+      ) :  listing?.listing_type === "motors" ?  (
         <MotorListingForm
           initialValues={listing}
           mode="edit"

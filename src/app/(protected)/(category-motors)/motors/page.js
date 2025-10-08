@@ -243,28 +243,44 @@ const Page = () => {
           {/* Tabs section - blended with hero color */}
           <div className="bg-white rounded-lg  overflow-hidden">
             {/* Tabs section - flush with top of card */}
-            <div className="flex border-b border-gray-200">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => {
-                    setActiveTab(tab.key);
-                    setFilters({ ...filters, category_id: null });
-                  }}
-                  className={`flex-1 text-sm font-medium h-10 px-4 text-center w-auto
-      ${activeTab === tab.key
-                      ? "bg-white text-[#175f48]"
-                      : "bg-gray-50 text-gray-600 hover:bg-gray-100"
-                    } border-r border-gray-200 last:border-r-0`}
-                >
-                  <div className="flex items-center justify-center gap-2 h-full">
-                    <img src={tab.icon} alt={tab.name} className="w-5 h-5 object-contain" />
-                    <span>{tab.name}</span>
-                  </div>
-                </button>
-              ))}
+<div className="flex border-b border-gray-200 overflow-x-auto no-scrollbar">
+  {tabs.map((tab) => (
+    <button
+      key={tab.key}
+      onClick={() => {
+        const selectedCat = categories.find(
+          (cat) => cat.name.toLowerCase() === tab.name.toLowerCase()
+        );
+        setActiveTab(tab.key);
+        setFilters({
+          ...filters,
+          category_id:
+            tab.key === "allcat"
+              ? null
+              : selectedCat
+              ? selectedCat.id
+              : null,
+        });
+      }}
+      className={`flex-shrink-0 text-sm font-medium h-10 px-4 text-center
+      ${
+        activeTab === tab.key
+          ? "bg-white text-[#175f48]"
+          : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+      } border-r border-gray-200 last:border-r-0`}
+    >
+      <div className="flex items-center justify-center gap-2 h-full">
+        <img
+          src={tab.icon}
+          alt={tab.name}
+          className="w-4 h-4 object-contain"
+        />
+        <span className="whitespace-nowrap text-sm">{tab.name}</span>
+      </div>
+    </button>
+  ))}
+</div>
 
-            </div>
           </div>
 
           {/* <div className="px-6 py-4">

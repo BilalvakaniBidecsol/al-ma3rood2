@@ -251,21 +251,15 @@ const PropertiesClient = () => {
 
   const clearFilters = () => {
     setFilters({
-      vehicle_type: "",
-      make: "",
-      model: "",
-      year_min: "",
-      year_max: "",
-      price_min: "",
-      price_max: "",
-      fuel_type: "",
-      transmission: "",
-      body_style: "",
-      condition: "",
-      odometer_min: "",
-      odometer_max: "",
       search: "",
-      category_id: null,
+    category_id: null,
+    price_min: 0,
+    price_max: 10000000,
+    condition: "",
+    land_area: "", 
+    parking: "", 
+    country: "",
+    city: "",
     });
     setActiveTab("");
     setSearchQuery("");
@@ -275,10 +269,15 @@ const PropertiesClient = () => {
 
   // Dropdown options
   const conditionOptions = [
-    { value: "", label: "Any Condition" },
-    { value: "new", label: "New" },
-    { value: "used", label: "Used" },
-  ];
+  { value: "", label: "Any Condition" },
+  { value: "brand_new", label: "Brand New" },
+  { value: "ready_to_move", label: "Ready to Move" },
+  { value: "under_construction", label: "Under Construction" },
+  { value: "furnished", label: "Furnished" },
+  { value: "semi_furnished", label: "Semi-Furnished" },
+  { value: "unfurnished", label: "Unfurnished" },
+  { value: "recently_renovated", label: "Recently Renovated" },
+];
 
   const priceOptions = [
     { value: "", label: "Select Price" },
@@ -328,43 +327,44 @@ const PropertiesClient = () => {
           {/* Tabs section - blended with hero color */}
           <div className="bg-white rounded-lg  overflow-hidden">
             {/* Tabs section - flush with top of card */}
-            <div className="flex border-b border-gray-200">
-              {tabs.map((tab) => (
-                <button
-                  key={tab.key}
-                  onClick={() => {
-                    const selectedCat = categories.find(
-                      (cat) => cat.name.toLowerCase() === tab.name.toLowerCase()
-                    );
-                    setActiveTab(tab.key);
-                    setFilters({
-                      ...filters,
-                      category_id:
-                        tab.key === "allcat"
-                          ? null
-                          : selectedCat
-                          ? selectedCat.id
-                          : null,
-                    });
-                  }}
-                  className={`flex-1 text-sm font-medium h-10 px-4 text-center w-auto
+            <div className="flex border-b border-gray-200 overflow-x-auto no-scrollbar">
+  {tabs.map((tab) => (
+    <button
+      key={tab.key}
+      onClick={() => {
+        const selectedCat = categories.find(
+          (cat) => cat.name.toLowerCase() === tab.name.toLowerCase()
+        );
+        setActiveTab(tab.key);
+        setFilters({
+          ...filters,
+          category_id:
+            tab.key === "allcat"
+              ? null
+              : selectedCat
+              ? selectedCat.id
+              : null,
+        });
+      }}
+      className={`flex-shrink-0 text-sm font-medium h-10 px-4 text-center
       ${
         activeTab === tab.key
           ? "bg-white text-[#175f48]"
           : "bg-gray-50 text-gray-600 hover:bg-gray-100"
       } border-r border-gray-200 last:border-r-0`}
-                >
-                  <div className="flex items-center justify-center gap-2 h-full">
-                    <img
-                      src={tab.icon}
-                      alt={tab.name}
-                      className="w-5 h-5 object-contain"
-                    />
-                    <span>{tab.name}</span>
-                  </div>
-                </button>
-              ))}
-            </div>
+    >
+      <div className="flex items-center justify-center gap-2 h-full">
+        <img
+          src={tab.icon}
+          alt={tab.name}
+          className="w-5 h-5 object-contain"
+        />
+        <span className="whitespace-nowrap text-[15.3px]">{tab.name}</span>
+      </div>
+    </button>
+  ))}
+</div>
+
           </div>
 
           {/* Main Filter Content */}
@@ -389,7 +389,7 @@ const PropertiesClient = () => {
                 </div>
 
                 {/* Price Range */}
-                <div>
+                <div className="z-20">
                   <label className="block mb-1 text-sm font-medium text-gray-700">
                     Min Price
                   </label>
@@ -454,7 +454,7 @@ const PropertiesClient = () => {
             )}
             {/* ✅ BOTTOM Search Box for cars */}
             {activeTab !== "allcat" && (
-              <div className="my-4">
+              <div className="my-4 pt-10">
                 <label className="block mb-1 text-sm font-medium text-gray-700">
                   {t("Keywords")}
                 </label>
@@ -485,7 +485,7 @@ const PropertiesClient = () => {
                     loadMotorListings();
                   }}
                   type="button"
-                  className="w-full sm:w-auto bg-[#175f48] hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors text-center"
+                  className="w-full cursor-pointer sm:w-auto bg-[#175f48] hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors text-center"
                 >
                   {t("View listings")}
                 </button>
@@ -565,8 +565,8 @@ const PropertiesClient = () => {
               <option value="year_old">{t("Oldest First")}</option>
               {/* <option value="odometer_low">Mileage: Low to High</option> */}
             </select>
-            <div className="flex justify-center gap-2">
-              <button
+            {/* <div className="flex justify-center gap-2"> */}
+              {/* <button
                 className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${
                   viewMode === "list"
                     ? "bg-green-100 text-green-700"
@@ -577,8 +577,8 @@ const PropertiesClient = () => {
               >
                 <FaThList />
                 <span>{t("Grid")}</span>
-              </button>
-              <button
+              </button> */}
+              {/* <button
                 className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${
                   viewMode === "grid"
                     ? "bg-green-100 text-green-700"
@@ -589,8 +589,8 @@ const PropertiesClient = () => {
               >
                 <FaTh />
                 <span>{t("Grid")}</span>
-              </button>
-            </div>
+              </button> */}
+            {/* </div> */}
           </div>
         </div>
 

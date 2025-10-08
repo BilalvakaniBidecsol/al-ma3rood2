@@ -530,7 +530,7 @@ useEffect(() => {
           <Button
             onClick={nextStep}
             className="px-8 py-3 text-lg flex items-center"
-            disabled={!watchedVehicleType}
+            disabled={!watchedCategoryId}
           >
             Continue
             <IoIosArrowForward className="ml-2" />

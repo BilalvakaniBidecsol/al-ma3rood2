@@ -170,7 +170,7 @@ export default function Page() {
               watchers: 0,
               offers: listing.selling_offers || [],
               slug: listing.slug,
-              closingDate: listing.expire_at,
+              closingDate: listing.expire_at || "",
               image: listing.images?.[0]?.image_path
                 ? `${Image_URL}${listing.images[0].image_path}`
                 : "/default-image.jpg",
