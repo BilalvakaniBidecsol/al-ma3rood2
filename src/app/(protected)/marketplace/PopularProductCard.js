@@ -599,31 +599,6 @@ const PopularProductCard = ({
 
   const scrollRef = useRef(null);
 
-  // ✅ Page load hote hi "Mobile" category ke products fetch karo
-  // useEffect(() => {
-  //   const mobileCategory = filterCategories.find(
-  //     (cat) =>
-  //       cat.name.toLowerCase() === "Antiques & Collectables" || cat.slug?.toLowerCase() === "Antiques & Collectables"
-  //   );
-
-  //   if (mobileCategory) {
-  //     setActiveCategory(mobileCategory.id);
-
-  //     const fetchMobileProducts = async () => {
-  //       setLoading(true);
-  //       try {
-  //         const data = await listingsApi.getListings({
-  //           category_id: mobileCategory.id,
-  //         });
-  //         setCards(data?.data || []);
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
-
-  //     fetchMobileProducts();
-  //   }
-  // }, [filterCategories]);
   useEffect(() => {
     console.log("All Categories from API:", filterCategories);
 
@@ -640,11 +615,12 @@ const PopularProductCard = ({
 
       const fetchMobileProducts = async () => {
         setLoading(true);
-        try {
-          const data = await listingsApi.getListings({
+        const payload= {
             category_id: mobileCategory.id,
-          });
-          setCards(data?.data || []);
+          }
+        try {
+          const data = await listingsApi.getListingsByFilter(payload);
+          setCards(data || []);
         } finally {
           setLoading(false);
         }
@@ -658,9 +634,12 @@ const PopularProductCard = ({
   const handleCategoryClick = async (category) => {
     setActiveCategory(category.id);
     setLoading(true);
+    const payload= {
+            category_id: category.id,
+          }
     try {
-      const data = await listingsApi.getListings({ category_id: category.id });
-      setCards(data?.data || []);
+      const data = await listingsApi.getListingsByFilter(payload);
+      setCards(data || []);
     } finally {
       setLoading(false);
     }
@@ -725,7 +704,7 @@ const PopularProductCard = ({
             {cards?.length > 0 &&
               cards.slice(0, 4).map((card, index) => {
                 // 👉 Last item = See More
-                if (index === 3) {
+                if (index === 5) {
                   return (
                     <Link
                       key="see-more"
