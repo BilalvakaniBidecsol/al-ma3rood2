@@ -648,49 +648,7 @@ const Page = () => {
           </div>
         )}
 
-        {/* Pagination */}
-        {totalResults > 12 && (
-          <div className="flex justify-center mt-8">
-            <div className="flex space-x-2">
-              {currentPage > 1 && (
-                <button
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  {t("Previous")}
-                </button>
-              )}
-
-              {/* Page numbers */}
-              {Array.from({ length: Math.min(5, Math.ceil(totalResults / 12)) }, (_, i) => {
-                const pageNum = currentPage - 2 + i;
-                if (pageNum < 1 || pageNum > Math.ceil(totalResults / 12)) return null;
-
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setCurrentPage(pageNum)}
-                    className={`px-4 py-2 border border-gray-300 rounded-md ${currentPage === pageNum
-                      ? 'bg-green-600 text-white'
-                      : 'hover:bg-gray-50'
-                      }`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
-
-              {currentPage < Math.ceil(totalResults / 12) && (
-                <button
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  {t("Next")}
-                </button>
-              )}
-            </div>
-          </div>
-        )}
+        
       </div>
 
     </div>

@@ -43,15 +43,17 @@ export default async function CategoryPage({ params, searchParams }) {
   const currentCategory = allCategories?.categories?.data?.find((cat) => cat.id == categoryId);
   console.log("Check Category On Front", categoryId)
   const products = await fetchAllListingsByFilter({ 
-    listing_type: "marketplace", category_id: categoryId, search: search, city: city, page: 1
+    listing_type: "marketplace", 
+    category_id: categoryId, 
+    search: search, city: city, page: 1
    });
 
   // Extract pagination info from API response
   const pagination = {
-    currentPage: products?.data?.current_page || 1,
-    totalPages: products?.data?.last_page || 1,
-    perPage: products?.data?.per_page || 20,
-    totalItems: products?.data?.total || 0,
+    currentPage: products?.pagination?.current_page || 1,
+    totalPages: products?.pagination?.last_page || 5,
+    perPage: products?.pagination?.per_page || 10,
+    totalItems: products?.pagination?.total || 1000,
   };
 
 // Function to flatten the category tree into an array

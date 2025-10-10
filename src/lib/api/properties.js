@@ -23,7 +23,7 @@ export const propertiesApi = {
     filters: {},
         pagination: {
           page: payload?.pagination?.page || 1,
-          per_page: payload?.pagination?.per_page || 30,
+          per_page: payload?.pagination?.per_page || 6,
         },
       };
 

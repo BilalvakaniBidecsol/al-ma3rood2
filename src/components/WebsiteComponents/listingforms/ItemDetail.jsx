@@ -83,6 +83,14 @@ const ItemDetail = ({ parentCategoryName }) => {
   const categoryKey = (parentCategoryName || '').toLowerCase();
   const extraFields = categoryFields[categoryKey] || [];
   const { t } = useTranslation();
+  const conditions = [
+  { key: "brand_new_unused", label: "Brand New / Unused – never opened or used." },
+  { key: "like_new", label: "Like New – opened but looks and works like new." },
+  { key: "gently_used_excellent_condition", label: "Gently Used / Excellent Condition – minor signs of use." },
+  { key: "good_condition", label: "Good Condition – visible wear but fully functional." },
+  { key: "fair_condition", label: "Fair Condition – heavily used but still works." },
+  { key: "for_parts_or_not_working", label: "For Parts or Not Working – damaged or needs repair." },
+];
 
 
   return (
@@ -115,21 +123,19 @@ const ItemDetail = ({ parentCategoryName }) => {
       {t("Condition")}
 
   </label>
-  <div className="space-y-2">
-    {["new", "used"].map((type) => (
-      <label key={type} className="flex items-center gap-3">
-        <input
-          type="radio"
-          value={type}
-          {...register("condition")}
-          checked={condition === type}
-          className="accent-green-500"
-        />
-        <span className="text-sm capitalize">
-          {type === "new" ? t("Brand new unused item") : t("Used item")}
-        </span>
-      </label>
-    ))}
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+    {conditions.map((item) => (
+    <label key={item.key} className="flex items-center gap-3">
+      <input
+        type="radio"
+        value={item.key}
+        {...register("condition")}
+        checked={condition === item.key}
+        className="accent-green-500"
+      />
+      <span className="text-sm">{t(item.label)}</span>
+    </label>
+  ))}
   </div>
   {errors.condition && (
     <p className="text-red-500 text-sm mt-1">{errors.condition.message}</p>

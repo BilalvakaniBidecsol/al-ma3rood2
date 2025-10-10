@@ -132,11 +132,8 @@ export const motorsApi = {
   },
 
   // Get motor models based on make
-  getMotorModels: async (make, vehicleType = null) => {
-    const params = new URLSearchParams({ make });
-    if (vehicleType) params.append('vehicle_type', vehicleType);
-    
-    const response = await axiosClient.get(`/motors/models?${params.toString()}`);
+  getMotorModels: async () => {
+    const response = await axiosClient.post(`/vehicle`);
     return response.data;
   },
 

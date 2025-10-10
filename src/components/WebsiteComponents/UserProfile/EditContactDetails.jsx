@@ -14,40 +14,52 @@ import { Country, State, City } from "country-state-city";
 import Select from "react-select";
 import { useLocationStore } from "@/lib/stores/locationStore";
 
+// const schema = yup.object().shape({
+//   firstname: yup.string().required("Firstname is required"),
+//   lastname: yup.string().required("Lastname is required"),
+//   gender: yup.string().required("Gender is required"),
+//   country: yup.string().required("Country is required"),
+//   accountType: yup.string().required("Account type is required"),
+//   businessName: yup.string().required("Business name is required"),
+//   addressFinder: yup.string().required("Address finder is required"),
+//   addressLine1: yup.string().required("Address line 1 is required"),
+//   addressLine2: yup.string().required("Address line 2 is required"),
+//   suburb: yup.string().required("Suburb is required"),
+//   // city: yup.string().required("City is required"),
+//   region: yup.string().required("Region is required"),
+//   governorate: yup.string().required("Governorate is required"),
+//   postCode: yup.string().required("Post code is required"),
+//   closestDistrict: yup.string().required("Closest district is required"),
+// });
 const schema = yup.object().shape({
-  firstname: yup.string().required("Firstname is required"),
-  lastname: yup.string().required("Lastname is required"),
-  // phone: yup
-  // .number().optional,
-  // .typeError("Landline must be a number")
-  // .integer("Landline must be an integer")
-  // .required("Landline is required"),
-
-  // mobile: yup
-  //   .number().optional,
-  // .typeError("Mobile must be a number")
-  // .integer("Mobile must be an integer")
-  // .required("Mobile is required"),
-
-  gender: yup.string().required("Gender is required"),
-  country: yup.string().required("Country is required"),
-  accountType: yup.string().required("Account type is required"),
-  businessName: yup.string().required("Business name is required"),
-  addressFinder: yup.string().required("Address finder is required"),
-  addressLine1: yup.string().required("Address line 1 is required"),
-  addressLine2: yup.string().required("Address line 2 is required"),
-  suburb: yup.string().required("Suburb is required"),
-  // city: yup.string().required("City is required"),
-  region: yup.string().required("Region is required"),
-  governorate: yup.string().required("Governorate is required"),
-  postCode: yup.string().required("Post code is required"),
-  closestDistrict: yup.string().required("Closest district is required"),
+  firstname: yup.string().nullable(),
+  lastname: yup.string().nullable(),
+  gender: yup.string().nullable(),
+  country: yup.string().nullable(),
+  accountType: yup.string().nullable(),
+  businessName: yup
+    .string()
+    .when("accountType", {
+      is: "business",
+      then: (schema) => schema.required("Business name is required"),
+      otherwise: (schema) => schema.nullable(),
+    }),
+  addressFinder: yup.string().nullable(),
+  addressLine1: yup.string().nullable(),
+  addressLine2: yup.string().nullable(),
+  suburb: yup.string().nullable(),
+  region: yup.string().nullable(),
+  governorate: yup.string().nullable(),
+  postCode: yup.string().nullable(),
+  closestDistrict: yup.string().nullable(),
 });
+
 
 const EditContactDetails = () => {
   const hideComponent = useProfileStore((state) => state.hideComponent);
   const { user, logout, updateUser } = useAuthStore();
     const { locations, getAllLocations } = useLocationStore();
+    const [loading, setLoading] = React.useState(false);
 
   const {
     register,
@@ -62,8 +74,8 @@ const EditContactDetails = () => {
       firstname: user?.first_name || "",
       lastname: user?.last_name || "",
       name: `${user?.firstname} ${user?.lastname}` || "",
-      phone: user?.phone || "",
-      landline: user?.landline || "",
+      phone: user?.landline || "",
+      mobile: user?.phone || "",
       gender: user?.gender || "",
       accountType: user?.account_type || "",
       country: user?.country || "",
@@ -75,10 +87,13 @@ const EditContactDetails = () => {
       postCode: user?.post_code || "",
       closestDistrict: user?.closest_district || "",
       city: user?.city || "",
+      governorate: user?.governorates.name || "",
+        region: user?.regions.name || "",
     },
   });
 
   const onSubmit = async (data) => {
+    setLoading(true);
     const formData = new FormData();
 
     const regions_id = regions.find((r) => r.name == data.region);
@@ -123,11 +138,11 @@ const EditContactDetails = () => {
       //  });
       toast.success("Contact Detail updated successfully!");
       updateUser({
-        first_name: res.data.firstname || "",
-        last_name: res.data.lastname || "",
+        first_name: res.data.first_name || "",
+        last_name: res.data.last_name || "",
         name: `${res.data.firstname} ${res.data.lastname}` || "",
-        landline: res.data.landline || "",
-        landline: res.data.landline || "",
+        mobile: res.data.landline || "",
+        phone: res.data.mobile || "",
         gender: res.data.gender || "",
         account_type: res.data.account_type || "",
         country: res.data.country || "",
@@ -139,15 +154,19 @@ const EditContactDetails = () => {
         post_code: res.data.post_code || "",
         closest_district: res.data.closest_district || "",
         city: res.data.city || "",
+        governorates: res.data.governorates || "",
+        regions: res.data.regions || "",
       });
-      reset();
+      // reset();
     } catch (err) {
       const errorMessage =
         err?.response?.data?.message ||
         "Something went wrong. Please try again.";
       toast.error(errorMessage);
       console.error("Contact Detail update error:", err);
-    }
+    } finally {
+    setLoading(false); 
+  }
   };
   const { t } = useTranslation();
   const [selectedCountry, setSelectedCountry] = useState({
@@ -348,15 +367,15 @@ const cities =
               </p>
             )}
           </div>
-
+<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Landline */}
           <div className="mt-4">
             <h4 className="text-sm font-semibold mb-2">
               {t("Landline")} (optional)
             </h4>
             <div className="flex items-center gap-2">
-              <select
-                className="border border-gray-300 px-1 py-2 w-24 rounded-[10px]"
+              {/* <select
+                className="border border-gray-300 px-1 py-1 w-24 rounded-[10px]"
                 defaultValue=""
               >
                 <option value="">{t("Select")}</option>
@@ -364,7 +383,7 @@ const cities =
                 <option value="+91">+91</option>
                 <option value="+1">+1</option>
                 <option value="+44">+44</option>
-              </select>
+              </select> */}
               <input
                 type="text"
                 {...register("phone")}
@@ -384,12 +403,12 @@ const cities =
               {t("Mobile")} (optional)
             </h4>
             <div className="flex items-center gap-2">
-              <select className="border border-gray-300 px-1 py-2 w-24 rounded-[10px]">
+              {/* <select className="border border-gray-300 px-1 py-1 w-24 rounded-[10px]">
                 <option value="+92">+92</option>
                 <option value="+91">+91</option>
                 <option value="+1">+1</option>
                 <option value="+44">+44</option>
-              </select>
+              </select> */}
               <input
                 type="text"
                 {...register("mobile")}
@@ -402,9 +421,12 @@ const cities =
               </p>
             )} */}
           </div>
+          </div>
         </div>
 
         {/* Business Name */}
+        {watch("accountType") === "business" && (
+          <>
         <h3 className="text-md font-semibold mb-2">{t("Business details")}</h3>
         <div className="mb-6 p-4 bg-white rounded border border-gray-300">
           <h3 className="text-md font-semibold mb-2">{t("Business Name")}</h3>
@@ -420,10 +442,12 @@ const cities =
             </p>
           )}
         </div>
+        </>
+        )}
 
         {/* Street address */}
         <h3 className="text-md font-semibold mb-2">{t("Street address")}</h3>
-        <div className="mb-6 p-4 bg-white rounded border border-gray-300">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-white rounded border border-gray-300">
           <div className="mb-4 w-64">
             <label className="text-sm font-semibold mb-1 block">
               {t("Country")}
@@ -501,7 +525,7 @@ const cities =
           )}
           </div>
 
-          <div className="mt-6 space-y-4">
+          {/* <div className="mt-6 space-y-4"> */}
             <div>
               <h4 className="text-sm font-semibold mb-1">
                 {t("Address Finder")}
@@ -629,11 +653,11 @@ const cities =
                 </p>
               )}
             </div>
-          </div>
+          {/* </div> */}
         </div>
 
         <div className="md:col-span-2 flex gap-3">
-          <Button type="submit">{t("Save")}</Button>
+          <Button type="submit" disabled={loading}>{loading ? t("Saving...") : t("Save")}</Button>
           <Button type="button" onClick={hideComponent}>
             {t("Go Back")}
           </Button>

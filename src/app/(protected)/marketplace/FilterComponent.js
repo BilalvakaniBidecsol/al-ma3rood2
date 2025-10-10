@@ -581,6 +581,14 @@ const FilterComponent = ({ categoryId, onResults }) => {
   const [openTab, setOpenTab] = useState(null); // which tab dropdown is open
   const { t } = useTranslation();
   const { selectedCity, setSelectedCity } = useCityStore();
+    const conditions = [
+    { key: "brand_new_unused", label: "Brand New / Unused – never opened or used." },
+    { key: "like_new", label: "Like New – opened but looks and works like new." },
+    { key: "gently_used_excellent_condition", label: "Gently Used / Excellent Condition – minor signs of use." },
+    { key: "good_condition", label: "Good Condition – visible wear but fully functional." },
+    { key: "fair_condition", label: "Fair Condition – heavily used but still works." },
+    { key: "for_parts_or_not_working", label: "For Parts or Not Working – damaged or needs repair." },
+  ];
 
   useEffect(() => {
     const defaultCities = City.getCitiesOfCountry("SA");
@@ -626,15 +634,20 @@ const FilterComponent = ({ categoryId, onResults }) => {
       <div className="flex justify-between items-center mb-3">
         {/* Active Filters */}
         <div className="flex flex-wrap gap-2">
-          {newUsed && (
-            <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full text-sm">
-              {newUsed === "new" ? t("New") : t("Used")}
-              <IoClose
-                className="cursor-pointer"
-                onClick={() => removeFilter("condition")}
-              />
-            </span>
-          )}
+         {newUsed && (
+  <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full text-sm">
+    {
+      // find the matching label from conditions array by key
+      conditions.find((item) => item.key === newUsed)?.label.split("–")[0] ||
+      t("Condition")
+    }
+    <IoClose
+      className="cursor-pointer"
+      onClick={() => removeFilter("condition")}
+    />
+  </span>
+)}
+
           {selectedCity && (
             <span className="flex items-center gap-1 bg-gray-100 px-2 py-1 rounded-full text-sm">
               {selectedCity}
@@ -679,13 +692,20 @@ const FilterComponent = ({ categoryId, onResults }) => {
 <div className="flex gap-2 flex-wrap items-center">
   {/* Condition Tab */}
   <button
+    type="button"
     onClick={() => setOpenTab(openTab === "condition" ? null : "condition")}
     className={`flex items-center gap-1 px-4 py-1.5 rounded-full text-sm font-medium transition 
-    ${openTab === "condition" ? "bg-green-100 text-green-700 border border-green-400" : "bg-gray-50 border text-gray-700 hover:bg-green-50"}`}
+      ${openTab === "condition"
+        ? "bg-green-100 text-green-700 border border-green-400"
+        : "bg-gray-50 border text-gray-700 hover:bg-green-50"}`}
   >
-    {newUsed ? (newUsed === "new" ? t("New") : t("Used")) : t("Condition")}
+    {newUsed
+      ? conditions.find((item) => item.key === newUsed)?.label.split("–")[0]
+      : t("Condition")}
     <FiChevronDown size={14} />
   </button>
+
+
 
   {/* City Tab */}
   <button
@@ -733,22 +753,34 @@ const FilterComponent = ({ categoryId, onResults }) => {
 </div>
 
 {/* Dropdowns */}
-{openTab === "condition" && (
-  <div className="mt-2 w-40 bg-white border rounded-lg shadow-lg p-2 animate-fade-in">
-    {["new", "used"].map((val) => (
-      <button
-        key={val}
-        onClick={() => {
-          setNewUsed(val);
+  {openTab === "condition" && (
+    <div className="absolute z-10 mt-2 w-1/3 bg-white border border-gray-200 rounded-lg shadow-md p-3">
+      <div className="space-y-2 grid grid-cols-1 md:grid-cols-2">
+        {conditions.map((item) => (
+          <label
+            key={item.key}
+            className="flex items-start gap-2 cursor-pointer p-2 rounded hover:bg-green-50 transition"
+          >
+            <input
+              type="radio"
+              value={item.key}
+               onClick={() => {
+          setNewUsed(item.key);
           setOpenTab(null);
         }}
-        className="block w-full text-left px-3 py-2 rounded-md text-sm hover:bg-green-50 hover:text-green-700 transition"
-      >
-        {val === "new" ? t("New") : t("Used")}
-      </button>
-    ))}
-  </div>
-)}
+              checked={newUsed === item.key}
+              onChange={() => {
+                setValue("newUsed", item.key);
+                setOpenTab(null); // close dropdown after select
+              }}
+              className="mt-1"
+            />
+            <span className="text-sm text-gray-700">{t(item.label)}</span>
+          </label>
+        ))}
+      </div>
+    </div>
+  )}
 
 {openTab === "city" && (
   <div className="mt-2 w-44 bg-white border rounded-lg shadow-lg max-h-40 overflow-y-auto animate-fade-in">

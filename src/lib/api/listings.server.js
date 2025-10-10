@@ -137,10 +137,10 @@ export async function fetchAllListingsByFilter(payload) {
     const url = `${process.env.NEXT_PUBLIC_API_BASE_URL_MA3ROOD}listings/filters`;
 
     const formattedPayload = {
-      listing_type: "marketplace",
+      listing_type: payload?.listing_type || "marketplace",
       pagination: {
         page: payload?.pagination?.page || 1,
-        per_page: payload?.pagination?.per_page || 10,
+        per_page: payload?.pagination?.per_page || 8,
       },
     };
 

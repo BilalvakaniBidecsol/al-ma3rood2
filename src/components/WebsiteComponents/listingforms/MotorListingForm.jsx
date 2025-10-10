@@ -8,6 +8,7 @@ import { Car, BikeIcon as Motorbike, Caravan, Sailboat, Wrench } from "lucide-re
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { listingsApi } from "@/lib/api/listings";
+import { motorsApi } from "@/lib/api/motors";
 import { toast } from "react-toastify";
 import UploadPhotos from "./UploadPhotos";
 import { categoriesApi } from "@/lib/api/category";
@@ -195,6 +196,7 @@ const MotorListingForm = ({initialValues,
   const { t } = useTranslation();
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modals, setModals] = useState([]);
   const [categoryStack, setCategoryStack] = useState([]);
   const [currentCategories, setCurrentCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
@@ -302,8 +304,19 @@ useEffect(() => {
         console.error("Error fetching categories:", error);
       }
     };
+     const fetchModals = async () => {
+      try {
+        const { data } = await motorsApi.getMotorModels();
+        setModals(data || []);
+        console.log("Modals", data);
+      } catch (error) {
+        console.error("Error fetching modals:", error);
+      }
+    };
 
     fetchCategories();
+    fetchModals();
+
   }, []);
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Select from "react-select";
 import { Search, BikeIcon as Motorbike } from "lucide-react";
 import CustomDropdown from "@/components/WebsiteComponents/MotorsPageComponents/CustomDropdown";
@@ -47,69 +47,36 @@ function buildCategoryTree(categories) {
   return roots;
 }
 
-const PropertiesClient = () => {
-  const properties = [
-    {
-      id: 1,
-      title: "Grand Oak Residence",
-      location: "1234 Oak Lane, Lexington Heights, Wellington",
-      bedrooms: "4 bedrooms",
-      area: "5,025 Sq. Ft.",
-      bathrooms: "5 bathroom",
-      description:
-        "Stay ahead with industry news, smart property tips, and design inspiration crafted to guide you at every step of your real estate journey",
-      image:
-        "https://www.mashvisor.com/blog/wp-content/uploads/2018/04/bigstock-Row-Of-New-Suburban-Homes-55511546.jpg",
-    },
-    {
-      id: 2,
-      title: "Grand Oak Residence",
-      location: "1234 Oak Lane, Lexington Heights, Wellington",
-      bedrooms: "4 bedrooms",
-      area: "5,025 Sq. Ft.",
-      bathrooms: "5 bathroom",
-      description:
-        "Stay ahead with industry news, smart property tips, and design inspiration crafted to guide you at every step of your real estate journey",
-      image:
-        "https://www.mashvisor.com/blog/wp-content/uploads/2018/04/bigstock-Row-Of-New-Suburban-Homes-55511546.jpg",
-    },
-    {
-      id: 3,
-      title: "Grand Oak Residence",
-      location: "1234 Oak Lane, Lexington Heights, Wellington",
-      bedrooms: "4 bedrooms",
-      area: "5,025 Sq. Ft.",
-      bathrooms: "5 bathroom",
-      description:
-        "Stay ahead with industry news, smart property tips, and design inspiration crafted to guide you at every step of your real estate journey",
-
-      image:
-        "https://www.mashvisor.com/blog/wp-content/uploads/2018/04/bigstock-Row-Of-New-Suburban-Homes-55511546.jpg",
-    },
-    {
-      id: 4,
-      title: "Grand Oak Residence",
-      location: "1234 Oak Lane, Lexington Heights, Wellington",
-      bedrooms: "4 bedrooms",
-      area: "6,025 Sq. Ft.",
-      bathrooms: "5 bathroom",
-      description:
-        "Stay ahead with industry news, smart property tips, and design inspiration crafted to guide you at every step of your real estate journey",
-
-      image:
-        "https://www.mashvisor.com/blog/wp-content/uploads/2018/04/bigstock-Row-Of-New-Suburban-Homes-55511546.jpg",
-    },
-  ];
+const PropertiesClient = ({
+  category,
+  initialProducts,
+  pagination,
+}) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const categoryTree = buildCategoryTree(categories);
   const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
   const [sortBy, setSortBy] = useState("price_low");
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(true);
-  const [motorListings, setMotorListings] = useState([]);
+  const [motorListings, setMotorListings] = useState(initialProducts || []);
+    const [activeTab, setActiveTab] = useState("");
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("cars");
+
+  const tabs = allowedTabs.filter((allowed) =>
+    categories.some((cat) =>
+      cat.name.toLowerCase().includes(allowed.name.toLowerCase())
+    )
+  );
   const [totalResults, setTotalResults] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(
+    pagination?.currentPage < pagination?.totalPages
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const observerRef = useRef(null);
+  const firstLoad = useRef(true);
+
   // Filter states
   const [filters, setFilters] = useState({
     search: "",
@@ -132,14 +99,17 @@ const PropertiesClient = () => {
     Ford: ["Mustang", "F-150", "Explorer"],
   };
 
-  // Load motor listings
-  useEffect(() => {
-    loadMotorListings();
-  }, [filters.category_id, currentPage, searchQuery]);
+// useEffect(() => {
+//   loadMore(true); 
+// }, [filters])
 
-  const loadMotorListings = async () => {
+
+const loadMore = useCallback(async () => {
+    if (!hasMore || isLoading) return;
+
     setIsLoading(true);
     try {
+      const nextPage = currentPage + 1;
       const payload = {
         ...filters,
         max_price: filters?.price_max,
@@ -151,19 +121,33 @@ const PropertiesClient = () => {
           page: currentPage,
           per_page: 12,
         },
+        listing_type: "property",
+        pagination: { page: nextPage, per_page: 6 },
+        category_id: filters?.category_id,
       };
 
+      console.log("📡 Loading page:", nextPage);
       const response = await propertiesApi.getPropertiesByFilter(payload);
-      setMotorListings(response || []);
-    } catch (error) {
-      console.error("Error loading motor listings:", error);
-      toast.error("Failed to load motor listings");
-      setMotorListings([]);
-      setTotalResults(0);
+
+      // ✅ Adjust depending on API structure
+      const newData = response || [];
+      const totalPages =
+        response?.pagination?.last_page ||
+        1;
+
+      if (newData.length > 0) {
+        setMotorListings((prev) => [...prev, ...newData]);
+        setCurrentPage(nextPage);
+        setHasMore(nextPage < totalPages);
+      } else {
+        setHasMore(false);
+      }
+    } catch (err) {
+      console.error("❌ Error loading more:", err);
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [currentPage, hasMore, isLoading, pagination?.totalPages]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -201,28 +185,42 @@ const PropertiesClient = () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, [isMobileMenuOpen]);
-  const [activeTab, setActiveTab] = useState("");
-  const [showMoreOptions, setShowMoreOptions] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState("cars");
 
-  const tabs = allowedTabs.filter((allowed) =>
-    categories.some((cat) =>
-      cat.name.toLowerCase().includes(allowed.name.toLowerCase())
-    )
+ // ✅ Intersection Observer (Infinite Scroll)
+useEffect(() => {
+  if (isLoading || !hasMore) return;
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      // Prevent first automatic trigger
+      if (firstLoad.current) {
+        firstLoad.current = false;
+        return;
+      }
+
+      if (entries[0].isIntersecting && hasMore && !isLoading) {
+        console.log("🔥 Bottom reached → loading more...");
+        loadMore(); 
+      }
+    },
+    {
+      root: null,
+      rootMargin: "300px",
+      threshold: 0.1,
+    }
   );
+
+  const currentRef = observerRef.current;
+  if (currentRef) observer.observe(currentRef);
+
+  return () => {
+    if (currentRef) observer.unobserve(currentRef);
+  };
+}, [hasMore, isLoading, loadMore]);
+
+
   // Always include "All categories"
   tabs.push(allowedTabs.find((t) => t.key === "allcat"));
-
-  const toggleMoreOptions = () => {
-    setShowMoreOptions(!showMoreOptions);
-  };
-  const handleFilterChange = (filterName, value) => {
-    setFilters((prev) => ({
-      ...prev,
-      [filterName]: value,
-    }));
-    setCurrentPage(1); // Reset to first page when filters change
-  };
 
   // Apply sorting before rendering
   const sortedListings = [...motorListings].sort((a, b) => {
@@ -249,6 +247,12 @@ const PropertiesClient = () => {
     }
   });
 
+     useEffect(() => {
+  console.log("📊 Pagination Info:", pagination);
+  console.log("➡️ Has More:", hasMore);
+}, [motorListings, sortedListings]);
+
+
   const clearFilters = () => {
     setFilters({
       search: "",
@@ -264,7 +268,7 @@ const PropertiesClient = () => {
     setActiveTab("");
     setSearchQuery("");
     setCurrentPage(1);
-    loadMotorListings();
+    loadMore();
   };
 
   // Dropdown options
@@ -305,7 +309,8 @@ const PropertiesClient = () => {
   ];
 
   return (
-    <div className="bg-white min-h-screen">
+    <div className="bg-white">
+
       {/* Hero Section */}
       <div
         className="w-full h-64 sm:h-72 lg:h-80 rounded-b-[60px] text-white px-4 sm:px-8 py-10 sm:py-12 relative flex items-center"
@@ -320,7 +325,7 @@ const PropertiesClient = () => {
           />
         </div>
       </div>
-      {/* {t("Your Marketplace. Your Kingdom.")} */}
+      
       {/* Filter Card with Blended Tabs */}
       <div className="max-w-5xl mx-auto -mt-20 relative z-10 px-4">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
@@ -482,7 +487,7 @@ const PropertiesClient = () => {
               <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
                 <button
                   onClick={() => {
-                    loadMotorListings();
+                    loadMore();
                   }}
                   type="button"
                   className="w-full cursor-pointer sm:w-auto bg-[#175f48] hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors text-center"
@@ -565,120 +570,86 @@ const PropertiesClient = () => {
               <option value="year_old">{t("Oldest First")}</option>
               {/* <option value="odometer_low">Mileage: Low to High</option> */}
             </select>
-            {/* <div className="flex justify-center gap-2"> */}
-              {/* <button
-                className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${
-                  viewMode === "list"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-                onClick={() => setViewMode("list")}
-                aria-pressed={viewMode === "list"}
-              >
-                <FaThList />
-                <span>{t("Grid")}</span>
-              </button> */}
-              {/* <button
-                className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${
-                  viewMode === "grid"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                }`}
-                onClick={() => setViewMode("grid")}
-                aria-pressed={viewMode === "grid"}
-              >
-                <FaTh />
-                <span>{t("Grid")}</span>
-              </button> */}
-            {/* </div> */}
           </div>
         </div>
 
-        {/* Motor listings */}
-        {isLoading ? (
-          <div className="flex justify-center items-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-          </div>
-        ) : motorListings.length > 0 ? (
-          <div
-            className={`grid gap-6 mb-10 ${
-              viewMode === "grid"
-                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
-                : "grid-cols-1 md:mx-10 "
-            }`}
-          >
-            {motorListings.map((property) => (
-              <PropertyCard
-                key={property.id}
-                listing={property}
-                viewMode={viewMode}
-              />
-            ))}
-          </div>
-        ) : (
-          <div className="text-center py-12">
-            <div className="text-gray-500 mb-4">
-              <Search className="w-16 h-16 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No properties found</h3>
-              <p>Try adjusting your search criteria or filters</p>
-            </div>
-            <button
-              onClick={clearFilters}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors"
-            >
-              Clear Filters
-            </button>
-          </div>
-        )}
+{/* Property listings */}
+<div
+  className={`grid gap-6 mb-10 ${
+    viewMode === "grid"
+      ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+      : "grid-cols-1 md:mx-10"
+  }`}
+>
+  {/* 🟩 Show existing listings */}
+  {motorListings.length > 0 &&
+    motorListings.map((property) => (
+      <PropertyCard
+        key={property.id}
+        listing={property}
+        viewMode={viewMode}
+      />
+    ))}
 
-        {/* Pagination */}
-        {totalResults > 12 && (
-          <div className="flex justify-center mt-8">
-            <div className="flex space-x-2">
-              {currentPage > 1 && (
-                <button
-                  onClick={() => setCurrentPage(currentPage - 1)}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  {t("Previous")}
-                </button>
-              )}
-
-              {/* Page numbers */}
-              {Array.from(
-                { length: Math.min(5, Math.ceil(totalResults / 12)) },
-                (_, i) => {
-                  const pageNum = currentPage - 2 + i;
-                  if (pageNum < 1 || pageNum > Math.ceil(totalResults / 12))
-                    return null;
-
-                  return (
-                    <button
-                      key={pageNum}
-                      onClick={() => setCurrentPage(pageNum)}
-                      className={`px-4 py-2 border border-gray-300 rounded-md ${
-                        currentPage === pageNum
-                          ? "bg-green-600 text-white"
-                          : "hover:bg-gray-50"
-                      }`}
-                    >
-                      {pageNum}
-                    </button>
-                  );
-                }
-              )}
-
-              {currentPage < Math.ceil(totalResults / 12) && (
-                <button
-                  onClick={() => setCurrentPage(currentPage + 1)}
-                  className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
-                >
-                  {t("Next")}
-                </button>
-              )}
-            </div>
+  {/* 🟨 Show initial skeletons only if no data yet */}
+  {isLoading && currentPage === 1 && motorListings.length === 0 &&
+    [...Array(6)].map((_, i) => (
+      <div
+        key={i}
+        className="rounded-lg overflow-hidden shadow-lg animate-pulse bg-gray-100"
+      >
+        <div className="h-52 bg-gray-300"></div>
+        <div className="p-4 space-y-3">
+          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+          <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+          <div className="flex justify-between mt-4">
+            <div className="h-3 bg-gray-300 rounded w-1/4"></div>
+            <div className="h-3 bg-gray-300 rounded w-1/4"></div>
           </div>
-        )}
+        </div>
+      </div>
+    ))}
+
+  {/* 🟦 Append skeletons below old data while loading next page */}
+  {isLoading && currentPage > 1 && (
+    [...Array(3)].map((_, i) => (
+      <div
+        key={`loader-${i}`}
+        className="rounded-lg overflow-hidden shadow-lg animate-pulse bg-gray-100"
+      >
+        <div className="h-52 bg-gray-300"></div>
+        <div className="p-4 space-y-3">
+          <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+          <div className="h-3 bg-gray-300 rounded w-1/2"></div>
+          <div className="flex justify-between mt-4">
+            <div className="h-3 bg-gray-300 rounded w-1/4"></div>
+            <div className="h-3 bg-gray-300 rounded w-1/4"></div>
+          </div>
+        </div>
+      </div>
+    ))
+  )}
+</div>
+
+{/* 🟥 Show "no results" message */}
+{!isLoading && motorListings.length === 0 && (
+  <div className="text-center py-12">
+    <div className="text-gray-500 mb-4">
+      <Search className="w-16 h-16 mx-auto mb-4" />
+      <h3 className="text-xl font-semibold mb-2">No properties found</h3>
+      <p>Try adjusting your search criteria or filters</p>
+    </div>
+    <button
+      onClick={clearFilters}
+      className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors"
+    >
+      Clear Filters
+    </button>
+  </div>
+)}
+
+{/* 🔹 Infinite Scroll Trigger */}
+      <div ref={observerRef} className="h-10 bg-transparent" />
       </div>
     </div>
   );
