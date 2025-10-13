@@ -15,13 +15,27 @@ import { categoriesApi } from "@/lib/api/category";
 import { Image_URL } from "@/config/constants";
 import { HexColorPicker } from "react-colorful";
 import CategoryModal from "./CategoryModal";
+import { 
+  getTransformedVehicleData, 
+  getVehicleTypeFromCategory,
+  isSupportedVehicleType 
+} from "@/lib/vehicles";
+import SearchableDropdown from "@/components/WebsiteComponents/ReuseableComponenets/SearchableDropdown";
 
 const motorListingSchema = z.object({
   title: z.string().min(1, "Title is required"),
   subtitle: z.string().nullable().optional(),
   category_id: z.number().optional().default(1),
   description: z.string().min(1, "Description is required"),
-  condition: z.enum(["new", "used"]),
+  // condition: z.enum(["new", "used"]),
+  condition: z.enum([
+  "brand_new_unused",
+  "like_new",
+  "gently_used_excellent_condition",
+  "good_condition",
+  "fair_condition",
+  "for_parts_or_not_working",
+]),
   images: z.array(z.any()).min(1, "At least one image is required"),
 
   buy_now_price: z.string().optional(),
@@ -88,68 +102,7 @@ const vehicleTypes = [
   { key: "boat", name: "Boat & Marine", icon: Sailboat, description: "Boats, Yachts, Jetskis" },
   { key: "parts", name: "Parts & Accessories", icon: Wrench, description: "Car parts, Accessories" },
 ];
-const carData = [
-  {
-    make: "Toyota",
-    models: [
-      { name: "Corolla", years: [2020, 2021, 2022, 2023] },
-      { name: "Camry", years: [2019, 2020, 2021, 2022] },
-      { name: "RAV4", years: [2021, 2022, 2023] },
-      { name: "Hilux", years: [2018, 2019, 2020, 2021] },
-      { name: "Fortuner", years: [2020, 2021, 2022] },
-    ],
-  },
-  {
-    make: "Honda",
-    models: [
-      { name: "Civic", years: [2019, 2020, 2021, 2022] },
-      { name: "Accord", years: [2020, 2021, 2022, 2023] },
-      { name: "CR-V", years: [2021, 2022, 2023] },
-      { name: "City", years: [2018, 2019, 2020, 2021] },
-      { name: "HR-V", years: [2020, 2021, 2022] },
-    ],
-  },
-  {
-    make: "Ford",
-    models: [
-      { name: "F-150", years: [2019, 2020, 2021, 2022] },
-      { name: "Mustang", years: [2020, 2021, 2022, 2023] },
-      { name: "Explorer", years: [2018, 2019, 2020, 2021] },
-      { name: "Escape", years: [2021, 2022, 2023] },
-      { name: "Edge", years: [2019, 2020, 2021] },
-    ],
-  },
-  {
-    make: "BMW",
-    models: [
-      { name: "3 Series", years: [2019, 2020, 2021, 2022] },
-      { name: "5 Series", years: [2020, 2021, 2022, 2023] },
-      { name: "X3", years: [2018, 2019, 2020, 2021] },
-      { name: "X5", years: [2021, 2022, 2023] },
-      { name: "7 Series", years: [2019, 2020, 2021] },
-    ],
-  },
-  {
-    make: "Mercedes",
-    models: [
-      { name: "C-Class", years: [2019, 2020, 2021, 2022] },
-      { name: "E-Class", years: [2020, 2021, 2022, 2023] },
-      { name: "S-Class", years: [2018, 2019, 2020, 2021] },
-      { name: "GLC", years: [2021, 2022, 2023] },
-      { name: "GLE", years: [2019, 2020, 2021] },
-    ],
-  },
-  {
-    make: "Hyundai",
-    models: [
-      { name: "Elantra", years: [2019, 2020, 2021, 2022] },
-      { name: "Sonata", years: [2020, 2021, 2022, 2023] },
-      { name: "Tucson", years: [2018, 2019, 2020, 2021] },
-      { name: "Santa Fe", years: [2021, 2022, 2023] },
-      { name: "Creta", years: [2019, 2020, 2021] },
-    ],
-  },
-];
+// Vehicle data will be loaded dynamically from vehicles.json
 
 const carPartsData = [
   {
@@ -204,6 +157,33 @@ const MotorListingForm = ({initialValues,
   const vehicle_type =
     categoryStack.length > 0 ? categoryStack?.[0]?.name : null;
 
+  // Vehicle data state
+  const [vehicleData, setVehicleData] = useState([]);
+  const [loadingVehicleData, setLoadingVehicleData] = useState(false);
+
+  // Load vehicle data based on vehicle type
+  useEffect(() => {
+    const loadVehicleData = async () => {
+      if (!vehicle_type) {
+        setVehicleData([]);
+        return;
+      }
+
+      setLoadingVehicleData(true);
+      try {
+        const vehicleType = getVehicleTypeFromCategory(vehicle_type);
+        const data = await getTransformedVehicleData(vehicleType);
+        setVehicleData(data);
+      } catch (error) {
+        console.error('Error loading vehicle data:', error);
+        setVehicleData([]);
+      } finally {
+        setLoadingVehicleData(false);
+      }
+    };
+
+    loadVehicleData();
+  }, [vehicle_type]);
 
   const normalizedInitialValues = useMemo(() => {
     if (!initialValues) return {};
@@ -227,14 +207,17 @@ const MotorListingForm = ({initialValues,
     } else {
         copy.allow_offers = false;
     }
-     // ✅ Car data normalization
+    
+    // ✅ Vehicle data normalization using dynamic data
+    if (vehicleData.length > 0) {
   const selectedMake =
-    carData.find(
+        vehicleData.find(
       (brand) =>
         brand.make.toLowerCase().trim() ===
         (copy.make || "").toLowerCase().trim()
-    ) || carData[0];
+        ) || vehicleData[0];
 
+      if (selectedMake && selectedMake.models.length > 0) {
   const selectedModel =
     selectedMake.models.find(
       (m) =>
@@ -253,18 +236,22 @@ const MotorListingForm = ({initialValues,
     model: selectedModel.name,
     year: String(selectedYear),
   };
-  }, [initialValues, carData]);
+      }
+    }
+
+    return copy;
+  }, [initialValues, vehicleData]);
 
 useEffect(() => {
     if (Object.keys(normalizedInitialValues).length > 0) {
     console.log("Reset triggered with data:", normalizedInitialValues);
     reset(normalizedInitialValues);
   }
-}, [initialValues, carData, reset, normalizedInitialValues]);
+}, [initialValues, vehicleData, reset, normalizedInitialValues]);
 
 useEffect(() => {
-  console.log("Reset Triggered:", { initialValues, carDataLength: carData.length });
-}, [initialValues, carData]);
+  console.log("Reset Triggered:", { initialValues, vehicleDataLength: vehicleData.length });
+}, [initialValues, vehicleData]);
 
 
       useEffect(() => {
@@ -298,7 +285,7 @@ useEffect(() => {
       const listing_type = "motors"
       try {
         const { data } = await categoriesApi.getAllCategories(null, listing_type);
-        setCategories(data || []);
+        // setCategories(data || []);
         console.log("Property dataaa", data);
       } catch (error) {
         console.error("Error fetching categories:", error);
@@ -489,6 +476,14 @@ useEffect(() => {
         return null;
     }
   };
+    const conditions = [
+  { key: "brand_new_unused", label: "Brand New / Unused – never opened or used." },
+  { key: "like_new", label: "Like New – opened but looks and works like new." },
+  { key: "gently_used_excellent_condition", label: "Gently Used / Excellent Condition – minor signs of use." },
+  { key: "good_condition", label: "Good Condition – visible wear but fully functional." },
+  { key: "fair_condition", label: "Fair Condition – heavily used but still works." },
+  { key: "for_parts_or_not_working", label: "For Parts or Not Working – damaged or needs repair." },
+];
   
 
 
@@ -591,12 +586,14 @@ useEffect(() => {
           name="make"
           control={control}
           render={({ field }) => (
-            <select {...field} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500">
-              <option value="">Select Brand</option>
-              {carPartsData.map((b) => (
-                <option key={b.make} value={b.make}>{b.make}</option>
-              ))}
-            </select>
+            <SearchableDropdown
+              options={carPartsData.map(brand => brand.make)}
+              value={field.value}
+              onChange={field.onChange}
+              placeholder="Select Brand"
+              searchPlaceholder="Search brands..."
+              emptyMessage="No brands found"
+            />
           )}
         />
       </div>
@@ -610,12 +607,15 @@ useEffect(() => {
             const selectedBrand = watch("make");
             const parts = carPartsData.find((b) => b.make === selectedBrand)?.parts || [];
             return (
-              <select {...field} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" disabled={!selectedBrand}>
-                <option value="">Select Part</option>
-                {parts.map((p) => (
-                  <option key={p.name} value={p.name}>{p.name}</option>
-                ))}
-              </select>
+              <SearchableDropdown
+                options={parts.map(part => part.name)}
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Select Part"
+                disabled={!selectedBrand}
+                searchPlaceholder="Search parts..."
+                emptyMessage="No parts found"
+              />
             );
           }}
         />
@@ -635,12 +635,15 @@ useEffect(() => {
                 .find((b) => b.make === selectedBrand)
                 ?.parts.find((p) => p.name === selectedPart)?.compatibleModels || [];
             return (
-              <select {...field} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" disabled={!selectedPart}>
-                <option value="">Select Model</option>
-                {models.map((m) => (
-                  <option key={m} value={m}>{m}</option>
-                ))}
-              </select>
+              <SearchableDropdown
+                options={models}
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Select Model"
+                disabled={!selectedPart}
+                searchPlaceholder="Search models..."
+                emptyMessage="No models found"
+              />
             );
           }}
         />
@@ -662,12 +665,15 @@ useEffect(() => {
                 ?.parts.find((p) => p.name === selectedPart)
                 ?.years || [];
             return (
-              <select {...field} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" disabled={!selectedModel}>
-                <option value="">Select Year</option>
-                {years.map((y) => (
-                  <option key={y} value={y}>{y}</option>
-                ))}
-              </select>
+              <SearchableDropdown
+                options={years.map(year => year.toString())}
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Select Year"
+                disabled={!selectedModel}
+                searchPlaceholder="Search years..."
+                emptyMessage="No years found"
+              />
             );
           }}
         />
@@ -675,8 +681,8 @@ useEffect(() => {
 
       {/* Condition */}
       <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Condition *</label>
-        <Controller
+        {/* <label className="block text-sm font-medium text-gray-700 mb-2">Condition *</label> */}
+        {/* <Controller
           name="condition"
           control={control}
           render={({ field }) => (
@@ -685,7 +691,19 @@ useEffect(() => {
               <label className="flex items-center"><input type="radio" {...field} value="used" className="mr-2"/> Used</label>
             </div>
           )}
-        />
+        /> */}
+{conditions.map((item) => (
+    <label key={item.key} className="flex items-center gap-3">
+      <input
+        type="radio"
+        value={item.key}
+        {...register("condition")}
+        checked={condition === item.key}
+        className="accent-green-500"
+      />
+      <span className="text-sm">{t(item.label)}</span>
+    </label>
+  ))}
       </div>
     </div>
 
@@ -694,7 +712,7 @@ useEffect(() => {
       {/* Color */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
-        <Controller
+        {/* <Controller
           name="color"
           control={control}
           defaultValue="#000000"
@@ -704,7 +722,21 @@ useEffect(() => {
               <input type="text" value={field.value} onChange={field.onChange} className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="#000000"/>
             </div>
           )}
+        /> */}
+         <Controller
+      name="color"
+      control={control}
+      defaultValue=""
+      render={({ field }) => (
+        <input
+          type="text"
+          value={field.value}
+          onChange={field.onChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Enter color name or hex code (e.g., red, #ff0000)"
         />
+      )}
+    />
       </div>
 
       {/* Description */}
@@ -756,17 +788,16 @@ useEffect(() => {
               name="make"
               control={control}
               render={({ field }) => (
-                <select
-                  {...field}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Select Brand</option>
-                  {carData.map((car) => (
-                    <option key={car.make} value={car.make}>
-                      {car.make}
-                    </option>
-                  ))}
-                </select>
+                <SearchableDropdown
+                  options={vehicleData.map(vehicle => vehicle.make)}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder="Select Brand"
+                  disabled={loadingVehicleData}
+                  loading={loadingVehicleData}
+                  searchPlaceholder="Search brands..."
+                  emptyMessage="No brands found"
+                />
               )}
             />
             {errors.make && (
@@ -782,23 +813,21 @@ useEffect(() => {
               name="model"
               control={control}
               render={({ field }) => {
-                const selectedBrand = watch("make"); // make select hota hai
+                const selectedBrand = watch("make");
                 const models =
-                  carData.find((car) => car.make === selectedBrand)?.models || [];
+                  vehicleData.find((vehicle) => vehicle.make === selectedBrand)?.models || [];
 
                 return (
-                  <select
-                    {...field}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    disabled={!selectedBrand}
-                  >
-                    <option value="">Select Model</option>
-                    {models.map((m) => (
-                      <option key={m.name} value={m.name}>
-                        {m.name}
-                      </option>
-                    ))}
-                  </select>
+                  <SearchableDropdown
+                    options={models.map(model => model.name)}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select Model"
+                    disabled={!selectedBrand || loadingVehicleData}
+                    loading={loadingVehicleData}
+                    searchPlaceholder="Search models..."
+                    emptyMessage="No models found"
+                  />
                 );
               }}
             />
@@ -819,24 +848,23 @@ useEffect(() => {
               render={({ field }) => {
                 const selectedBrand = watch("make");
                 const selectedModel = watch("model");
-                const years =
-                  carData
-                    .find((car) => car.make === selectedBrand)
-                    ?.models.find((m) => m.name === selectedModel)?.years || [];
+                const years = (
+                  vehicleData
+                    .find((vehicle) => vehicle.make === selectedBrand)
+                    ?.models.find((m) => m.name === selectedModel)?.years || []
+                ).slice().sort((a, b) => b - a);
 
                 return (
-                  <select
-                    {...field}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    disabled={!selectedModel}
-                  >
-                    <option value="">Select Year</option>
-                    {years.map((y) => (
-                      <option key={y} value={y}>
-                        {y}
-                      </option>
-                    ))}
-                  </select>
+                  <SearchableDropdown
+                    options={years.map(year => year.toString())}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select Year"
+                    disabled={!selectedModel || loadingVehicleData}
+                    loading={loadingVehicleData}
+                    searchPlaceholder="Search years..."
+                    emptyMessage="No years found"
+                  />
                 );
               }}
             />
@@ -851,31 +879,26 @@ useEffect(() => {
               Condition *
             </label>
             <Controller
-              name="condition"
-              control={control}
-              render={({ field }) => (
-                <div className="flex space-x-4">
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      {...field}
-                      value="new"
-                      className="mr-2"
-                    />
-                    New
-                  </label>
-                  <label className="flex items-center">
-                    <input
-                      type="radio"
-                      {...field}
-                      value="used"
-                      className="mr-2"
-                    />
-                    Used
-                  </label>
-                </div>
-              )}
-            />
+  name="condition"
+  control={control}
+  render={({ field }) => (
+    <div className="space-y-2 grid grid-cols-1 md:grid-cols-2">
+      {conditions.map((item) => (
+        <label key={item.key} className="flex items-center gap-3">
+          <input
+            type="radio"
+            value={item.key}
+            checked={field.value === item.key}
+            onChange={() => field.onChange(item.key)}
+            className="accent-green-500"
+          />
+          <span className="text-sm">{t(item.label)}</span>
+        </label>
+      ))}
+    </div>
+  )}
+/>
+
           </div>
           {/* 
           <div>
@@ -997,31 +1020,20 @@ useEffect(() => {
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Color *
             </label>
-            <Controller
-              name="color"
-              control={control}
-              defaultValue="#000000" // default black
-              render={({ field }) => (
-                <div className="flex items-center gap-3">
-                  {/* Color Picker */}
-                  <input
-                    type="color"
-                    value={field.value}
-                    onChange={field.onChange}
-                    className="w-12 h-10 border border-gray-300 rounded-md cursor-pointer"
-                  />
-
-                  {/* Text Input for Hex Code */}
-                  <input
-                    type="text"
-                    value={field.value}
-                    onChange={field.onChange}
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="#ffffff"
-                  />
-                </div>
-              )}
-            />
+             <Controller
+      name="color"
+      control={control}
+      defaultValue=""
+      render={({ field }) => (
+        <input
+          type="text"
+          value={field.value}
+          onChange={field.onChange}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+          placeholder="Enter color name or hex code (e.g., red, #ff0000)"
+        />
+      )}
+    />
             {errors.color && (
               <p className="text-red-500 text-sm mt-1">{errors.color.message}</p>
             )}
@@ -1114,7 +1126,7 @@ useEffect(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Buy Now Price ($)
+                Buy Now Price  (<span className="price">$</span>)
               </label>
               <Controller
                 name="buy_now_price"
@@ -1158,7 +1170,7 @@ useEffect(() => {
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Start Price ($)
+                  Start Price (<span className="price">$</span>)
                 </label>
                 <Controller
                   name="start_price"
@@ -1178,7 +1190,7 @@ useEffect(() => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reserve Price ($)
+                  Reserve Price  (<span className="price">$</span>)
                 </label>
                 <Controller
                   name="reserve_price"

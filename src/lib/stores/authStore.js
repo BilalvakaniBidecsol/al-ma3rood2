@@ -12,61 +12,19 @@ export const useAuthStore = create(
       isLoading: false,
       error: null,
 
+       // ✅ Reset everything
+       clearAuth: () => {
+  removeAuthToken();
+  useWatchlistStore.getState().clearWatchlist();
+  localStorage.removeItem("token");
+  localStorage.removeItem("auth-storage");
+  set({ user: null, token: null, error: null });
+},
+
       // Reset errors
       resetError: () => set({ error: null }),
 
-      // login: async (email, password) => {
-      //   set({ isLoading: true, error: null });
-      //   try {
-      //     const { data: user, token } = await authApi.login({
-      //       email,
-      //       password,
-      //     });
-      //     setAuthToken(token);
-      //     set({ user, token, isLoading: false });
-      //     // Fetch and set watchlist after login
-      //     try {
-      //       const { data } = await watchlistApi.getWatchlist();
-      //       useWatchlistStore.getState().setWatchlist(data?.data || []);
-      //     } catch (e) {
-      //       useWatchlistStore.getState().setWatchlist([]);
-      //     }
-      //     return user;
-      //   } catch (error) {
-      //     set({ error: error?.message || "Login Failed", isLoading: false });
-      //     throw error;
-      //   }
-      // },
-
-      // register: async (userData) => {
-      //   set({ isLoading: true, error: null });
-      //   try {
-      //     if (userData.password !== userData.confirmPassword) {
-      //       throw new Error("Passwords don't match");
-      //     }
-
-      //     const { data: user, token } = await authApi.register({
-      //       name: userData.name,
-      //       first_name: userData.first_name,
-      //       last_name: userData.last_name,
-      //       username:userData.username, 
-      //       email: userData.email,
-      //       phone: userData.phone,
-      //       country: userData.country,
-      //       billing_address: userData.billing_address,
-      //       city: userData.city,
-      //       state: userData.state,
-      //       password: userData.password,
-      //     });
-
-      //     localStorage.setItem("token", token);
-      //     set({ user, token, isLoading: false });
-      //     return user;
-      //   } catch (error) {
-      //     set({ error: error.data?.error, isLoading: false });
-      //     throw error;
-      //   }
-      // },
+      
 login: async (email, password) => {
   set({ isLoading: true, error: null });
 
@@ -164,6 +122,31 @@ login: async (email, password) => {
           return null;
         }
       },
+
+       // ✅ Verify token and clear data if missing/invalid
+      verifyAuth: async () => {
+        try {
+          const token = localStorage.getItem("token");
+
+          if (!token) {
+            get().clearAuth();
+            return null;
+          }
+
+          const user = await authApi.verifyToken();
+          if (!user) {
+            get().clearAuth();
+            return null;
+          }
+
+          set({ user, token });
+          return user;
+        } catch (error) {
+          get().clearAuth();
+          return null;
+        }
+      },
+
 
       updateUser: (updatedData) =>
         set((state) => ({

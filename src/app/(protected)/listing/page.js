@@ -243,7 +243,7 @@ const handleListingTypeSelect = (type) => {
                   List houses, apartments, plots, commercial spaces, and rental properties
                 </p>
                 <div className="text-sm text-gray-500">
-                  Specialized forms for property type, location, price, size, and amenities
+                  Tailored forms to capture property type, location, price, size, and key features
                 </div>
               </div>
             </div>
@@ -267,7 +267,7 @@ const handleListingTypeSelect = (type) => {
           <div className="mb-6">
             <button
               onClick={handleBackToListingType}
-              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
             >
               <IoIosArrowForward className="w-4 h-4 rotate-180 mr-2" />
               Back to listing type selection
@@ -286,7 +286,7 @@ const handleListingTypeSelect = (type) => {
           <div className="mb-6">
             <button
               onClick={handleBackToListingType}
-              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
             >
               <IoIosArrowForward className="w-4 h-4 rotate-180 mr-2" />
               Back to listing type selection
@@ -307,7 +307,7 @@ const handleListingTypeSelect = (type) => {
         <div className="mb-6">
           <button
             onClick={handleBackToListingType}
-            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors"
+            className="flex items-center text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
           >
             <IoIosArrowForward className="w-4 h-4 rotate-180 mr-2" />
             Back to listing type selection

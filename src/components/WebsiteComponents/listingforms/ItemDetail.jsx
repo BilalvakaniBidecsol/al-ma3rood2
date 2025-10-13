@@ -1,6 +1,14 @@
+"use client";
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import RichTextEditor from "@/components/ui/RichTextEditor";
+import dynamic from "next/dynamic";
+
+const QuillEditor = dynamic(() => import("@/components/ui/QuillEditor"), {
+  ssr: false,
+  loading: () => <div className="h-32 bg-gray-100 animate-pulse rounded-md"></div>
+});
+
 import { useTranslation } from "react-i18next";
 
 export const categoryFields = {
@@ -31,7 +39,7 @@ export const categoryFields = {
   "clothing & fashion": [
     {
       field: "color",
-      type: "select",
+      type: "text",
       required: false,
       options: ["red", "blue", "green", "yellow"]
     }
@@ -53,7 +61,7 @@ export const categoryFields = {
     },
     {
       field: "color",
-      type: "select",
+      type: "text",
       required: false,
       options: ["black", "white", "silver", "red", "blue", "green", "yellow"]
     }
@@ -102,21 +110,20 @@ const ItemDetail = ({ parentCategoryName }) => {
       {t("Description")}
   </label>
   <Controller
-    name="description"
-    control={control}
-    rules={{ required: "Description is required" }}
-    render={({ field: { onChange, value }, fieldState: { error } }) => (
-      <RichTextEditor
+  name="description"
+  control={control}
+  rules={{ required: "Description is required" }}
+  render={({ field: { onChange, value }, fieldState: { error } }) => (
+    <div className="rounded-md">
+      <QuillEditor
         value={value}
         onChange={onChange}
         error={error?.message}
-  placeholder={t("Describe your item...")}
+        placeholder="Describe your item..."
       />
-    )}
-  />
-  {errors.description && (
-    <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
+    </div>
   )}
+/>
 
   {/* Condition */}
   <label className="block text-sm font-medium text-gray-700 mt-6 mb-2">
@@ -207,6 +214,29 @@ const ItemDetail = ({ parentCategoryName }) => {
         </div>
       );
     }
+if (field.type === "text") {
+  return (
+    <div key={fieldName} className="mt-6">
+      {label}
+      <input
+        type="text"
+        {...register(fieldName, { required: field.required })}
+        placeholder={`Enter ${toDisplayName(field.field)}`}
+        className={`w-full border rounded px-4 py-2 focus:outline-none ${
+          errors[fieldName]
+            ? "border-red-500 focus:border-red-500 focus:ring-red-400"
+            : "border-gray-300 focus:border-green-400 focus:ring"
+        }`}
+      />
+      {errors[fieldName] && (
+        <p className="text-red-500 text-sm mt-1">
+          {toDisplayName(field.field)} is required
+        </p>
+      )}
+    </div>
+  );
+}
+
 
     return null;
   })}

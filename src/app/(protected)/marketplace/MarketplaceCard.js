@@ -445,13 +445,13 @@ const MarketplaceCard = ({
                   <div className="border-t border-gray-200 my-1" />
 
                   <div className="flex justify-between mt-1">
-                    {(card.creator?.city || card.creator?.billing_address) && (
+                    {(card.creator?.region_name || card.creator?.billing_address) && (
                       <div className="text-gray-700">
                         <div className="text-[10px] text-gray-400 tracking-wide">
-                          {t("City")}:
+                          {t("Region")}:
                         </div>
                         <div className="font-bold text-xs">
-                          {card.creator.city || card.creator.billing_address}
+                          {card.creator.region_name || card.creator.billing_address}
                         </div>
                       </div>
                     )}

@@ -267,7 +267,7 @@ const cities =
 
       <div className="-mt-3 p-6 bg-gray-50 rounded-lg">
         {/* Account Type */}
-        <h3 className="text-1xl font-semibold mb-2">{t("Account type")}</h3>
+        {/* <h3 className="text-1xl font-semibold mb-2">{t("Account type")}</h3>
         <div className="mb-6 mt-2 p-4 bg-white rounded border border-gray-300">
           <div className="space-y-2">
             <label className="flex items-center space-x-2">
@@ -298,7 +298,7 @@ const cities =
               )}
             </p>
           </div>
-        </div>
+        </div> */}
 
         {/* Primary Contact Person */}
         <h3 className="text-md font-semibold mb-4">
@@ -425,7 +425,7 @@ const cities =
         </div>
 
         {/* Business Name */}
-        {watch("accountType") === "business" && (
+        {/* {watch("accountType") === "business" && (
           <>
         <h3 className="text-md font-semibold mb-2">{t("Business details")}</h3>
         <div className="mb-6 p-4 bg-white rounded border border-gray-300">
@@ -443,7 +443,7 @@ const cities =
           )}
         </div>
         </>
-        )}
+        )} */}
 
         {/* Street address */}
         <h3 className="text-md font-semibold mb-2">{t("Street address")}</h3>
@@ -526,7 +526,7 @@ const cities =
           </div>
 
           {/* <div className="mt-6 space-y-4"> */}
-            <div>
+            {/* <div>
               <h4 className="text-sm font-semibold mb-1">
                 {t("Address Finder")}
               </h4>
@@ -541,7 +541,7 @@ const cities =
                   {errors.addressFinder.message}
                 </p>
               )}
-            </div>
+            </div> */}
             <div>
               <h4 className="text-sm font-semibold mb-1">{t("Address")}</h4>
               <input
@@ -556,7 +556,7 @@ const cities =
                 </p>
               )}
 
-              <br />
+              {/* <br />
               <input
                 type="text"
                 {...register("addressLine2")}
@@ -567,9 +567,9 @@ const cities =
                 <p className="text-red-500 text-xs mt-1">
                   {errors.addressLine2.message}
                 </p>
-              )}
+              )} */}
             </div>
-            <div>
+            {/* <div>
               <h4 className="text-sm font-semibold mb-1">
                 {t("Suburb (optional)")}
               </h4>
@@ -584,7 +584,7 @@ const cities =
                   {errors.suburb.message}
                 </p>
               )}
-            </div>
+            </div> */}
             {/* <div>
               <h4 className="text-sm font-semibold mb-1">{t("City")}</h4>
               <input

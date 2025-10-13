@@ -639,15 +639,15 @@ export default function ProductDetailsClient({ product: initialProduct }) {
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
               {product.title}
             </h1>
-            {(product?.creator?.city || product?.creator?.billing_address) && (
+            {(product?.creator?.region_name || product?.creator?.billing_address) && (
               <div
                 className={`flex items-center gap-2 text-sm text-gray-500 mt-1 ${i18n.language === "ar" ? "right" : ""
                   }`}
               >
                 <FaMapMarkerAlt className="text-green-600" />
                 <span>
-                  {product?.creator?.city
-                    ? `${t("City")}: ${product?.creator?.city}`
+                  {product?.creator?.region_name
+                    ? `${t("Region")}: ${product?.creator?.region_name}`
                     : `${t("Location")}: ${product?.creator?.billing_address}`}
                 </span>
               </div>
@@ -888,14 +888,14 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                   100% {t("positive feedback")}
                 </div> */}
                 <div className="text-xs text-gray-500 mt-0.5">
-                  {product.creator?.city ? (
+                  {product.creator?.region_name ? (
                     <>
-                      {t("City")}: {product.creator.city}
+                      {t("Region")}: {product.creator.region_name}
                     </>
                   ) : (
                     <>
-                      {t("Location")}:{" "}
-                      {product.creator?.billing_address || "Unknown"}
+                      {/* {t("Location")}:{" "}
+                      {product.creator?.billing_address || "Unknown"} */}
                     </>
                   )}
                 </div>
@@ -949,7 +949,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
             .map(([key, value]) => (
               <div key={key}>
                 <div className="font-bold">{t(key.toLocaleUpperCase())}</div>
-                <div className="text-gray-700">{value}</div>
+                <div className="text-gray-700">{String(value).replace(/_/g, " ")}</div>
               </div>
             ))}
         </div>

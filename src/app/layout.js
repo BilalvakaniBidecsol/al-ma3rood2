@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cookies } from "next/headers";
 import Toaster from "@/components/WebsiteComponents/Toaster";
+import AuthCleanup from "@/lib/common/AuthCleanup";
 
 // const geistSans = Geist({
 //   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default async function RootLayout({ children }) {
         className={`${lang === "ar" ? "font-Amiri" : "font-Poppins"} antialiased min-h-screen bg-gray-50`}
       >
         <Toaster />
+        <AuthCleanup />
         {children}
       </body>
     </html>

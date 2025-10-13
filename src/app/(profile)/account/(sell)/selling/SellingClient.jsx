@@ -127,7 +127,7 @@ export default function SellingClient() {
       <h1 className="text-2xl font-bold text-green-600 uppercase mb-1 mt-5">
         {t("Selling")}
       </h1>
-      <p className="text-sm mb-4 mt-3">{filteredListings.length} {t("Listings")}</p>
+      <p className="text-sm mb-4 mt-3">{filteredListings.length} {"- "} {t("Listings")}</p>
 
       <div className="mb-4">
         <select

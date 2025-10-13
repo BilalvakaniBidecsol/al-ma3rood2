@@ -2,12 +2,8 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Select from "react-select";
 import { Search, BikeIcon as Motorbike } from "lucide-react";
-import CustomDropdown from "@/components/WebsiteComponents/MotorsPageComponents/CustomDropdown";
 import { categoriesApi } from "@/lib/api/category";
-import Link from "next/link";
 import propertiesApi, { motorSearchFilters } from "@/lib/api/properties";
-import { FaTh, FaThList } from "react-icons/fa";
-import MotorListingCard from "@/components/WebsiteComponents/MotorListingCard";
 import { useTranslation } from "react-i18next";
 import PropertyCard from "./PropertyCard";
 
@@ -99,11 +95,6 @@ const PropertiesClient = ({
     Ford: ["Mustang", "F-150", "Explorer"],
   };
 
-// useEffect(() => {
-//   loadMore(true); 
-// }, [filters])
-
-
 const loadMore = useCallback(async () => {
     if (!hasMore || isLoading) return;
 
@@ -148,6 +139,36 @@ const loadMore = useCallback(async () => {
       setIsLoading(false);
     }
   }, [currentPage, hasMore, isLoading, pagination?.totalPages]);
+
+  const handleViewListings = async () => {
+  try {
+    setIsLoading(true);
+    setCurrentPage(1);
+
+    const payload = {
+      ...filters,
+      max_price: filters?.price_max,
+      min_price: filters?.price_min,
+      search: filters?.search,
+      sort: sortBy,
+      listing_type: "property",
+      pagination: { page: 1, per_page: 12 },
+      category_id: filters?.category_id,
+    };
+
+    console.log("🔍 Fetching properties with filters:", payload);
+    const response = await propertiesApi.getPropertiesByFilter(payload);
+
+    const newData = response || [];
+    setMotorListings(newData);
+    setHasMore(response?.pagination?.current_page < response?.pagination?.last_page);
+  } catch (err) {
+    console.error("❌ Error fetching filtered listings:", err);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -256,14 +277,14 @@ useEffect(() => {
   const clearFilters = () => {
     setFilters({
       search: "",
-    category_id: null,
-    price_min: 0,
-    price_max: 10000000,
-    condition: "",
-    land_area: "", 
-    parking: "", 
-    country: "",
-    city: "",
+      category_id: null,
+      price_min: 0,
+      price_max: 10000000,
+      condition: "",
+      land_area: "",
+      parking: "",
+      country: "",
+      city: "",
     });
     setActiveTab("");
     setSearchQuery("");
@@ -273,15 +294,15 @@ useEffect(() => {
 
   // Dropdown options
   const conditionOptions = [
-  { value: "", label: "Any Condition" },
-  { value: "brand_new", label: "Brand New" },
-  { value: "ready_to_move", label: "Ready to Move" },
-  { value: "under_construction", label: "Under Construction" },
-  { value: "furnished", label: "Furnished" },
-  { value: "semi_furnished", label: "Semi-Furnished" },
-  { value: "unfurnished", label: "Unfurnished" },
-  { value: "recently_renovated", label: "Recently Renovated" },
-];
+    { value: "", label: "Any Condition" },
+    { value: "brand_new", label: "Brand New" },
+    { value: "ready_to_move", label: "Ready to Move" },
+    { value: "under_construction", label: "Under Construction" },
+    { value: "furnished", label: "Furnished" },
+    { value: "semi_furnished", label: "Semi-Furnished" },
+    { value: "unfurnished", label: "Unfurnished" },
+    { value: "recently_renovated", label: "Recently Renovated" },
+  ];
 
   const priceOptions = [
     { value: "", label: "Select Price" },
@@ -333,43 +354,44 @@ useEffect(() => {
           <div className="bg-white rounded-lg  overflow-hidden">
             {/* Tabs section - flush with top of card */}
             <div className="flex border-b border-gray-200 overflow-x-auto no-scrollbar">
-  {tabs.map((tab) => (
-    <button
-      key={tab.key}
-      onClick={() => {
-        const selectedCat = categories.find(
-          (cat) => cat.name.toLowerCase() === tab.name.toLowerCase()
-        );
-        setActiveTab(tab.key);
-        setFilters({
-          ...filters,
-          category_id:
-            tab.key === "allcat"
-              ? null
-              : selectedCat
-              ? selectedCat.id
-              : null,
-        });
-      }}
-      className={`flex-shrink-0 text-sm font-medium h-10 px-4 text-center
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => {
+                    const selectedCat = categories.find(
+                      (cat) => cat.name.toLowerCase() === tab.name.toLowerCase()
+                    );
+                    setActiveTab(tab.key);
+                    setFilters({
+                      ...filters,
+                      category_id:
+                        tab.key === "allcat"
+                          ? null
+                          : selectedCat
+                          ? selectedCat.id
+                          : null,
+                    });
+                  }}
+                  className={`flex-shrink-0 text-sm font-medium h-10 px-4 text-center
       ${
         activeTab === tab.key
           ? "bg-white text-[#175f48]"
           : "bg-gray-50 text-gray-600 hover:bg-gray-100"
       } border-r border-gray-200 last:border-r-0`}
-    >
-      <div className="flex items-center justify-center gap-2 h-full">
-        <img
-          src={tab.icon}
-          alt={tab.name}
-          className="w-5 h-5 object-contain"
-        />
-        <span className="whitespace-nowrap text-[15.3px]">{tab.name}</span>
-      </div>
-    </button>
-  ))}
-</div>
-
+                >
+                  <div className="flex items-center justify-center gap-2 h-full">
+                    <img
+                      src={tab.icon}
+                      alt={tab.name}
+                      className="w-5 h-5 object-contain"
+                    />
+                    <span className="whitespace-nowrap text-[15.3px]">
+                      {tab.name}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Main Filter Content */}
@@ -383,6 +405,7 @@ useEffect(() => {
                     Condition
                   </label>
                   <Select
+                    instanceId="condition-select"
                     options={conditionOptions}
                     value={conditionOptions.find(
                       (o) => o.value === filters.condition
@@ -399,6 +422,7 @@ useEffect(() => {
                     Min Price
                   </label>
                   <Select
+                    instanceId="min-price-select"
                     options={priceOptions}
                     value={priceOptions.find(
                       (o) => o.value === filters.price_min
@@ -414,6 +438,7 @@ useEffect(() => {
                     Max Price
                   </label>
                   <Select
+                    instanceId="max-price-select"
                     options={priceOptions}
                     value={priceOptions.find(
                       (o) => o.value === filters.price_max
@@ -430,6 +455,7 @@ useEffect(() => {
                     Land Area
                   </label>
                   <Select
+                    instanceId="land-area-select"
                     options={landAreaOptions}
                     value={landAreaOptions.find(
                       (o) => o.value === filters.land_area
@@ -446,6 +472,7 @@ useEffect(() => {
                     Parking
                   </label>
                   <Select
+                    instanceId="parking-select"
                     options={parkingOptions}
                     value={parkingOptions.find(
                       (o) => o.value === filters.parking

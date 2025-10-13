@@ -1,4 +1,5 @@
 import axiosClient from "./axiosClient";
+import { useAuthStore } from "../../lib/stores/authStore";
 
 export const authApi = {
   login: (credentials) => axiosClient.post("/user/login", credentials),
@@ -15,22 +16,51 @@ export const authApi = {
 };
 
 export const setAuthToken = (token) => {
-  if (typeof window !== "undefined") {
-    localStorage.setItem("token", token);
+  // if (typeof window !== "undefined") {
+  //   localStorage.setItem("token", token);
+  // }
+
+  // // Set cookie with Secure and SameSite=None for production
+  // document.cookie = `auth-token=${token}; path=/; max-age=86400; SameSite=None; Secure`;
+   if (typeof window !== "undefined") {
+    if (token) {
+      localStorage.setItem("token", token);
+    } else {
+      // 🚫 If no token, clear everything
+      localStorage.removeItem("token");
+      localStorage.removeItem("auth-storage");
+    }
   }
 
-  // Set cookie with Secure and SameSite=None for production
-  document.cookie = `auth-token=${token}; path=/; max-age=86400; SameSite=None; Secure`;
+  // ✅ Set or clear cookie
+  if (token) {
+    document.cookie = `auth-token=${token}; path=/; max-age=86400; SameSite=None; Secure`;
+  } else {
+    document.cookie =
+      "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+  }
 };
 
 export const removeAuthToken = () => {
-  if (typeof window !== "undefined") {
+   if (typeof window !== "undefined") {
     localStorage.removeItem("token");
+    localStorage.removeItem("auth-storage"); 
   }
+  try {
+    const store = useAuthStore.getState();
+    if (store?.clearAuth) store.clearAuth();
+  } catch {}
   document.cookie =
     "auth-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
 };
 
 export const getAuthToken = () => {
-  return localStorage.getItem("token");
+  if (typeof window === "undefined") return null;
+
+  const token = localStorage.getItem("token");
+  if (!token) {
+    // Auto cleanup if token missing
+    localStorage.removeItem("auth-storage");
+  }
+  return token;
 };

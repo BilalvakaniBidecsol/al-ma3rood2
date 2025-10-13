@@ -681,143 +681,94 @@ const PopularProductCard = ({
       </div>
 
       {/* Cards */}
-      {loading ? (
-        <div className="text-center py-10">{t("Loading")}...</div>
-      ) : (
-        <div className="relative">
-          {/* Left Arrow */}
-          <button
-            onClick={scrollLeft}
-            // className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow rounded-full p-2 z-10 bg-white shadow-md hover:bg-gray-100"
+    {loading ? (
+  <div className="text-center py-10">{t("Loading")}...</div>
+) : cards?.length === 0 ? (
+  <div className="text-center py-10 text-gray-500 font-medium">
+    {t("No products available")}
+  </div>
+) : (
+  <div className="relative">
+    {/* Left Arrow */}
+    <button
+      onClick={scrollLeft}
+      // className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow rounded-full p-2 z-10 bg-white shadow-md hover:bg-gray-100"
+    >
+      {/* <FaChevronLeft size={22} /> */}
+    </button>
+
+    <div
+      ref={scrollRef}
+      className={
+        layout === "grid"
+          ? "flex gap-4 overflow-x-auto px-8 scrollbar-hide snap-x snap-mandatory"
+          : "flex flex-col gap-4 overflow-x-auto px-8 scrollbar-hide"
+      }
+    >
+      {cards.slice(0, 6).map((card, index) => {
+        if (index === 5) {
+          return (
+            <Link
+              key="see-more"
+              href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug}`}
+              className="min-w-[250px] max-w-[250px] flex flex-col items-center justify-center 
+                bg-[#F5F5F5] border-2 border-gray-300 rounded-xl shadow-sm 
+                hover:shadow-md transition-all duration-300  
+                flex-shrink-0 group"
+            >
+              <span className="text-lg font-semibold text-gray-700 mb-1 group-hover:text-black">
+                {t("See More")}
+              </span>
+              <span className="flex items-center gap-2 text-sm text-gray-500 font-medium group-hover:text-gray-700">
+                {t("Explore All")}
+                {isRTL ? (
+                  <FaChevronLeft className="transition-transform duration-300 group-hover:-translate-x-1" />
+                ) : (
+                  <FaChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
+                )}
+              </span>
+            </Link>
+          );
+        }
+
+        return (
+          <Link
+            key={index}
+            href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug}`}
+            className="flex-shrink-0 block bg-[#FBFBFB] p-2 rounded hover:shadow-lg transition-shadow w-60 snap-start"
           >
-            {/* <FaChevronLeft size={22} /> */}
-          </button>
+            <img
+              src={
+                card.images?.[0]?.image_path
+                  ? `${Image_URL}${card.images?.[0]?.image_path}`
+                  : Image_NotFound
+              }
+              alt={card.images?.[0]?.alt_text || "Product Image"}
+              className="w-full h-48 object-cover rounded-t bg-white"
+            />
 
-          <div
-            ref={scrollRef}
-            className={
-              layout === "grid"
-                ? "flex gap-4 overflow-x-auto px-8 scrollbar-hide snap-x snap-mandatory"
-                : "flex flex-col gap-4 overflow-x-auto px-8 scrollbar-hide"
-            }
-          >
-            {cards?.length > 0 &&
-              cards.slice(0, 4).map((card, index) => {
-                // 👉 Last item = See More
-                if (index === 5) {
-                  return (
-                    <Link
-                      key="see-more"
-                      // href={`/marketplace/${card.category?.slug || "unknown"}?categoryId=${card.category?.id || ""}`}
-                         href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug
-                }`}
-                      className="min-w-[250px] max-w-[250px] flex flex-col items-center justify-center 
-                        bg-[#F5F5F5] border-2 border-gray-300 rounded-xl shadow-sm 
-                        hover:shadow-md transition-all duration-300  
-                        flex-shrink-0 group"
-                    >
-                      <span className="text-lg font-semibold text-gray-700 mb-1 group-hover:text-black">
-                        {t("See More")}
-                      </span>
-                      <span className="flex items-center gap-2 text-sm text-gray-500 font-medium group-hover:text-gray-700">
-                        {t("Explore All")}
-                        {isRTL ? (
-                          <FaChevronLeft className="transition-transform duration-300 group-hover:-translate-x-1" />
-                        ) : (
-                          <FaChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
-                        )}
-                      </span>
-                    </Link>
-                  );
-                }
+            <div className="px-3 pt-3">
+              <div className="flex items-center justify-between gap-2 mb-1">
+                {card.category?.name && (
+                  <span className="text-xs text-gray-600 font-medium">
+                    {t("Category")}: {card.category.name}
+                  </span>
+                )}
+              </div>
 
-                // Normal Product Cards
-                return (
-                  <Link
-                    key={index}
-                    // href={`/marketplace/${card.category?.slug || "unknown"}/${card.slug}`}
-                       href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug
-                }`}
-                    className="flex-shrink-0 block bg-[#FBFBFB] p-2 rounded hover:shadow-lg transition-shadow w-60 snap-start"
-                  >
-                    <img
-                      src={
-                        card.images?.[0]?.image_path
-                          ? `${Image_URL}${card.images?.[0]?.image_path}`
-                          : Image_NotFound
-                      }
-                      alt={card.images?.[0]?.alt_text || "Product Image"}
-                      className="w-full h-48 object-cover rounded-t bg-white"
-                    />
+              <div className="text-lg font-semibold">
+                {card.title.length > 18
+                  ? `${card.title.slice(0, 18)}...`
+                  : card.title}
+              </div>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+  </div>
+)}
 
-                    <div className="px-3 pt-3">
-                      <div className="flex items-center justify-between gap-2 mb-1">
-                        {card.category?.name && (
-                          <span className="text-xs text-gray-600 font-medium">
-                            {t("Category")}: {card.category.name}
-                          </span>
-                        )}
-
-                        <div className="text-xs text-gray-600 font-medium">
-                          {card.expire_at ? (
-                            <>
-                              <span>{t("Closes")}</span>:{" "}
-                              {new Date(card.expire_at).toLocaleDateString("en-US", {
-                                weekday: "short",
-                                day: "numeric",
-                                month: "short",
-                              })}
-                            </>
-                          ) : (
-                            <span className="invisible">placeholder</span>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="text-lg font-semibold">
-                        {card.title.length > 18
-                          ? `${card.title.slice(0, 18)}...`
-                          : card.title}
-
-                        <div className="border-t border-gray-200 my-1" />
-
-                        <div className="flex justify-between mt-1">
-                          {(card.creator?.city || card.creator?.billing_address) && (
-                            <div className="text-gray-700">
-                              <div className="text-[10px] text-gray-400 tracking-wide">
-                                {t("City")}:
-                              </div>
-                              <div className="font-bold text-xs">
-                                {card.creator.city || card.creator.billing_address}
-                              </div>
-                            </div>
-                          )}
-
-                          {card.buy_now_price && (
-                            <div className="text-right text-gray-700 flex flex-col items-end">
-                              <div className="text-[9px] text-gray-400 uppercase tracking-wide">
-                                {t("Buy Now")}:
-                              </div>
-                              <div className="font-bold">
-                                <span className="price">$</span>
-                                {card.buy_now_price}
-                              </div>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-          </div>
-
-          {/* Right Arrow */}
-          <button onClick={scrollRight}>
-            {/* <FaChevronRight size={22} /> */}
-          </button>
-        </div>
-      )}
     </div>
   );
 };
