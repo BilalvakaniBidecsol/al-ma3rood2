@@ -3,7 +3,7 @@ import Link from 'next/link';
 import { Car, Calendar, Gauge, Fuel, Settings, MapPin, Heart, Eye } from 'lucide-react';
 import { Image_URL } from '@/config/constants';
 
-const MotorListingCard = ({ key, listing, viewMode }) => {
+const MotorListingCard = ({ listing, viewMode }) => {
   const getAttributeValue = (key) => {
     const attribute = listing.attributes?.find(attr => attr.key === key);
     return attribute ? attribute.value : null;

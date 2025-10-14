@@ -31,6 +31,18 @@ export default async function Marketplace({ searchParams }) {
   console.log("deals-list", listings);
 
   const { categories, isLoading, error } = catResult;
+
+  const dealCards =
+  Array.isArray(listings?.data)
+    ? listings.data.slice(0, 8)
+    : Array.isArray(listings?.data?.data)
+    ? listings.data.data.slice(0, 8)
+    : [];
+
+const popularCards =
+  Array.isArray(listings?.data?.data)
+    ? listings.data.data.slice(0, 4)
+    : [];
   
 
   return (
@@ -65,7 +77,8 @@ export default async function Marketplace({ searchParams }) {
       <div className="md:px-20" id="marketplace-deals">
         <MarketplaceCard
           heading="Deals"
-          cards={listings?.data?.slice(0, 8) || []}
+          // cards={listings?.data?.slice(0, 8) || []}
+          cards={dealCards}
           seeMoreLink="/hotDeals"
         />
       </div>
@@ -77,7 +90,8 @@ export default async function Marketplace({ searchParams }) {
       >
         <PopularProductCard
           categories={categories}
-          cards={listings?.data?.data?.slice(0, 4)}
+          // cards={listings?.data?.data?.slice(0, 4)}
+          cards={popularCards}
         />
       </Suspense>
 

@@ -347,8 +347,8 @@ console.log('res', formData.region)
       ...formData,
       name: `${formData.first_name} ${formData.last_name}`.trim(),
       country_id: country?.id || null,
-    region_id: selectedRegion?.id || null,
-    governorate_id: selectedGovernorate?.id || null,
+    regions_id: selectedRegion?.id || null,
+    governorates_id: selectedGovernorate?.id || null,
     // city_id: selectedCity?.id || null,
     };
     console.log(updatedFormData);

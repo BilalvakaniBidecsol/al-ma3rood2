@@ -164,7 +164,7 @@ export default function SellingClient() {
               image: listing.images?.[0]?.image_path
                 ? `${Image_URL}${listing.images[0].image_path}`
                 : "/default-image.jpg",
-              link: `/marketplace/${listing.category?.slug || "unknown"}/${
+              link: `/marketplace/${listing.category?.slug?.split("/").pop() || "unknown"}/${
                 listing.slug
               }`,
             }}

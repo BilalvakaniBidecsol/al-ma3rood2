@@ -254,7 +254,7 @@ const MarketplaceCard = ({
 
 
   return (
-    <div className="relative">
+    <div className="relative mx-5 md:mx-0">
       {/* Heading */}
       <h2
         className={`text-2xl font-semibold pb-1 mb-6 ${centerHeading ? "text-center" : ""
@@ -414,7 +414,7 @@ const MarketplaceCard = ({
                 />
 
                 <div className="px-3 pt-3">
-                  <div className="flex items-center justify-between gap-2 mb-1">
+                  <div className="flex items-start justify-between gap-2 line-clamp-2 min-h-[2.5rem]">
                     {card.category?.name && (
                       <span className="text-xs text-gray-600 font-medium">
                         {t("Category")}: {card.category.name}
@@ -445,16 +445,20 @@ const MarketplaceCard = ({
                   <div className="border-t border-gray-200 my-1" />
 
                   <div className="flex justify-between mt-1">
-                    {(card.creator?.region_name || card.creator?.billing_address) && (
+                   
                       <div className="text-gray-700">
+                         {(card.creator?.region_name || card.creator?.billing_address) && (
+                          <>
                         <div className="text-[10px] text-gray-400 tracking-wide">
                           {t("Region")}:
                         </div>
                         <div className="font-bold text-xs">
                           {card.creator.region_name || card.creator.billing_address}
                         </div>
+                        </>
+                         )}
                       </div>
-                    )}
+                   
                     {card.buy_now_price && (
                       <div className="text-right text-gray-700 flex flex-col items-end">
                         <div className="text-[9px] text-gray-400 uppercase tracking-wide">

@@ -208,7 +208,7 @@ const ListofferClient = () => {
                     ? `${Image_URL}${listing.listing.images[0].image_path}`
                     : "/default-image.jpg",
                   link: `/marketplace/${
-                    listing.listing.category?.slug || "unknown"
+                    listing.listing.category?.slug?.split("/").pop() || "unknown"
                   }/${listing.listing.slug}`,
                 }}
                 //               actions={[

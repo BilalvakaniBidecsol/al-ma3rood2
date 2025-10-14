@@ -28,11 +28,11 @@ const UpdateDetails = () => {
       icon: FaUserEdit,
       label: "Edit Contact Details",
     },
-    {
-      id: "editDeliveryAddress",
-      icon: FaUserEdit,
-      label: "Edit Delivery Address",
-    },
+    // {
+    //   id: "editDeliveryAddress",
+    //   icon: FaUserEdit,
+    //   label: "Edit Delivery Address",
+    // },
   ];
 
   const profileOptions = [
@@ -71,7 +71,7 @@ const UpdateDetails = () => {
       <button
         key={item.id}
         onClick={() => showComponent(item.id)}
-        className={`flex items-center text-green-600 hover:underline ${isRTL ? "" : ""}`}
+        className={`flex items-center text-green-600 cursor-pointer hover:underline ${isRTL ? "" : ""}`}
       >
         <item.icon className={`${isRTL ? "ml-2" : "mr-2"}`} />
         {t(item.label)}

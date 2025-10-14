@@ -60,8 +60,8 @@ const Page = () => {
     model: '',
     year_min: '',
     year_max: '',
-    price_min: null,
-    price_max: null,
+    price_min: undefined,
+    price_max: undefined,
     fuel_type: '',
     transmission: '',
     body_style: '',
@@ -367,7 +367,7 @@ const Page = () => {
                       <option value="">{t("Min")}</option>
                       {[0, 500, 1000, 5000, 10000, 20000, 50000].map((price) => (
                         <option key={price} value={price}>
-                          ${price.toLocaleString()}
+                          {price.toLocaleString()}
                         </option>
                       ))}
                     </select>
@@ -380,7 +380,7 @@ const Page = () => {
                       <option value="">{t("Max")}</option>
                       {[1000, 5000, 10000, 20000, 50000, 100000].map((price) => (
                         <option key={price} value={price}>
-                          <span className="price">$</span>{price.toLocaleString()}
+                          {price.toLocaleString()}
                         </option>
                       ))}
                     </select>

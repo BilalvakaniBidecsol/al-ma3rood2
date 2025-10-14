@@ -596,7 +596,8 @@ const PopularProductCard = ({
   const [loading, setLoading] = useState(false);
   const { t, i18n } = useTranslation();
   const isRTL = i18n.dir() === "rtl";
-
+const [isAtStart, setIsAtStart] = useState(true);
+  const [isAtEnd, setIsAtEnd] = useState(false);
   const scrollRef = useRef(null);
 
   useEffect(() => {
@@ -645,12 +646,30 @@ const PopularProductCard = ({
     }
   };
 
+    const checkScroll = () => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setIsAtStart(scrollLeft === 0);
+      setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 5);
+    }
+  };
+
+  useEffect(() => {
+    checkScroll();
+  }, []);
+
   const scrollLeft = () => {
-    scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: -300, behavior: "smooth" });
+      setTimeout(checkScroll, 400);
+    }
   };
 
   const scrollRight = () => {
-    scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: 300, behavior: "smooth" });
+      setTimeout(checkScroll, 400);
+    }
   };
 
   return (
@@ -689,13 +708,16 @@ const PopularProductCard = ({
   </div>
 ) : (
   <div className="relative">
-    {/* Left Arrow */}
-    <button
-      onClick={scrollLeft}
-      // className="absolute left-0 top-1/2 -translate-y-1/2 bg-white shadow rounded-full p-2 z-10 bg-white shadow-md hover:bg-gray-100"
-    >
-      {/* <FaChevronLeft size={22} /> */}
-    </button>
+{/* Left Arrow */}
+      <button
+        onClick={scrollLeft}
+        // disabled={isAtStart}
+        className={`hidden sm:flex absolute top-1/2 -translate-y-1/2 rounded-full p-2 z-10 bg-white
+            ${isRTL ? "right-0" : "left-0"} 
+           `}
+      >
+        {isRTL ? <FaChevronRight size={22} /> : <FaChevronLeft size={22} />}
+      </button>
 
     <div
       ref={scrollRef}
@@ -766,6 +788,18 @@ const PopularProductCard = ({
         );
       })}
     </div>
+
+   {/* Right Arrow */}
+<button
+        onClick={scrollRight}
+        // disabled={isAtEnd}
+        className={`hidden sm:flex absolute top-1/2 -translate-y-1/2 rounded-full p-2 z-10 bg-white
+             ${isRTL ? "left-0" : "right-0"} 
+            
+          `}
+      >
+        {isRTL ? <FaChevronLeft size={22} /> : <FaChevronRight size={22} />}
+      </button>
   </div>
 )}
 

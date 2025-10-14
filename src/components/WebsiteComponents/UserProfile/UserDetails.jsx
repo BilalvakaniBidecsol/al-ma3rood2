@@ -454,7 +454,7 @@ const UserDetails = ({ profile }) => {
             {
               icon: "/Profile/location.png",
               label: "Location",
-              value: user?.billing_address,
+              value: user?.address_1,
             },
             {
               icon: "/Profile/since.png",

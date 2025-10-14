@@ -6,7 +6,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { listingsApi } from "@/lib/api/listings";
 import { useRouter } from "next/navigation";
-import { Image_URL } from "@/config/constants";
+import { Image_NotFound, Image_URL } from "@/config/constants";
 import { useStaticCategoryStore } from "@/lib/stores/staticCategoryStore";
 
 const GridLayout = () => {
@@ -243,14 +243,19 @@ const handleFocus = () => {
             className="p-3 hover:bg-gray-100 cursor-pointer flex items-start gap-3 transition-all"
           >
             <img
-              src={
-                item.images?.[0]?.image_path
-                  ? `${Image_URL}/${item.images[0].image_path}`
-                  : "/placeholder.png"
-              }
-              alt={item.title}
-              className="min-w-12 h-12 object-cover rounded"
-            />
+  src={
+    item?.images?.[0]?.image_path
+      ? `${Image_URL}/${item.images[0].image_path}`
+      : Image_NotFound
+  }
+  alt={item?.title || "No Image"}
+  className="min-w-12 h-12 object-cover rounded"
+  onError={(e) => {
+    e.target.onerror = null; // Prevent infinite loop
+    e.target.src = Image_NotFound; // Show fallback icon if image fails to load
+  }}
+/>
+
             <div>
               <p className="text-sm text-start text-black font-medium">
                 {item.title}

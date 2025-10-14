@@ -4,7 +4,13 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import Button from "@/components/WebsiteComponents/ReuseableComponenets/Button";
 import { IoIosArrowForward, IoIosArrowBack } from "react-icons/io";
-import { Car, BikeIcon as Motorbike, Caravan, Sailboat, Wrench } from "lucide-react";
+import {
+  Car,
+  BikeIcon as Motorbike,
+  Caravan,
+  Sailboat,
+  Wrench,
+} from "lucide-react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import { listingsApi } from "@/lib/api/listings";
@@ -12,81 +18,86 @@ import { motorsApi } from "@/lib/api/motors";
 import { toast } from "react-toastify";
 import UploadPhotos from "./UploadPhotos";
 import { categoriesApi } from "@/lib/api/category";
-import { Image_URL } from "@/config/constants";
-import { HexColorPicker } from "react-colorful";
 import CategoryModal from "./CategoryModal";
-import { 
-  getTransformedVehicleData, 
+import {
+  getTransformedVehicleData,
   getVehicleTypeFromCategory,
-  isSupportedVehicleType 
+  isSupportedVehicleType,
 } from "@/lib/vehicles";
 import SearchableDropdown from "@/components/WebsiteComponents/ReuseableComponenets/SearchableDropdown";
 
-const motorListingSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  subtitle: z.string().nullable().optional(),
-  category_id: z.number().optional().default(1),
-  description: z.string().min(1, "Description is required"),
-  // condition: z.enum(["new", "used"]),
-  condition: z.enum([
-  "brand_new_unused",
-  "like_new",
-  "gently_used_excellent_condition",
-  "good_condition",
-  "fair_condition",
-  "for_parts_or_not_working",
-]),
-  images: z.array(z.any()).min(1, "At least one image is required"),
+const motorListingSchema = z
+  .object({
+    title: z.string().min(1, "Title is required"),
+    subtitle: z.string().nullable().optional(),
+    category_id: z.number().optional().default(1),
+    description: z.string().min(1, "Description is required"),
+    // condition: z.enum(["new", "used"]),
+    condition: z.enum([
+      "brand_new_unused",
+      "like_new",
+      "gently_used_excellent_condition",
+      "good_condition",
+      "fair_condition",
+      "for_parts_or_not_working",
+    ]),
+    images: z.array(z.any()).min(1, "At least one image is required"),
 
-  buy_now_price: z.string().optional(),
-  allow_offers: z.boolean().optional(),
-  start_price: z.string().optional(),
-  reserve_price: z.string().optional(),
-  expire_at: z.date().optional(),
-  payment_method_id: z.string().optional(),
-  // quantity: z.number().optional(),
-  // vehicle_type: z.string().min(1, "Vehicle Type is required"),
-  make: z.string().min(1, "Make is required"),
-  model: z.string().min(1, "Model is required"),
-  year: z.string().min(1, "Year is required"),
-  part: z.string().optional(),
-  fuel_type: z.string().optional(),
-  transmission: z.string().optional(),
-  body_style: z.string().optional(),
-  odometer: z.string().optional(),
-  engine_size: z.string().optional(),
-  doors: z.string().optional(),
-  seats: z.string().optional(),
-  drive_type: z.string().optional(),
-  color: z.string().optional(),
-  import_history: z.string().optional(),
-  listing_type: z.string().optional(),
-  safety_rating: z.string().optional(),
-  vin: z.string().optional(),
-  registration: z.string().optional(),
-  wof_expiry: z.string().optional(),
-  rego_expiry: z.string().optional(),
-}).refine((data) => {
-  // Case 1: Buy now price is filled
-  if (data.buy_now_price && data.buy_now_price.trim() !== "") {
-    return true;
-  }
+    buy_now_price: z.string().optional(),
+    allow_offers: z.boolean().optional(),
+    start_price: z.string().optional(),
+    reserve_price: z.string().optional(),
+    expire_at: z.date().optional(),
+    payment_method_id: z.string().optional(),
+    // quantity: z.number().optional(),
+    // vehicle_type: z.string().min(1, "Vehicle Type is required"),
+    make: z.string().min(1, "Make is required"),
+    model: z.string().min(1, "Model is required"),
+    year: z.string().min(1, "Year is required"),
+    part: z.string().optional(),
+    fuel_type: z.string().optional(),
+    transmission: z.string().optional(),
+    body_style: z.string().optional(),
+    odometer: z.string().optional(),
+    engine_size: z.string().optional(),
+    doors: z.string().optional(),
+    seats: z.string().optional(),
+    drive_type: z.string().optional(),
+    color: z.string().optional(),
+    import_history: z.string().optional(),
+    listing_type: z.string().optional(),
+    safety_rating: z.string().optional(),
+    vin: z.string().optional(),
+    registration: z.string().optional(),
+    wof_expiry: z.string().optional(),
+    rego_expiry: z.string().optional(),
+  })
+  .refine(
+    (data) => {
+      // Case 1: Buy now price is filled
+      if (data.buy_now_price && data.buy_now_price.trim() !== "") {
+        return true;
+      }
 
-  // Case 2: Both start and reserve price are filled
-  if (
-    data.start_price && data.start_price.trim() !== "" &&
-    data.reserve_price && data.reserve_price.trim() !== ""
-  ) {
-    return true;
-  }
+      // Case 2: Both start and reserve price are filled
+      if (
+        data.start_price &&
+        data.start_price.trim() !== "" &&
+        data.reserve_price &&
+        data.reserve_price.trim() !== ""
+      ) {
+        return true;
+      }
 
-  // Otherwise fail
-  return false;
-}, {
-  message: "Either enter Buy Now Price, or both Start Price and Reserve Price",
-  path: ["buy_now_price"], // error will show under buy_now_price by default
-});
-
+      // Otherwise fail
+      return false;
+    },
+    {
+      message:
+        "Either enter Buy Now Price, or both Start Price and Reserve Price",
+      path: ["buy_now_price"], // error will show under buy_now_price by default
+    }
+  );
 
 const steps = [
   { title: "Vehicle Type & Category", key: "vehicle-type" },
@@ -97,10 +108,30 @@ const steps = [
 
 const vehicleTypes = [
   { key: "car", name: "Car", icon: Car, description: "Cars, SUVs, Utes, Vans" },
-  { key: "motorbike", name: "Motorbike", icon: Motorbike, description: "Motorcycles, Scooters" },
-  { key: "caravan", name: "Caravan & Motorhome", icon: Caravan, description: "Caravans, Motorhomes, Trailers" },
-  { key: "boat", name: "Boat & Marine", icon: Sailboat, description: "Boats, Yachts, Jetskis" },
-  { key: "parts", name: "Parts & Accessories", icon: Wrench, description: "Car parts, Accessories" },
+  {
+    key: "motorbike",
+    name: "Motorbike",
+    icon: Motorbike,
+    description: "Motorcycles, Scooters",
+  },
+  {
+    key: "caravan",
+    name: "Caravan & Motorhome",
+    icon: Caravan,
+    description: "Caravans, Motorhomes, Trailers",
+  },
+  {
+    key: "boat",
+    name: "Boat & Marine",
+    icon: Sailboat,
+    description: "Boats, Yachts, Jetskis",
+  },
+  {
+    key: "parts",
+    name: "Parts & Accessories",
+    icon: Wrench,
+    description: "Car parts, Accessories",
+  },
 ];
 // Vehicle data will be loaded dynamically from vehicles.json
 
@@ -108,41 +139,77 @@ const carPartsData = [
   {
     make: "Toyota",
     parts: [
-      { name: "Headlight", compatibleModels: ["Corolla", "Camry"], years: [2019, 2020, 2021, 2022] },
-      { name: "Bumper", compatibleModels: ["Corolla", "Hilux"], years: [2018, 2019, 2020] },
-      { name: "Brake Pads", compatibleModels: ["RAV4", "Fortuner"], years: [2020, 2021, 2022] },
+      {
+        name: "Headlight",
+        compatibleModels: ["Corolla", "Camry"],
+        years: [2019, 2020, 2021, 2022],
+      },
+      {
+        name: "Bumper",
+        compatibleModels: ["Corolla", "Hilux"],
+        years: [2018, 2019, 2020],
+      },
+      {
+        name: "Brake Pads",
+        compatibleModels: ["RAV4", "Fortuner"],
+        years: [2020, 2021, 2022],
+      },
     ],
   },
   {
     make: "Honda",
     parts: [
-      { name: "Headlight", compatibleModels: ["Civic", "Accord"], years: [2019, 2020, 2021] },
-      { name: "Bumper", compatibleModels: ["City", "CR-V"], years: [2018, 2019, 2020] },
-      { name: "Brake Pads", compatibleModels: ["HR-V"], years: [2020, 2021, 2022] },
+      {
+        name: "Headlight",
+        compatibleModels: ["Civic", "Accord"],
+        years: [2019, 2020, 2021],
+      },
+      {
+        name: "Bumper",
+        compatibleModels: ["City", "CR-V"],
+        years: [2018, 2019, 2020],
+      },
+      {
+        name: "Brake Pads",
+        compatibleModels: ["HR-V"],
+        years: [2020, 2021, 2022],
+      },
     ],
   },
   {
     make: "Ford",
     parts: [
-      { name: "Headlight", compatibleModels: ["F-150", "Mustang"], years: [2019, 2020, 2021] },
-      { name: "Bumper", compatibleModels: ["Explorer", "Escape"], years: [2018, 2019, 2020] },
+      {
+        name: "Headlight",
+        compatibleModels: ["F-150", "Mustang"],
+        years: [2019, 2020, 2021],
+      },
+      {
+        name: "Bumper",
+        compatibleModels: ["Explorer", "Escape"],
+        years: [2018, 2019, 2020],
+      },
     ],
   },
 ];
 
-
-
-const MotorListingForm = ({initialValues,
-    mode="create"}) => {
-        const methods = useForm({
+const MotorListingForm = ({ initialValues, mode = "create" }) => {
+  const methods = useForm({
     resolver: zodResolver(motorListingSchema),
     defaultValues: {},
     mode: "onTouched",
   });
 
-  const { handleSubmit, setValue, watch, reset, formState: { errors }, control } = methods;
+  const {
+    handleSubmit,
+    setValue,
+    watch,
+    reset,
+    formState: { errors },
+    control,
+  } = methods;
   const watchedVehicleType = watch("vehicle_type");
-   const watchedCategoryId = watch("category_id");
+  const watchedCategoryId = watch("category_id");
   const [activeStep, setActiveStep] = useState(0);
   const [selectedVehicleType, setSelectedVehicleType] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -155,7 +222,7 @@ const MotorListingForm = ({initialValues,
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const vehicle_type =
-    categoryStack.length > 0 ? categoryStack?.[0]?.name : null;
+    categoryStack.length > 0 ? categoryStack?.[0]?.name : selectedCategory?.name;
 
   // Vehicle data state
   const [vehicleData, setVehicleData] = useState([]);
@@ -175,7 +242,7 @@ const MotorListingForm = ({initialValues,
         const data = await getTransformedVehicleData(vehicleType);
         setVehicleData(data);
       } catch (error) {
-        console.error('Error loading vehicle data:', error);
+        console.error("Error loading vehicle data:", error);
         setVehicleData([]);
       } finally {
         setLoadingVehicleData(false);
@@ -185,113 +252,127 @@ const MotorListingForm = ({initialValues,
     loadVehicleData();
   }, [vehicle_type]);
 
+  useEffect(() => {
+    // console.log("aaaa vehicle_type", vehicle_type);
+    // console.log("aaaa categoryStack", categoryStack);
+    // console.log("aaaa vehicleData", vehicleData);
+    console.log("aaaa selectedCategory", selectedCategory);
+  }, [selectedCategory]);
+
   const normalizedInitialValues = useMemo(() => {
     if (!initialValues) return {};
-    
-    // **Start with a deep copy of the raw data**
-    const copy = { ...initialValues }; 
 
-      Object.keys(copy).forEach((key) => {
-    if (copy[key] === null) copy[key] = "";
-  });
-    
+    // **Start with a deep copy of the raw data**
+    const copy = { ...initialValues };
+
+    Object.keys(copy).forEach((key) => {
+      if (copy[key] === null) copy[key] = "";
+    });
+
     // 1. Convert expire_at string to Date object
     if (copy.expire_at && typeof copy.expire_at === "string") {
       const date = new Date(copy.expire_at);
       copy.expire_at = isNaN(date.getTime()) ? null : date;
     }
-    
+
     // 2. Convert 'allow_offers' string ("false") to boolean (false)
     if (copy.allow_offers) {
-        copy.allow_offers = copy.allow_offers === "true" || copy.allow_offers === true;
+      copy.allow_offers =
+        copy.allow_offers === "true" || copy.allow_offers === true;
     } else {
-        copy.allow_offers = false;
+      copy.allow_offers = false;
     }
-    
+
     // ✅ Vehicle data normalization using dynamic data
     if (vehicleData.length > 0) {
-  const selectedMake =
+      const selectedMake =
         vehicleData.find(
-      (brand) =>
-        brand.make.toLowerCase().trim() ===
-        (copy.make || "").toLowerCase().trim()
+          (brand) =>
+            brand.make.toLowerCase().trim() ===
+            (copy.make || "").toLowerCase().trim()
         ) || vehicleData[0];
 
       if (selectedMake && selectedMake.models.length > 0) {
-  const selectedModel =
-    selectedMake.models.find(
-      (m) =>
-        m.name.toLowerCase().trim() ===
-        (copy.model || "").toLowerCase().trim()
-    ) || selectedMake.models[0];
+        const selectedModel =
+          selectedMake.models.find(
+            (m) =>
+              m.name.toLowerCase().trim() ===
+              (copy.model || "").toLowerCase().trim()
+          ) || selectedMake.models[0];
 
-  // Make sure year exists in the model years array
-  const selectedYear = selectedModel.years.includes(Number(copy.year))
-    ? Number(copy.year)
-    : selectedModel.years[selectedModel.years.length - 1];
+        // Make sure year exists in the model years array
+        const selectedYear = selectedModel.years.includes(Number(copy.year))
+          ? Number(copy.year)
+          : selectedModel.years[selectedModel.years.length - 1];
 
-  return {
-    ...copy,
-    make: selectedMake.make,
-    model: selectedModel.name,
-    year: String(selectedYear),
-  };
+        return {
+          ...copy,
+          make: selectedMake.make,
+          model: selectedModel.name,
+          year: String(selectedYear),
+        };
       }
     }
 
     return copy;
   }, [initialValues, vehicleData]);
 
-useEffect(() => {
+  useEffect(() => {
     if (Object.keys(normalizedInitialValues).length > 0) {
-    console.log("Reset triggered with data:", normalizedInitialValues);
-    reset(normalizedInitialValues);
-  }
-}, [initialValues, vehicleData, reset, normalizedInitialValues]);
+      console.log("Reset triggered with data:", normalizedInitialValues);
+      reset(normalizedInitialValues);
+    }
+  }, [initialValues, vehicleData, reset, normalizedInitialValues]);
 
-useEffect(() => {
-  console.log("Reset Triggered:", { initialValues, vehicleDataLength: vehicleData.length });
-}, [initialValues, vehicleData]);
+  useEffect(() => {
+    console.log("Reset Triggered:", {
+      initialValues,
+      vehicleDataLength: vehicleData.length,
+    });
+  }, [initialValues, vehicleData]);
 
-
-      useEffect(() => {
-        async function initCategoryForEdit() {
-          if (
-            mode === "edit" &&
-            initialValues &&
-            initialValues.category_id &&
-            !selectedCategory
-          ) {
-            const res = await categoriesApi.getAllCategories(
-              initialValues.category.parent_id, "motors"
-            );
-            const allCategories = res.data || res;
-            const found = allCategories.find(
-              (cat) => cat.id == initialValues.category.id
-            );
-            console.log(initialValues)
-            if (found) {
-              setSelectedCategory(found);
-              setCategoryStack([found?.parent, found]);
-            }
-          }
+  useEffect(() => {
+    async function initCategoryForEdit() {
+      if (
+        mode === "edit" &&
+        initialValues &&
+        initialValues.category_id &&
+        !selectedCategory
+      ) {
+        const res = await categoriesApi.getAllCategories(
+          initialValues.category.parent_id,
+          "motors"
+        );
+        const allCategories = res.data || res;
+        const found = allCategories.find(
+          (cat) => cat.id == initialValues.category.id
+        );
+        console.log(initialValues);
+        if (found) {
+          setSelectedCategory(found);
+          setCategoryStack([found?.parent, found]);
         }
-        initCategoryForEdit();
-        // eslint-disable-next-line
-      }, [mode, initialValues, selectedCategory]);
+      }
+    }
+    initCategoryForEdit();
+    // eslint-disable-next-line
+  }, [mode, initialValues, selectedCategory]);
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const listing_type = "motors"
+      const listing_type = "motors";
       try {
-        const { data } = await categoriesApi.getAllCategories(null, listing_type);
+        const { data } = await categoriesApi.getAllCategories(
+          null,
+          listing_type
+        );
         // setCategories(data || []);
         console.log("Property dataaa", data);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
-     const fetchModals = async () => {
+    const fetchModals = async () => {
       try {
         const { data } = await motorsApi.getMotorModels();
         setModals(data || []);
@@ -303,15 +384,14 @@ useEffect(() => {
 
     fetchCategories();
     fetchModals();
-
   }, []);
 
   useEffect(() => {
-    const listing_type = 'motors';
+    const listing_type = "motors";
     if (isModalOpen) {
       setLoadingCategories(true);
       categoriesApi
-        .getAllCategories('', listing_type)
+        .getAllCategories("", listing_type)
         .then((cats) => {
           setCurrentCategories(cats.data || cats);
           setCategoryStack([]);
@@ -324,8 +404,10 @@ useEffect(() => {
   const handleCategoryClick = async (cat) => {
     setLoadingCategories(true);
     try {
-      const result = await categoriesApi.getAllCategories(cat.id, 'motors');
+      const result = await categoriesApi.getAllCategories(cat.id, "motors");
       const children = result.data || result;
+      console.log("aaaa result", result);
+      console.log("aaaa children", children);
       if (children && children.length > 0) {
         setCategoryStack((prev) => [...prev, { id: cat.id, name: cat.name }]);
         setCurrentCategories(children);
@@ -345,13 +427,13 @@ useEffect(() => {
     newStack.pop();
     let parentId =
       newStack.length > 0 ? newStack[newStack.length - 1].id : undefined;
-    const result = await categoriesApi.getAllCategories(parentId, 'motors');
+    const result = await categoriesApi.getAllCategories(parentId, "motors");
     setCurrentCategories(result.data || result);
     setCategoryStack(newStack);
     setLoadingCategories(false);
   };
 
-   useEffect(() => {
+  useEffect(() => {
     if (watchedVehicleType && watchedVehicleType !== selectedVehicleType) {
       setSelectedVehicleType(watchedVehicleType);
       setValue("make", "");
@@ -359,8 +441,8 @@ useEffect(() => {
     }
   }, [watchedVehicleType, setValue, selectedVehicleType]);
   useEffect(() => {
-  console.log("🚨 Validation Errors:", errors);
-}, [errors]);
+    console.log("🚨 Validation Errors:", errors);
+  }, [errors]);
 
   const onSubmit = async (data) => {
     setIsSubmitting(true);
@@ -386,10 +468,28 @@ useEffect(() => {
       // formData.append("quantity", data.quantity || "1");
 
       const motorFields = [
-        "vehicle_type", "make", "model", "year", "fuel_type", "transmission",
-        "body_style", "odometer", "engine_size", "doors", "seats", "drive_type",
-        "color", "import_history", "listing_type", "safety_rating", "vin",
-        "registration", "wof_expiry", "rego_expiry", "license_plate", "allow_offers"
+        "vehicle_type",
+        "make",
+        "model",
+        "year",
+        "fuel_type",
+        "transmission",
+        "body_style",
+        "odometer",
+        "engine_size",
+        "doors",
+        "seats",
+        "drive_type",
+        "color",
+        "import_history",
+        "listing_type",
+        "safety_rating",
+        "vin",
+        "registration",
+        "wof_expiry",
+        "rego_expiry",
+        "license_plate",
+        "allow_offers",
       ];
 
       let attributeIndex = 0;
@@ -402,8 +502,8 @@ useEffect(() => {
           attributeIndex++;
         } else if (
           (typeof value === "number" && !isNaN(value)) ||
-          (typeof value === "boolean") ||
-          (value instanceof Date)
+          typeof value === "boolean" ||
+          value instanceof Date
         ) {
           formData.append(`attributes[${attributeIndex}][key]`, field);
           formData.append(
@@ -413,8 +513,6 @@ useEffect(() => {
           attributeIndex++;
         }
       });
-
-
 
       if (data.images && data.images.length > 0) {
         data.images.forEach((image, index) => {
@@ -426,19 +524,22 @@ useEffect(() => {
 
       // const response = await listingsApi.createListing(formData);
       // toast.success("Motor listing created successfully!");
-        let response;
-    if (mode === "edit" && initialValues.slug) {
-      response = await listingsApi.updateListing(initialValues.slug, formData);
-      toast.success("Motor listing updated successfully!");
-    } else {
-      response = await listingsApi.createListing(formData);
-      toast.success("Motor listing created successfully!");
-    }
+      let response;
+      if (mode === "edit" && initialValues.slug) {
+        response = await listingsApi.updateListing(
+          initialValues.slug,
+          formData
+        );
+        toast.success("Motor listing updated successfully!");
+      } else {
+        response = await listingsApi.createListing(formData);
+        toast.success("Motor listing created successfully!");
+      }
 
       if (response && response.slug) {
         router.push(`/listing/viewlisting?slug=${response.slug}`);
       } else {
-        router.push('/account');
+        router.push("/account");
       }
     } catch (error) {
       console.error("Error creating motor listing:", error);
@@ -463,11 +564,15 @@ useEffect(() => {
   const renderStepContent = () => {
     switch (activeStep) {
       case 0:
-        return <VehicleTypeStep setIsModalOpen={setIsModalOpen}
-          selectedCategory={selectedCategory}
-          watch={watch} />;
+        return (
+          <VehicleTypeStep
+            setIsModalOpen={setIsModalOpen}
+            selectedCategory={selectedCategory}
+            watch={watch}
+          />
+        );
       case 1:
-        return <VehicleDetailsStep  vehicle_type={vehicle_type}/>;
+        return <VehicleDetailsStep vehicle_type={vehicle_type} />;
       case 2:
         return <PhotosStep />;
       case 3:
@@ -476,213 +581,246 @@ useEffect(() => {
         return null;
     }
   };
-    const conditions = [
-  { key: "brand_new_unused", label: "Brand New / Unused – never opened or used." },
-  { key: "like_new", label: "Like New – opened but looks and works like new." },
-  { key: "gently_used_excellent_condition", label: "Gently Used / Excellent Condition – minor signs of use." },
-  { key: "good_condition", label: "Good Condition – visible wear but fully functional." },
-  { key: "fair_condition", label: "Fair Condition – heavily used but still works." },
-  { key: "for_parts_or_not_working", label: "For Parts or Not Working – damaged or needs repair." },
-];
-  
-
-
-
+  const conditions = [
+    {
+      key: "brand_new_unused",
+      label: "Brand New / Unused – never opened or used.",
+    },
+    {
+      key: "like_new",
+      label: "Like New – opened but looks and works like new.",
+    },
+    {
+      key: "gently_used_excellent_condition",
+      label: "Gently Used / Excellent Condition – minor signs of use.",
+    },
+    {
+      key: "good_condition",
+      label: "Good Condition – visible wear but fully functional.",
+    },
+    {
+      key: "fair_condition",
+      label: "Fair Condition – heavily used but still works.",
+    },
+    {
+      key: "for_parts_or_not_working",
+      label: "For Parts or Not Working – damaged or needs repair.",
+    },
+  ];
 
   const VehicleTypeStep = ({ setIsModalOpen, selectedCategory, watch }) => {
- const category_id = watch("category_id");
+    const category_id = watch("category_id");
     // Modal open handler
     const openCategoryModal = () => setIsModalOpen(true);
 
     return (
-    <div className="space-y-8">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">What are you listing?</h2>
-        <p className="text-lg text-gray-600">Choose the type of vehicle or part you want to sell</p>
-      </div>
-
-      {/* <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
-       {category_id && selectedCategory ? (
-            <div className="flex justify-between items-center">
-              <p className="text-base text-green-600 font-semibold">
-                {selectedCategory?.name}
-              </p>
-              <button
-                type="button"
-                onClick={openCategoryModal}
-                className="text-sm text-green-600 hover:underline"
-              >
-                {t("Change")}
-              </button>
-            </div>
-          ) : (
-            <div onClick={openCategoryModal} className="cursor-pointer">
-              <p className="text-green-600 font-medium">
-                {" "}
-                {t("Choose category")}
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                {t("We'll suggest a category based on your title, too.")}
-              </p>
-              {errors.category_id && (
-                <p className="text-red-500 text-sm mt-2">
-                  {errors.category_id.message}
-                </p>
-              )}
-            </div>
-          )}
-      {/* </div> */}
-
-      {watchedCategoryId && (
+      <div className="space-y-8">
         <div className="text-center">
-          <Button
-            onClick={nextStep}
-            className="px-8 py-3 text-lg flex items-center"
-            disabled={!watchedCategoryId}
-          >
-            Continue
-            <IoIosArrowForward className="ml-2" />
-          </Button>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            What are you listing?
+          </h2>
+          <p className="text-lg text-gray-600">
+            Choose the type of vehicle or part you want to sell
+          </p>
         </div>
-      )}
-    </div>
-  );}
 
-  const VehicleDetailsStep = ({vehicle_type}) => (
+        {/* <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"> */}
+        {category_id && selectedCategory ? (
+          <div className="flex justify-between items-center">
+            <p className="text-base text-green-600 font-semibold">
+              {selectedCategory?.name}
+            </p>
+            <button
+              type="button"
+              onClick={openCategoryModal}
+              className="text-sm text-green-600 hover:underline"
+            >
+              {t("Change")}
+            </button>
+          </div>
+        ) : (
+          <div onClick={openCategoryModal} className="cursor-pointer">
+            <p className="text-green-600 font-medium">
+              {" "}
+              {t("Choose category")}
+            </p>
+            <p className="text-sm text-gray-500 mt-1">
+              {t("We'll suggest a category based on your title, too.")}
+            </p>
+            {errors.category_id && (
+              <p className="text-red-500 text-sm mt-2">
+                {errors.category_id.message}
+              </p>
+            )}
+          </div>
+        )}
+        {/* </div> */}
+
+        {watchedCategoryId && (
+          <div className="flex justify-between pt-6">
+            <Button
+              onClick={nextStep}
+              className="flex items-center justify-center w-36"
+              disabled={!watchedCategoryId}
+            >
+              <span className="flex items-center justify-center w-full">
+                <span className="flex-1 text-center">Continue</span>
+                <IoIosArrowForward className="flex-shrink-0" />
+              </span>
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const VehicleDetailsStep = ({ vehicle_type }) => (
     <div className="space-y-8">
       <div className="text-center">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">Vehicle Details</h2>
-        <p className="text-lg text-gray-600">Tell us about your {vehicle_type}</p>
+        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+          Vehicle Details
+        </h2>
+        <p className="text-lg text-gray-600">
+          Tell us about your {vehicle_type}
+        </p>
       </div>
 
+      {vehicle_type === "Car parts & accessories" && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Car Part Details
+            </h3>
 
-  {vehicle_type === "Car parts & accessories" && (
-  <div className="grid md:grid-cols-2 gap-6">
-    
-    <div className="space-y-4">
-      <h3 className="text-xl font-semibold text-gray-900">Car Part Details</h3>
-
-    
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Title *</label>
-        <Controller
-          name="title"
-          control={control}
-          render={({ field }) => (
-            <input
-              {...field}
-              type="text"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-              placeholder="e.g., Toyota Corolla Headlight"
-            />
-          )}
-        />
-      </div>
-
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Brand *</label>
-        <Controller
-          name="make"
-          control={control}
-          render={({ field }) => (
-            <SearchableDropdown
-              options={carPartsData.map(brand => brand.make)}
-              value={field.value}
-              onChange={field.onChange}
-              placeholder="Select Brand"
-              searchPlaceholder="Search brands..."
-              emptyMessage="No brands found"
-            />
-          )}
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Part / Accessory *</label>
-        <Controller
-          name="part"
-          control={control}
-          render={({ field }) => {
-            const selectedBrand = watch("make");
-            const parts = carPartsData.find((b) => b.make === selectedBrand)?.parts || [];
-            return (
-              <SearchableDropdown
-                options={parts.map(part => part.name)}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select Part"
-                disabled={!selectedBrand}
-                searchPlaceholder="Search parts..."
-                emptyMessage="No parts found"
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Title *
+              </label>
+              <Controller
+                name="title"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="e.g., Toyota Corolla Headlight"
+                  />
+                )}
               />
-            );
-          }}
-        />
-      </div>
+            </div>
 
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Compatible Model *</label>
-        <Controller
-          name="model"
-          control={control}
-          render={({ field }) => {
-            const selectedBrand = watch("make");
-            const selectedPart = watch("part");
-            const models =
-              carPartsData
-                .find((b) => b.make === selectedBrand)
-                ?.parts.find((p) => p.name === selectedPart)?.compatibleModels || [];
-            return (
-              <SearchableDropdown
-                options={models}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select Model"
-                disabled={!selectedPart}
-                searchPlaceholder="Search models..."
-                emptyMessage="No models found"
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Brand *
+              </label>
+              <Controller
+                name="make"
+                control={control}
+                render={({ field }) => (
+                  <SearchableDropdown
+                    options={carPartsData.map((brand) => brand.make)}
+                    value={field.value}
+                    onChange={field.onChange}
+                    placeholder="Select Brand"
+                    searchPlaceholder="Search brands..."
+                    emptyMessage="No brands found"
+                  />
+                )}
               />
-            );
-          }}
-        />
-      </div>
+            </div>
 
-      
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Year *</label>
-        <Controller
-          name="year"
-          control={control}
-          render={({ field }) => {
-            const selectedBrand = watch("make");
-            const selectedPart = watch("part");
-            const selectedModel = watch("model");
-            const years =
-              carPartsData
-                .find((b) => b.make === selectedBrand)
-                ?.parts.find((p) => p.name === selectedPart)
-                ?.years || [];
-            return (
-              <SearchableDropdown
-                options={years.map(year => year.toString())}
-                value={field.value}
-                onChange={field.onChange}
-                placeholder="Select Year"
-                disabled={!selectedModel}
-                searchPlaceholder="Search years..."
-                emptyMessage="No years found"
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Part / Accessory *
+              </label>
+              <Controller
+                name="part"
+                control={control}
+                render={({ field }) => {
+                  const selectedBrand = watch("make");
+                  const parts =
+                    carPartsData.find((b) => b.make === selectedBrand)?.parts ||
+                    [];
+                  return (
+                    <SearchableDropdown
+                      options={parts.map((part) => part.name)}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select Part"
+                      disabled={!selectedBrand}
+                      searchPlaceholder="Search parts..."
+                      emptyMessage="No parts found"
+                    />
+                  );
+                }}
               />
-            );
-          }}
-        />
-      </div>
+            </div>
 
-      {/* Condition */}
-      <div>
-        {/* <label className="block text-sm font-medium text-gray-700 mb-2">Condition *</label> */}
-        {/* <Controller
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Compatible Model *
+              </label>
+              <Controller
+                name="model"
+                control={control}
+                render={({ field }) => {
+                  const selectedBrand = watch("make");
+                  const selectedPart = watch("part");
+                  const models =
+                    carPartsData
+                      .find((b) => b.make === selectedBrand)
+                      ?.parts.find((p) => p.name === selectedPart)
+                      ?.compatibleModels || [];
+                  return (
+                    <SearchableDropdown
+                      options={models}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select Model"
+                      disabled={!selectedPart}
+                      searchPlaceholder="Search models..."
+                      emptyMessage="No models found"
+                    />
+                  );
+                }}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Year *
+              </label>
+              <Controller
+                name="year"
+                control={control}
+                render={({ field }) => {
+                  const selectedBrand = watch("make");
+                  const selectedPart = watch("part");
+                  const selectedModel = watch("model");
+                  const years =
+                    carPartsData
+                      .find((b) => b.make === selectedBrand)
+                      ?.parts.find((p) => p.name === selectedPart)?.years || [];
+                  return (
+                    <SearchableDropdown
+                      options={years.map((year) => year.toString())}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select Year"
+                      disabled={!selectedModel}
+                      searchPlaceholder="Search years..."
+                      emptyMessage="No years found"
+                    />
+                  );
+                }}
+              />
+            </div>
+
+            {/* Condition */}
+            <div>
+              {/* <label className="block text-sm font-medium text-gray-700 mb-2">Condition *</label> */}
+              {/* <Controller
           name="condition"
           control={control}
           render={({ field }) => (
@@ -692,27 +830,29 @@ useEffect(() => {
             </div>
           )}
         /> */}
-{conditions.map((item) => (
-    <label key={item.key} className="flex items-center gap-3">
-      <input
-        type="radio"
-        value={item.key}
-        {...register("condition")}
-        checked={condition === item.key}
-        className="accent-green-500"
-      />
-      <span className="text-sm">{t(item.label)}</span>
-    </label>
-  ))}
-      </div>
-    </div>
+              {conditions.map((item) => (
+                <label key={item.key} className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
+                  <input
+                    type="radio"
+                    value={item.key}
+                    {...register("condition")}
+                    checked={condition === item.key}
+                    className="accent-green-500"
+                  />
+                  <span className="text-sm">{t(item.label)}</span>
+                </label>
+              ))}
+            </div>
+          </div>
 
-    {/* Right Column */}
-    <div className="space-y-4">
-      {/* Color */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Color</label>
-        {/* <Controller
+          {/* Right Column */}
+          <div className="space-y-4">
+            {/* Color */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Color
+              </label>
+              {/* <Controller
           name="color"
           control={control}
           defaultValue="#000000"
@@ -723,184 +863,202 @@ useEffect(() => {
             </div>
           )}
         /> */}
-         <Controller
-      name="color"
-      control={control}
-      defaultValue=""
-      render={({ field }) => (
-        <input
-          type="text"
-          value={field.value}
-          onChange={field.onChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="Enter color name or hex code (e.g., red, #ff0000)"
-        />
+              <Controller
+                name="color"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    value={field.value}
+                    onChange={field.onChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Enter color name (e.g., red)"
+                  />
+                )}
+              />
+            </div>
+
+            {/* Description */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description *
+              </label>
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <textarea
+                    {...field}
+                    rows={6}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Describe the part in detail..."
+                  />
+                )}
+              />
+            </div>
+          </div>
+        </div>
       )}
-    />
-      </div>
 
-      {/* Description */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">Description *</label>
-        <Controller
-          name="description"
-          control={control}
-          render={({ field }) => (
-            <textarea {...field} rows={6} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Describe the part in detail..."/>
-          )}
-        />
-      </div>
-    </div>
-  </div>
-)}
+      {vehicle_type !== "Car parts & accessories" && (
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Basic Information
+            </h3>
 
-   {vehicle_type !== "Car parts & accessories" && (
-       <div className="grid md:grid-cols-2 gap-6">
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-900">Basic Information</h3>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Title *
-            </label>
-            <Controller
-              name="title"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="e.g., 2020 Toyota Corolla Hybrid"
-                />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Title *
+              </label>
+              <Controller
+                name="title"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="text"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="e.g., 2020 Toyota Corolla Hybrid"
+                  />
+                )}
+              />
+              {errors.title && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.title.message}
+                </p>
               )}
-            />
-            {errors.title && (
-              <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
-            )}
-          </div>
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Make *
-            </label>
-            <Controller
-              name="make"
-              control={control}
-              render={({ field }) => (
-                <SearchableDropdown
-                  options={vehicleData.map(vehicle => vehicle.make)}
-                  value={field.value}
-                  onChange={field.onChange}
-                  placeholder="Select Brand"
-                  disabled={loadingVehicleData}
-                  loading={loadingVehicleData}
-                  searchPlaceholder="Search brands..."
-                  emptyMessage="No brands found"
-                />
-              )}
-            />
-            {errors.make && (
-              <p className="text-red-500 text-sm mt-1">{errors.make.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Model *
-            </label>
-            <Controller
-              name="model"
-              control={control}
-              render={({ field }) => {
-                const selectedBrand = watch("make");
-                const models =
-                  vehicleData.find((vehicle) => vehicle.make === selectedBrand)?.models || [];
-
-                return (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Make *
+              </label>
+              <Controller
+                name="make"
+                control={control}
+                render={({ field }) => (
                   <SearchableDropdown
-                    options={models.map(model => model.name)}
+                    options={vehicleData.map((vehicle) => vehicle.make)}
                     value={field.value}
                     onChange={field.onChange}
-                    placeholder="Select Model"
-                    disabled={!selectedBrand || loadingVehicleData}
+                    placeholder="Select Brand"
+                    disabled={loadingVehicleData}
                     loading={loadingVehicleData}
-                    searchPlaceholder="Search models..."
-                    emptyMessage="No models found"
+                    searchPlaceholder="Search brands..."
+                    emptyMessage="No brands found"
                   />
-                );
-              }}
-            />
-            {errors.model && (
-              <p className="text-red-500 text-sm mt-1">{errors.model.message}</p>
-            )}
-          </div>
+                )}
+              />
+              {errors.make && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.make.message}
+                </p>
+              )}
+            </div>
 
-         
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Model *
+              </label>
+              <Controller
+                name="model"
+                control={control}
+                render={({ field }) => {
+                  const selectedBrand = watch("make");
+                  const models =
+                    vehicleData.find(
+                      (vehicle) => vehicle.make === selectedBrand
+                    )?.models || [];
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Year *
-            </label>
-            <Controller
-              name="year"
-              control={control}
-              render={({ field }) => {
-                const selectedBrand = watch("make");
-                const selectedModel = watch("model");
-                const years = (
-                  vehicleData
-                    .find((vehicle) => vehicle.make === selectedBrand)
-                    ?.models.find((m) => m.name === selectedModel)?.years || []
-                ).slice().sort((a, b) => b - a);
+                  return (
+                    <SearchableDropdown
+                      options={models.map((model) => model.name)}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select Model"
+                      disabled={!selectedBrand || loadingVehicleData}
+                      loading={loadingVehicleData}
+                      searchPlaceholder="Search models..."
+                      emptyMessage="No models found"
+                    />
+                  );
+                }}
+              />
+              {errors.model && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.model.message}
+                </p>
+              )}
+            </div>
 
-                return (
-                  <SearchableDropdown
-                    options={years.map(year => year.toString())}
-                    value={field.value}
-                    onChange={field.onChange}
-                    placeholder="Select Year"
-                    disabled={!selectedModel || loadingVehicleData}
-                    loading={loadingVehicleData}
-                    searchPlaceholder="Search years..."
-                    emptyMessage="No years found"
-                  />
-                );
-              }}
-            />
-            {errors.year && (
-              <p className="text-red-500 text-sm mt-1">{errors.year.message}</p>
-            )}
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Year *
+              </label>
+              <Controller
+                name="year"
+                control={control}
+                render={({ field }) => {
+                  const selectedBrand = watch("make");
+                  const selectedModel = watch("model");
+                  const years = (
+                    vehicleData
+                      .find((vehicle) => vehicle.make === selectedBrand)
+                      ?.models.find((m) => m.name === selectedModel)?.years ||
+                    []
+                  )
+                    .slice()
+                    .sort((a, b) => b - a);
 
+                  return (
+                    <SearchableDropdown
+                      options={years.map((year) => year.toString())}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder="Select Year"
+                      disabled={!selectedModel || loadingVehicleData}
+                      loading={loadingVehicleData}
+                      searchPlaceholder="Search years..."
+                      emptyMessage="No years found"
+                    />
+                  );
+                }}
+              />
+              {errors.year && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.year.message}
+                </p>
+              )}
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Condition *
-            </label>
-            <Controller
-  name="condition"
-  control={control}
-  render={({ field }) => (
-    <div className="space-y-2 grid grid-cols-1 md:grid-cols-2">
-      {conditions.map((item) => (
-        <label key={item.key} className="flex items-center gap-3">
-          <input
-            type="radio"
-            value={item.key}
-            checked={field.value === item.key}
-            onChange={() => field.onChange(item.key)}
-            className="accent-green-500"
-          />
-          <span className="text-sm">{t(item.label)}</span>
-        </label>
-      ))}
-    </div>
-  )}
-/>
-
-          </div>
-          {/* 
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Condition *
+              </label>
+              <Controller
+                name="condition"
+                control={control}
+                render={({ field }) => (
+                  <div className="space-y-2 grid grid-cols-1 md:grid-cols-2">
+                    {conditions.map((item) => (
+                      <label key={item.key} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
+                        <input
+                          type="radio"
+                          value={item.key}
+                          checked={field.value === item.key}
+                          onChange={() => field.onChange(item.key)}
+                          className="accent-green-500"
+                        />
+                        <span className="text-sm">{t(item.label)}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+              />
+            </div>
+            {/* 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               PickUp Option
@@ -921,57 +1079,59 @@ useEffect(() => {
               )}
             />
           </div> */}
-        </div>
-
-        <div className="space-y-4">
-          <h3 className="text-xl font-semibold text-gray-900">Additional Details</h3>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Fuel Type
-            </label>
-            <Controller
-              name="fuel_type"
-              control={control}
-              render={({ field }) => (
-                <select
-                  {...field}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Select Fuel Type</option>
-                  <option value="Petrol">Petrol</option>
-                  <option value="Diesel">Diesel</option>
-                  <option value="Electric">Electric</option>
-                  <option value="Hybrid">Hybrid</option>
-                  <option value="LPG">LPG</option>
-                </select>
-              )}
-            />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Transmission
-            </label>
-            <Controller
-              name="transmission"
-              control={control}
-              render={({ field }) => (
-                <select
-                  {...field}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                >
-                  <option value="">Select Transmission</option>
-                  <option value="Automatic">Automatic</option>
-                  <option value="Manual">Manual</option>
-                  <option value="CVT">CVT</option>
-                  <option value="Semi-Auto">Semi-Auto</option>
-                </select>
-              )}
-            />
-          </div>
+          <div className="space-y-4">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Additional Details
+            </h3>
 
-          {/* {watchedVehicleType === "car" && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Fuel Type
+              </label>
+              <Controller
+                name="fuel_type"
+                control={control}
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">Select Fuel Type</option>
+                    <option value="Petrol">Petrol</option>
+                    <option value="Diesel">Diesel</option>
+                    <option value="Electric">Electric</option>
+                    <option value="Hybrid">Hybrid</option>
+                    <option value="LPG">LPG</option>
+                  </select>
+                )}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Transmission
+              </label>
+              <Controller
+                name="transmission"
+                control={control}
+                render={({ field }) => (
+                  <select
+                    {...field}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                  >
+                    <option value="">Select Transmission</option>
+                    <option value="Automatic">Automatic</option>
+                    <option value="Manual">Manual</option>
+                    <option value="CVT">CVT</option>
+                    <option value="Semi-Auto">Semi-Auto</option>
+                  </select>
+                )}
+              />
+            </div>
+
+            {/* {watchedVehicleType === "car" && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Body Style
@@ -998,85 +1158,93 @@ useEffect(() => {
             </div>
           )} */}
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Odometer (km)
-            </label>
-            <Controller
-              name="odometer"
-              control={control}
-              render={({ field }) => (
-                <input
-                  {...field}
-                  type="number"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="e.g., 50000"
-                />
-              )}
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Odometer (km)
+              </label>
+              <Controller
+                name="odometer"
+                control={control}
+                render={({ field }) => (
+                  <input
+                    {...field}
+                    type="number"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="e.g., 50000"
+                  />
+                )}
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Color *
-            </label>
-             <Controller
-      name="color"
-      control={control}
-      defaultValue=""
-      render={({ field }) => (
-        <input
-          type="text"
-          value={field.value}
-          onChange={field.onChange}
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-          placeholder="Enter color name or hex code (e.g., red, #ff0000)"
-        />
-      )}
-    />
-            {errors.color && (
-              <p className="text-red-500 text-sm mt-1">{errors.color.message}</p>
-            )}
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description *
-            </label>
-            <Controller
-              name="description"
-              control={control}
-              render={({ field }) => (
-                <textarea
-                  {...field}
-                  rows={4}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  placeholder="Describe your vehicle in detail..."
-                />
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Color *
+              </label>
+              <Controller
+                name="color"
+                control={control}
+                defaultValue=""
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    value={field.value}
+                    onChange={field.onChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Enter color name (e.g., red)"
+                  />
+                )}
+              />
+              {errors.color && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.color.message}
+                </p>
               )}
-            />
-            {errors.description && (
-              <p className="text-red-500 text-sm mt-1">{errors.description.message}</p>
-            )}
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Description *
+              </label>
+              <Controller
+                name="description"
+                control={control}
+                render={({ field }) => (
+                  <textarea
+                    {...field}
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+                    placeholder="Describe your vehicle in detail..."
+                  />
+                )}
+              />
+              {errors.description && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.description.message}
+                </p>
+              )}
+            </div>
           </div>
         </div>
-      </div>
-   )}
+      )}
 
       <div className="flex justify-between pt-6">
         <Button
           onClick={prevStep}
           variant="outline"
-          className="px-6 py-2 flex items-center"
+          className="flex items-center justify-center w-36"
         >
-          <IoIosArrowBack className="mr-2" />
-          Back
+          <span className="flex items-center justify-center w-full">
+            <IoIosArrowBack className="flex-shrink-0" />
+            <span className="flex-1 text-center">Back</span>
+          </span>
         </Button>
         <Button
           onClick={nextStep}
-          className="px-6 py-2 flex items-center"
+          className="flex items-center justify-center w-36"
         >
-          Continue
-          <IoIosArrowForward className="ml-2" />
+          <span className="flex items-center justify-center w-full">
+            <span className="flex-1 text-center">Continue</span>
+            <IoIosArrowForward className="flex-shrink-0" />
+          </span>
         </Button>
       </div>
     </div>
@@ -1086,7 +1254,9 @@ useEffect(() => {
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Upload Photos</h2>
-        <p className="text-lg text-gray-600">Add photos of your {watchedVehicleType}</p>
+        <p className="text-lg text-gray-600">
+          Add photos of your {watchedVehicleType}
+        </p>
       </div>
 
       <UploadPhotos />
@@ -1095,17 +1265,21 @@ useEffect(() => {
         <Button
           onClick={prevStep}
           variant="outline"
-          className="px-6 py-2 flex items-center"
+          className="flex items-center justify-center w-36"
         >
-          <IoIosArrowBack className="mr-2" />
-          Back
+          <span className="flex items-center justify-center w-full">
+            <IoIosArrowBack className="flex-shrink-0" />
+            <span className="flex-1 text-center">Back</span>
+          </span>
         </Button>
         <Button
           onClick={nextStep}
-          className="px-6 py-2 flex items-center"
+          className="flex items-center justify-center w-36"
         >
-          Continue
-          <IoIosArrowForward className="ml-2" />
+          <span className="flex items-center justify-center w-full">
+            <span className="flex-1 text-center">Continue</span>
+            <IoIosArrowForward className="flex-shrink-0" />
+          </span>
         </Button>
       </div>
     </div>
@@ -1116,8 +1290,12 @@ useEffect(() => {
     return (
       <div className="space-y-8">
         <div className="text-center">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Price & Payment</h2>
-          <p className="text-lg text-gray-600">Set your pricing and payment options</p>
+          <h2 className="text-3xl font-bold text-gray-900 mb-4">
+            Price & Payment
+          </h2>
+          <p className="text-lg text-gray-600">
+            Set your pricing and payment options
+          </p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -1126,7 +1304,7 @@ useEffect(() => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Buy Now Price  (<span className="price">$</span>)
+                Buy Now Price (<span className="price">$</span>)
               </label>
               <Controller
                 name="buy_now_price"
@@ -1141,7 +1319,6 @@ useEffect(() => {
                   />
                 )}
               />
-
             </div>
 
             <div>
@@ -1186,11 +1363,10 @@ useEffect(() => {
                     />
                   )}
                 />
-
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Reserve Price  (<span className="price">$</span>)
+                  o Reserve Price (<span className="price">$</span>)
                 </label>
                 <Controller
                   name="reserve_price"
@@ -1206,14 +1382,14 @@ useEffect(() => {
                     />
                   )}
                 />
-
               </div>
             </>
-
           </div>
 
           <div className="space-y-4">
-            <h3 className="text-xl font-semibold text-gray-900">Additional Options</h3>
+            <h3 className="text-xl font-semibold text-gray-900">
+              Additional Options
+            </h3>
 
             {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1249,17 +1425,23 @@ useEffect(() => {
                   <input
                     type="datetime-local"
                     {...field}
-                    value={field.value ? field.value.toISOString().slice(0, 16) : ''}
-                    onChange={(e) => field.onChange(e.target.value ? new Date(e.target.value) : null)}
+                    value={
+                      field.value ? field.value.toISOString().slice(0, 16) : ""
+                    }
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value ? new Date(e.target.value) : null
+                      )
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   />
                 )}
               />
             </div>
 
-            {watchedVehicleType !== "Car parts & accessories" && (
+            {/* {watchedVehicleType !== "Car parts & accessories" && (
               <>
-                {/* <div>
+                <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   VIN Number
                 </label>
@@ -1275,8 +1457,7 @@ useEffect(() => {
                     />
                   )}
                 />
-              </div> */
-              }
+              </div>
 
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1296,7 +1477,7 @@ useEffect(() => {
                   />
                 </div>
               </>
-            )}
+            )} */}
           </div>
         </div>
 
@@ -1309,18 +1490,19 @@ useEffect(() => {
             <IoIosArrowBack className="mr-2" />
             Back
           </Button>
-         <Button
-  onClick={() => handleSubmit(onSubmit)()}
-  className="px-6 py-2"
-  disabled={isSubmitting}
->
-  {isSubmitting ? t(mode === "edit" ? "Updating..." : "Creating...") : t(mode === "edit" ? "Update Listing" : "Create Listing")}
-</Button>
-
+          <Button
+            onClick={() => handleSubmit(onSubmit)()}
+            className="px-6 py-2"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? t(mode === "edit" ? "Updating..." : "Creating...")
+              : t(mode === "edit" ? "Update Listing" : "Create Listing")}
+          </Button>
         </div>
       </div>
-    )
-  }
+    );
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -1328,33 +1510,43 @@ useEffect(() => {
         <div className="flex items-center justify-between">
           {steps.map((step, index) => (
             <div key={step.key} className="flex items-center">
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${index <= activeStep
-                ? "bg-green-500 text-white"
-                : "bg-gray-200 text-gray-600"
-                }`}>
+              <div
+                className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
+                  index <= activeStep
+                    ? "bg-green-500 text-white"
+                    : "bg-gray-200 text-gray-600"
+                }`}
+              >
                 {index + 1}
               </div>
-              <span className={`ml-2 text-sm font-medium ${index <= activeStep ? "text-green-600" : "text-gray-500"
-                }`}>
+              <span
+                className={`ml-2 text-sm font-medium ${
+                  index <= activeStep ? "text-green-600" : "text-gray-500"
+                }`}
+              >
                 {step.title}
               </span>
               {index < steps.length - 1 && (
-                <div className={`w-16 h-1 mx-4 ${index < activeStep ? "bg-green-500" : "bg-gray-200"
-                  }`} />
+                <div
+                  className={`w-16 h-1 mx-4 ${
+                    index < activeStep ? "bg-green-500" : "bg-gray-200"
+                  }`}
+                />
               )}
             </div>
           ))}
         </div>
       </div>
-      
+
       {/* Step Content */}
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
-           {/* {renderStepContent()} */}
+          {/* {renderStepContent()} */}
 
-  {renderStepContent()}
-   {isModalOpen && <CategoryModal
+          {renderStepContent()}
+          {isModalOpen && (
+            <CategoryModal
               isOpen={isModalOpen}
               onClose={() => setIsModalOpen(false)}
               categoryStack={categoryStack}
@@ -1362,12 +1554,12 @@ useEffect(() => {
               currentCategories={currentCategories}
               handleCategoryClick={handleCategoryClick}
               loadingCategories={loadingCategories}
-            />}
-        
+            />
+          )}
         </form>
       </FormProvider>
     </div>
   );
 };
 
-export default MotorListingForm; 
+export default MotorListingForm;

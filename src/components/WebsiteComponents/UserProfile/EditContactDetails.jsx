@@ -37,13 +37,11 @@ const schema = yup.object().shape({
   gender: yup.string().nullable(),
   country: yup.string().nullable(),
   accountType: yup.string().nullable(),
-  businessName: yup
-    .string()
-    .when("accountType", {
-      is: "business",
-      then: (schema) => schema.required("Business name is required"),
-      otherwise: (schema) => schema.nullable(),
-    }),
+  businessName: yup.string().when("accountType", {
+    is: "business",
+    then: (schema) => schema.required("Business name is required"),
+    otherwise: (schema) => schema.nullable(),
+  }),
   addressFinder: yup.string().nullable(),
   addressLine1: yup.string().nullable(),
   addressLine2: yup.string().nullable(),
@@ -54,12 +52,11 @@ const schema = yup.object().shape({
   closestDistrict: yup.string().nullable(),
 });
 
-
 const EditContactDetails = () => {
   const hideComponent = useProfileStore((state) => state.hideComponent);
   const { user, logout, updateUser } = useAuthStore();
-    const { locations, getAllLocations } = useLocationStore();
-    const [loading, setLoading] = React.useState(false);
+  const { locations, getAllLocations } = useLocationStore();
+  const [loading, setLoading] = React.useState(false);
 
   const {
     register,
@@ -87,8 +84,8 @@ const EditContactDetails = () => {
       postCode: user?.post_code || "",
       closestDistrict: user?.closest_district || "",
       city: user?.city || "",
-      governorate: user?.governorates.name || "",
-        region: user?.regions.name || "",
+      governorate: user?.governorates?.name || "",
+      region: user?.regions?.name || "",
     },
   });
 
@@ -97,7 +94,9 @@ const EditContactDetails = () => {
     const formData = new FormData();
 
     const regions_id = regions.find((r) => r.name == data.region);
-    const governorates_id = governorates.find((r) => r.name == data.governorate);
+    const governorates_id = governorates.find(
+      (r) => r.name == data.governorate
+    );
     formData.append("first_name", data.firstname);
     formData.append("last_name", data.lastname);
     formData.append("name", `${data.firstname} ${data.lastname}`);
@@ -138,24 +137,24 @@ const EditContactDetails = () => {
       //  });
       toast.success("Contact Detail updated successfully!");
       updateUser({
-        first_name: res.data.first_name || "",
-        last_name: res.data.last_name || "",
-        name: `${res.data.firstname} ${res.data.lastname}` || "",
-        mobile: res.data.landline || "",
-        phone: res.data.phone || "",
-        gender: res.data.gender || "",
-        account_type: res.data.account_type || "",
-        country: res.data.country || "",
-        business_name: res.data.business_name || "",
-        address_finder: res.data.address_finder || "",
-        address_1: res.data.address_1 || "",
-        address_2: res.data.address_2 || "",
-        suburb: res.data.suburb || "",
-        post_code: res.data.post_code || "",
-        closest_district: res.data.closest_district || "",
-        city: res.data.city || "",
-        governorates: res.data.governorates || "",
-        regions: res.data.regions || "",
+        first_name: res.data?.first_name || "",
+        last_name: res.data?.last_name || "",
+        name: `${res.data?.firstname} ${res.data?.lastname}` || "",
+        mobile: res.data?.landline || "",
+        phone: res.data?.phone || "",
+        gender: res.data?.gender || "",
+        account_type: res.data?.account_type || "",
+        country: res.data?.country || "",
+        business_name: res.data?.business_name || "",
+        address_finder: res.data?.address_finder || "",
+        address_1: res.data?.address_1 || "",
+        address_2: res.data?.address_2 || "",
+        suburb: res.data?.suburb || "",
+        post_code: res.data?.post_code || "",
+        closest_district: res.data?.closest_district || "",
+        city: res.data?.city || "",
+        governorates: res.data?.governorates || "",
+        regions: res.data?.regions || "",
       });
       // reset();
     } catch (err) {
@@ -165,8 +164,8 @@ const EditContactDetails = () => {
       toast.error(errorMessage);
       console.error("Contact Detail update error:", err);
     } finally {
-    setLoading(false); 
-  }
+      setLoading(false);
+    }
   };
   const { t } = useTranslation();
   const [selectedCountry, setSelectedCountry] = useState({
@@ -178,17 +177,17 @@ const EditContactDetails = () => {
 
   // const [states, setStates] = useState([]);
   // const [cities, setCities] = useState([]);
-const country = locations.find((c) => c.id == 1); // Saudi Arabia
-const regions = country?.regions || [];
+  const country = locations.find((c) => c.id == 1); // Saudi Arabia
+  const regions = country?.regions || [];
 
-const governorates =
-  regions.find((r) => r.name === watch("region"))?.governorates || [];
+  const governorates =
+    regions.find((r) => r?.name === watch("region"))?.governorates || [];
 
-const cities =
-  governorates.find((g) => g.name === watch("governorate"))?.cities || [];
+  const cities =
+    governorates.find((g) => g?.name === watch("governorate"))?.cities || [];
 
-        useEffect(() => {
-    getAllLocations(); 
+  useEffect(() => {
+    getAllLocations();
   }, [getAllLocations]);
   // useEffect(() => {
   //   const allStates = State.getStatesOfCountry(selectedCountry.value);
@@ -204,7 +203,7 @@ const cities =
   //   //     label: city.name,
   //   //     value: city.isoCode,
   //   //   }))
-  //   // ); 
+  //   // );
   //     const uniqueCities = defaultCities.filter(
   //   (city, index, self) =>
   //     index === self.findIndex((c) => c.name === city.name)
@@ -216,7 +215,7 @@ const cities =
   //         label: city.name,
   //         value: city.name,
   //       }))
-  //     );   
+  //     );
   //   const selectedCities = defaultCities.find((s) => s.name == user.city);
   //   // console.log("User",user.city)
 
@@ -304,7 +303,7 @@ const cities =
         <h3 className="text-md font-semibold mb-4">
           {t("Primary contact person")}
         </h3>
-        <div className="mb-6 p-4 bg-white rounded border border-gray-300">
+        <div className="mb-6 p-4 bg-white rounded">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label
@@ -318,9 +317,9 @@ const cities =
                 {...register("firstname")}
                 className="w-full border border-gray-300 rounded-[10px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-              {errors.firstname && (
+              {errors?.firstname && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.firstname.message}
+                  {errors?.firstname.message}
                 </p>
               )}
             </div>
@@ -336,11 +335,47 @@ const cities =
                 {...register("lastname")}
                 className="w-full border border-gray-300 rounded-[10px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
               />
-              {errors.lastname && (
+              {errors?.lastname && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.lastname.message}
+                  {errors?.lastname.message}
                 </p>
               )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Landline */}
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold mb-2">
+                {t("Landline")} (optional)
+              </h4>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  {...register("phone")}
+                  className="w-full border border-gray-300 rounded-[10px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                />
+              </div>
+            </div>
+
+            {/* Mobile */}
+            <div className="mt-4">
+              <h4 className="text-sm font-semibold mb-2">
+                {t("Mobile")} (optional)
+              </h4>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  {...register("mobile")}
+                  className="w-full border border-gray-300 rounded-[10px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
+                  // className="w-52 border border-gray-300 rounded-[10px] px-2 py-1"
+                />
+              </div>
+              {/* {errors.mobile && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.mobile.message}
+              </p>
+            )} */}
             </div>
           </div>
 
@@ -367,61 +402,6 @@ const cities =
               </p>
             )}
           </div>
-<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Landline */}
-          <div className="mt-4">
-            <h4 className="text-sm font-semibold mb-2">
-              {t("Landline")} (optional)
-            </h4>
-            <div className="flex items-center gap-2">
-              {/* <select
-                className="border border-gray-300 px-1 py-1 w-24 rounded-[10px]"
-                defaultValue=""
-              >
-                <option value="">{t("Select")}</option>
-                <option value="+92">+92</option>
-                <option value="+91">+91</option>
-                <option value="+1">+1</option>
-                <option value="+44">+44</option>
-              </select> */}
-              <input
-                type="text"
-                {...register("phone")}
-                className="w-52 border border-gray-300 rounded-[10px] px-2 py-1"
-              />
-            </div>
-            {/* {errors.phone && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.phone.message}
-              </p>
-            )} */}
-          </div>
-
-          {/* Mobile */}
-          <div className="mt-4">
-            <h4 className="text-sm font-semibold mb-2">
-              {t("Mobile")} (optional)
-            </h4>
-            <div className="flex items-center gap-2">
-              {/* <select className="border border-gray-300 px-1 py-1 w-24 rounded-[10px]">
-                <option value="+92">+92</option>
-                <option value="+91">+91</option>
-                <option value="+1">+1</option>
-                <option value="+44">+44</option>
-              </select> */}
-              <input
-                type="text"
-                {...register("mobile")}
-                className="w-52 border border-gray-300 rounded-[10px] px-2 py-1"
-              />
-            </div>
-            {/* {errors.mobile && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.mobile.message}
-              </p>
-            )} */}
-          </div>
-          </div>
         </div>
 
         {/* Business Name */}
@@ -447,86 +427,90 @@ const cities =
 
         {/* Street address */}
         <h3 className="text-md font-semibold mb-2">{t("Street address")}</h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6 p-4 bg-white rounded border border-gray-300">
-          <div className="mb-4 w-64">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 p-4 bg-white rounded">
+          <div className="mb-4 w-full">
             <label className="text-sm font-semibold mb-1 block">
               {t("Country")}
             </label>
             <Select
               isDisabled
               value={selectedCountry}
-  options={[{ label: t("Saudi Arabia"), value: "SA" }]}
-              className="w-64"
+              options={[{ label: t("Saudi Arabia"), value: "SA" }]}
+              className="w-full"
               onChange={setSelectedCountry}
             />
           </div>
 
- <div className="mb-4 w-64">
+          <div className="mb-4 w-full">
             <label className="text-sm font-semibold mb-1 block">
               {t("Region")}
             </label>
-             <Controller
-    name="region"
-    control={control} // from useForm()
-    render={({ field }) => (
-      <Select
-        {...field}
-        value={
-          field.value ? { value: field.value, label: field.value } : null
-        }
-        onChange={(selected) => field.onChange(selected?.value || "")}
-        options={regions.map((g) => ({
-          value: g.name,
-          label: g.name,
-        }))}
-        placeholder={t("Select a Region")}
-        className="text-sm"
-        classNamePrefix="react-select"
-        isClearable
-      />
-    )}
-  />
-    {errors.region && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.region.message}
-            </p>
-          )}
+            <Controller
+              name="region"
+              control={control} // from useForm()
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  value={
+                    field.value
+                      ? { value: field.value, label: field.value }
+                      : null
+                  }
+                  onChange={(selected) => field.onChange(selected?.value || "")}
+                  options={regions.map((g) => ({
+                    value: g?.name,
+                    label: g?.name,
+                  }))}
+                  placeholder={t("Select a Region")}
+                  className="text-sm w-full"
+                  classNamePrefix="react-select"
+                  isClearable
+                />
+              )}
+            />
+            {errors.region && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.region.message}
+              </p>
+            )}
           </div>
 
-          <div className="mb-4 w-64">
+          <div className="mb-4 w-full">
             <label className="text-sm font-semibold mb-1 block">
               {t("Governorate")}
             </label>
-             <Controller
-    name="governorate"
-    control={control} // from useForm()
-    render={({ field }) => (
-      <Select
-        {...field}
-        value={
-          field.value ? { value: field.value, label: field.value } : null
-        }
-        onChange={(selected) => field.onChange(selected?.value || "")}
-        options={governorates.map((g) => ({
-          value: g.name,
-          label: g.name,
-        }))}
-        placeholder={t("Select a Governorate")}
-        className="text-sm"
-        classNamePrefix="react-select"
-        isClearable
-      />
-    )}
-  />
-    {errors.governorate && (
-            <p className="text-red-500 text-xs mt-1">
-              {errors.governorate.message}
-            </p>
-          )}
+            <Controller
+              name="governorate"
+              control={control} // from useForm()
+              render={({ field }) => (
+                <Select
+                  {...field}
+                  value={
+                    field.value
+                      ? { value: field.value, label: field.value }
+                      : null
+                  }
+                  onChange={(selected) => field.onChange(selected?.value || "")}
+                  options={governorates.map((g) => ({
+                    value: g?.name,
+                    label: g?.name,
+                  }))}
+                  placeholder={t("Select a Governorate")}
+                  className="text-sm"
+                  classNamePrefix="react-select"
+                  isClearable
+                />
+              )}
+            />
+            {errors.governorate && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.governorate.message}
+              </p>
+            )}
           </div>
-
+          
           {/* <div className="mt-6 space-y-4"> */}
-            {/* <div>
+          {/* <div>
               <h4 className="text-sm font-semibold mb-1">
                 {t("Address Finder")}
               </h4>
@@ -542,21 +526,20 @@ const cities =
                 </p>
               )}
             </div> */}
-            <div>
-              <h4 className="text-sm font-semibold mb-1">{t("Address")}</h4>
-              <input
-                type="text"
-                {...register("addressLine1")}
-                placeholder={t("Address line 1")}
-                className="w-64 border border-gray-300 rounded-[10px] px-3 py-2"
-              />
-              {errors.addressLine1 && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.addressLine1.message}
-                </p>
-              )}
+          <div className="col-span-full">
+            <h4 className="text-sm font-semibold mb-1">{t("Address")}</h4>
+            <textarea
+              {...register("addressLine1")}
+              placeholder={t("Enter address")}
+              className="w-full border border-gray-300 rounded-[10px] px-3 py-2 h-24"
+            />
+            {errors.addressLine1 && (
+              <p className="text-red-500 text-xs mt-1">
+                {errors.addressLine1.message}
+              </p>
+            )}
 
-              {/* <br />
+            {/* <br />
               <input
                 type="text"
                 {...register("addressLine2")}
@@ -568,8 +551,8 @@ const cities =
                   {errors.addressLine2.message}
                 </p>
               )} */}
-            </div>
-            {/* <div>
+          </div>
+          {/* <div>
               <h4 className="text-sm font-semibold mb-1">
                 {t("Suburb (optional)")}
               </h4>
@@ -585,7 +568,7 @@ const cities =
                 </p>
               )}
             </div> */}
-            {/* <div>
+          {/* <div>
               <h4 className="text-sm font-semibold mb-1">{t("City")}</h4>
               <input
                 type="text"
@@ -599,7 +582,7 @@ const cities =
                 </p>
               )}
             </div> */}
-            {/* <div>
+          {/* <div>
               <h4 className="text-sm font-semibold mb-1">{t("State")}</h4>
               <Select
                 options={states}
@@ -611,7 +594,7 @@ const cities =
               />
             </div> */}
 
-            {/* <div className="mt-4">
+          {/* <div className="mt-4">
               <h4 className="text-sm font-semibold mb-1">{t("City")}</h4>
               <Select
                 options={cities}
@@ -623,7 +606,7 @@ const cities =
               />
             </div> */}
 
-            <div>
+          {/* <div>
               <h4 className="text-sm font-semibold mb-1">{t("Post Code")}</h4>
               <input
                 type="text"
@@ -652,12 +635,14 @@ const cities =
                   {errors.closestDistrict.message}
                 </p>
               )}
-            </div>
+            </div> */}
           {/* </div> */}
         </div>
 
         <div className="md:col-span-2 flex gap-3">
-          <Button type="submit" disabled={loading}>{loading ? t("Saving...") : t("Save")}</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? t("Saving...") : t("Save")}
+          </Button>
           <Button type="button" onClick={hideComponent}>
             {t("Go Back")}
           </Button>
