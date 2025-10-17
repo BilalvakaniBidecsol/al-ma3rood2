@@ -256,6 +256,7 @@ const MarketplaceCard = ({
   return (
     <div className="relative mx-5 md:mx-0">
       {/* Heading */}
+      {heading && (
       <h2
         className={`text-2xl font-semibold pb-1 mb-6 ${centerHeading ? "text-center" : ""
           }`}
@@ -271,7 +272,7 @@ const MarketplaceCard = ({
           )}
         </span>
       </h2>
-
+)}
       {showCategoryFilters && (
         <div className="flex flex-wrap gap-2 mb-6 justify-center">
           {categoryNames?.map((category, index) => (
@@ -450,10 +451,10 @@ const MarketplaceCard = ({
                          {(card.creator?.region_name || card.creator?.billing_address) && (
                           <>
                         <div className="text-[10px] text-gray-400 tracking-wide">
-                          {t("Region")}:
+                          {t("Location")}:
                         </div>
                         <div className="font-bold text-xs">
-                          {card.creator.region_name || card.creator.billing_address}
+                          {(`${card?.creator?.city_name ? `${card?.creator?.city_name}, ` : ""} ${card?.creator?.governorate_name}, ${card?.creator?.region_name}`)}
                         </div>
                         </>
                          )}

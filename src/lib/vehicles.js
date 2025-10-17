@@ -76,8 +76,9 @@ export async function getVehicleData(type = 'cars') {
 }
 
 export async function getTransformedVehicleData(type = 'cars') {
+
   const vehicleData = await getVehicleData(type);
-  
+
   return vehicleData.map(vehicle => ({
     make: vehicle.make,
     models: vehicle.models.map(model => ({
@@ -92,11 +93,27 @@ export function isSupportedVehicleType(type) {
 }
 
 export function getVehicleTypeFromCategory(categoryName) {
-  if (!categoryName) return 'cars';
-  
-  const lowerCategory = categoryName.toLowerCase();
-  if (lowerCategory.includes('motorbike') || lowerCategory.includes('bike')) {
-    return 'bikes';
+  if (!categoryName) return "cars";
+
+  const lower = categoryName.toLowerCase();
+
+  const typeMap = [
+    { keys: ["motorbike", "bike"], value: "bikes" },
+    { keys: ["caravan", "motorhome"], value: "caravans_motorhomes" },
+    { keys: ["boats", "marine"], value: "boats_and_marine" },
+    { keys: ["aircraft"], value: "aircrafts" },
+    { keys: ["buses"], value: "buses" },
+    { keys: ["horse", "floats"], value: "horse_floats" },
+    { keys: ["specialist"], value: "specialist_cars" },
+    { keys: ["trailers"], value: "trailers" },
+    { keys: ["trucks"], value: "trucks" },
+    { keys: ["wrecked"], value: "wrecked_cars" },
+  ];
+
+  for (const { keys, value } of typeMap) {
+    if (keys.some((k) => lower.includes(k))) return value;
   }
-  return 'cars';
+
+  return "cars";
 }
+

@@ -122,7 +122,7 @@ export default function FeedbackCard() {
 
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="font-semibold">{item.username}</span>
+                  <span className="font-semibold`">{item.username}</span>
 
                   <span className="text-yellow-500 flex gap-1">
                     {Array.from({ length: 5 }, (_, i) => {

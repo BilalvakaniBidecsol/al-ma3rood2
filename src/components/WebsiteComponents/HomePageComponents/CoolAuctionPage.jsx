@@ -360,18 +360,25 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Image_NotFound, Image_URL } from "@/config/constants";
 import { listingsApi } from "@/lib/api/listings";
+import { useTranslation } from "react-i18next";
 
 const CoolAuctionPage = ({ heading = "All Cool Auctions", noDataText = "No Cool Auctions Found" }) => {
   const [listings, setListings] = useState([]); // ✅ Listings state
   const [loading, setLoading] = useState(true); // ✅ Loading state
+  const { t, i18n } = useTranslation();
+
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
-        const response = await listingsApi.getListings();
+        const payload = {
+              listing_type: "marketplace",
+              page: 1,
+            }
+        const response = await listingsApi.getListingsByFilter({payload});
         console.log("Listings API Response:", response);
 
-        setListings(response?.data || []);
+        setListings(response || []);
       } catch (error) {
         console.error("Error fetching listings:", error);
       } finally {
@@ -466,7 +473,7 @@ const CoolAuctionPage = ({ heading = "All Cool Auctions", noDataText = "No Cool 
               </div>
             </Link>
           ))} */}
-          {listings.map((item, index) => {
+          {listings?.map((item, index) => {
             const lastSlug = item.category?.slug?.split("/").pop() || "unknown";
 
             return (
@@ -515,12 +522,16 @@ const CoolAuctionPage = ({ heading = "All Cool Auctions", noDataText = "No Cool 
                   <div className="flex justify-between mt-1">
                     <div className="text-gray-700">
                       <div className="text-[10px] text-gray-400 tracking-wide">
-                        City:
+                        {t("Location")}:
                       </div>
                       <div className="font-bold text-xs">
-                        {item.creator?.city ||
-                          item.creator?.billing_address ||
-                          "N/A"}
+                        {(item.creator?.region_name || item.creator?.billing_address) && (
+                          <>
+                        <div className="font-bold text-xs">
+                          {(`${item?.creator?.city_name ? `${item?.creator?.city_name}, ` : ""} ${item?.creator?.governorate_name}, ${item?.creator?.region_name}`)}
+                        </div>
+                        </>
+                         )}
                       </div>
                     </div>
 

@@ -1,27 +1,30 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import Select from "react-select";
 import { Search, BikeIcon as Motorbike } from "lucide-react";
 import { categoriesApi } from "@/lib/api/category";
 import propertiesApi, { motorSearchFilters } from "@/lib/api/properties";
 import { useTranslation } from "react-i18next";
 import PropertyCard from "./PropertyCard";
+import { useLocationStore } from "@/lib/stores/locationStore";
 
 const allowedTabs = [
+    { key: "For Sale", name: "For Sale", icon: "./house.png" },
+  { key: "For Rent", name: "For Rent", icon: "./house.png" },
+  
+  { key: "Flatmates", name: "Flatmates", icon: "./flat.png" },
   {
     key: "Commercial Property",
     name: "Commercial Property",
-    icon: "./rent.png",
-  },
-  { key: "New homes", name: "New homes", icon: "./house.png" },
-  { key: "Residential", name: "Residential", icon: "./flat.png" },
-  {
-    key: "Retirement villages",
-    name: "Retirement villages",
     icon: "./villages.png",
   },
-  { key: "Rural", name: "Rural", icon: "./villages.png" },
-  { key: "allcat", name: "All categories", icon: "./categ.png" },
+
+  {
+    key: "Businesses",
+    name: "Businesses",
+    icon: "./flat.png",
+  },
+  // { key: "allcat", name: "All categories", icon: "./categ.png" },
 ];
 
 function buildCategoryTree(categories) {
@@ -72,8 +75,8 @@ const PropertiesClient = ({
   const [isLoading, setIsLoading] = useState(false);
   const observerRef = useRef(null);
   const firstLoad = useRef(true);
-
-  // Filter states
+  const { locations, getAllLocations } = useLocationStore();
+    // Filter states
   const [filters, setFilters] = useState({
     search: "",
     category_id: null,
@@ -84,7 +87,18 @@ const PropertiesClient = ({
     parking: "", // dropdown single field
     country: "",
     city: "",
+    region: "",
+    governorate: "",
   });
+const country = locations.find((c) => c.id == 1);
+const regions = country?.regions || [];
+
+const governorates = useMemo(() => {
+  const region = regions.find((r) => r.name === filters.region);
+  return region?.governorates || [];
+}, [regions, filters.region]);
+
+
 
   const { t } = useTranslation();
 
@@ -96,22 +110,25 @@ const PropertiesClient = ({
   };
 
 const loadMore = useCallback(async () => {
-    if (!hasMore || isLoading) return;
+    // if (!hasMore || isLoading) return;
 
     setIsLoading(true);
     try {
       const nextPage = currentPage + 1;
       const payload = {
         ...filters,
-        max_price: filters?.price_max,
-        min_price: filters?.price_min,
         search: filters?.search,
-        // vehicle_type: activeTab !== "allcat" ? activeTab : "",
-        sort: sortBy,
-        pagination: {
-          page: currentPage,
-          per_page: 12,
-        },
+        parking: filters?.parking,
+      max_price: filters?.price_max,
+      min_price: filters?.price_min,
+      search: filters?.search,
+      governorate: filters?.governorate,
+      region: filters?.region,
+      sort: sortBy,
+        // pagination: {
+        //   page: currentPage,
+        //   per_page: 12,
+        // },
         listing_type: "property",
         pagination: { page: nextPage, per_page: 6 },
         category_id: filters?.category_id,
@@ -138,7 +155,7 @@ const loadMore = useCallback(async () => {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, hasMore, isLoading, pagination?.totalPages]);
+  }, [currentPage, hasMore, isLoading, pagination?.totalPages, filters.category_id]);
 
   const handleViewListings = async () => {
   try {
@@ -147,10 +164,13 @@ const loadMore = useCallback(async () => {
 
     const payload = {
       ...filters,
+      parking: filters?.parking,
       max_price: filters?.price_max,
       min_price: filters?.price_min,
       search: filters?.search,
       sort: sortBy,
+      governorate: filters?.governorate,
+      region: filters?.region,
       listing_type: "property",
       pagination: { page: 1, per_page: 12 },
       category_id: filters?.category_id,
@@ -241,7 +261,7 @@ useEffect(() => {
 
 
   // Always include "All categories"
-  tabs.push(allowedTabs.find((t) => t.key === "allcat"));
+  // tabs.push(allowedTabs.find((t) => t.key === "allcat"));
 
   // Apply sorting before rendering
   const sortedListings = [...motorListings].sort((a, b) => {
@@ -268,10 +288,22 @@ useEffect(() => {
     }
   });
 
+  useEffect(() => {
+      getAllLocations(); 
+    }, [getAllLocations]);
      useEffect(() => {
-  console.log("📊 Pagination Info:", pagination);
-  console.log("➡️ Has More:", hasMore);
-}, [motorListings, sortedListings]);
+  // console.log("📊 Pagination Info:", pagination);
+  // console.log("➡️ Has More:", hasMore);
+  handleViewListings()
+}, [filters?.category_id]);
+
+// useEffect(() => {
+//   if (!firstLoad.current) {
+//     handleViewListings();
+//   } else {
+//     firstLoad.current = false;
+//   }
+// }, [filters, sortBy]);
 
 
   const clearFilters = () => {
@@ -285,11 +317,13 @@ useEffect(() => {
       parking: "",
       country: "",
       city: "",
+      region: "",
+      governorate: "", 
     });
     setActiveTab("");
     setSearchQuery("");
     setCurrentPage(1);
-    loadMore();
+    handleViewListings();
   };
 
   // Dropdown options
@@ -303,13 +337,18 @@ useEffect(() => {
     { value: "unfurnished", label: "Unfurnished" },
     { value: "recently_renovated", label: "Recently Renovated" },
   ];
+   const typeOptions = [
+    { value: 6154, label: "Any Type" },
+    { value: 6156, label: "For Lease" },
+    { value: 6157, label: "For Sale" },
+  ];
 
   const priceOptions = [
     { value: "", label: "Select Price" },
-    { value: "50000", label: "$50,000" },
-    { value: "100000", label: "$100,000" },
-    { value: "200000", label: "$200,000" },
-    { value: "500000", label: "$500,000+" },
+    { value: "50000", label: "50,000" },
+    { value: "100000", label: "100,000" },
+    { value: "200000", label: "200,000" },
+    { value: "500000", label: "500,000+" },
   ];
 
   const landAreaOptions = [
@@ -323,6 +362,7 @@ useEffect(() => {
 
   const parkingOptions = [
     { value: "", label: "Select Parking" },
+    { value: "0", label: "None" },
     { value: "1", label: "1 Slot" },
     { value: "2", label: "2 Slots" },
     { value: "3", label: "3 Slots" },
@@ -348,20 +388,20 @@ useEffect(() => {
       </div>
       
       {/* Filter Card with Blended Tabs */}
-      <div className="max-w-5xl mx-auto -mt-20 relative z-10 px-4">
+      <div className="max-w-4xl mx-auto -mt-20 relative z-10 px-4">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           {/* Tabs section - blended with hero color */}
           <div className="bg-white rounded-lg  overflow-hidden">
             {/* Tabs section - flush with top of card */}
             <div className="flex border-b border-gray-200 overflow-x-auto no-scrollbar">
-              {tabs.map((tab) => (
+              {tabs.map((tab, index) => (
                 <button
-                  key={tab.key}
+                  key={tab?.key}
                   onClick={() => {
                     const selectedCat = categories.find(
-                      (cat) => cat.name.toLowerCase() === tab.name.toLowerCase()
+                      (cat) => cat?.name.toLowerCase() === tab?.name.toLowerCase()
                     );
-                    setActiveTab(tab.key);
+                    setActiveTab(tab?.key);
                     setFilters({
                       ...filters,
                       category_id:
@@ -372,7 +412,7 @@ useEffect(() => {
                           : null,
                     });
                   }}
-                  className={`flex-shrink-0 text-sm font-medium h-10 px-4 text-center
+                  className={`flex-shrink-0 text-sm font-medium h-10 px-7 text-center
       ${
         activeTab === tab.key
           ? "bg-white text-[#175f48]"
@@ -399,6 +439,24 @@ useEffect(() => {
             {/* Initial Filter Grid */}
             {activeTab !== "allcat" && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+                {[6157, 6156, 6154].includes(filters.category_id) && (
+                <div>
+                  <label className="block mb-1 text-sm font-medium text-gray-700">
+                    Type
+                  </label>
+                 <Select
+                    instanceId="type-select"
+                    options={typeOptions}
+                    value={typeOptions.find(
+                      (o) => o.value === filters.category_id
+                    )}
+                    onChange={(selected) =>
+                      setFilters({ ...filters, category_id: selected.value })
+                    }
+                  />
+                </div>
+)}
                 {/* Condition */}
                 <div>
                   <label className="block mb-1 text-sm font-medium text-gray-700">
@@ -482,6 +540,52 @@ useEffect(() => {
                     }
                   />
                 </div>
+
+                <div>
+                  <label className="block mb-1 text-sm font-medium">{t("Region")}</label>
+          {/* {states.length > 0 && ( */}
+            <Select
+              name="region"
+              value={filters.region ? { value: filters.region, label: filters.region } : null}
+          onChange={(selected) =>
+            setFilters((prev) => ({
+              ...prev,
+              region: selected?.value || "",
+              governorate: "",
+              city: "",
+            }))
+          }
+          options={regions.map((r) => ({ value: r.name, label: r.name }))}
+              placeholder={t("Select a Region")}
+              className="text-sm"
+              classNamePrefix="react-select"
+              isClearable
+            />
+                </div>
+<div>
+  <label className="block mb-1 text-sm font-medium">{t("Governorate")}</label>
+          {/* {cities.length > 0 && ( */}
+            <Select
+              name="governorate"
+              value={
+            filters.governorate
+              ? { value: filters.governorate, label: filters.governorate }
+              : null
+          }
+          onChange={(selected) =>
+            setFilters((prev) => ({
+              ...prev,
+              governorate: selected?.value || "",
+              city: "",
+            }))
+          }
+          options={governorates.map((g) => ({ value: g.name, label: g.name }))}
+              placeholder={t("Select a Governorate")}
+              className="text-sm"
+              classNamePrefix="react-select"
+              isClearable
+            />
+</div>
               </div>
             )}
             {/* ✅ BOTTOM Search Box for cars */}
@@ -513,9 +617,7 @@ useEffect(() => {
             {activeTab !== "allcat" && (
               <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
                 <button
-                  onClick={() => {
-                    loadMore();
-                  }}
+                  onClick={handleViewListings}
                   type="button"
                   className="w-full cursor-pointer sm:w-auto bg-[#175f48] hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors text-center"
                 >
@@ -584,20 +686,18 @@ useEffect(() => {
               </>
             )}
           </p>
-          <div className="flex items-center gap-3 mt-2 md:mt-0">
+          {/* <div className="flex items-center gap-3 mt-2 md:mt-0">
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value)}
               className="border border-gray-300 rounded px-2 py-1 text-sm"
             >
-              {/* <option value="featured">Sort: Featured First</option> */}
               <option value="price_low">{t("Price: Low to High")}</option>
               <option value="price_high">{t("Price: High to Low")}</option>
               <option value="year_new">{t("Newest First")}</option>
               <option value="year_old">{t("Oldest First")}</option>
-              {/* <option value="odometer_low">Mileage: Low to High</option> */}
             </select>
-          </div>
+          </div> */}
         </div>
 
 {/* Property listings */}

@@ -16,6 +16,7 @@ import Breadcrumbs from "@/components/WebsiteComponents/ReuseableComponenets/Bre
 import { toast } from "react-toastify";
 import { RxCross2 } from "react-icons/rx";
 import ImageCarousel from "./ImageCarousel";
+import PropertyMapSection from "../PropertyMapSection";
 
 function BidHistoryModal({ bids, open, onClose }) {
   const { t } = useTranslation();
@@ -646,16 +647,15 @@ export default function ProductDetailsClient({ product: initialProduct }) {
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
               {product.title}
             </h1>
-            {(product?.creator?.city || product?.creator?.billing_address) && (
+            {(product?.creator?.region_name || product?.creator?.address_1) && (
               <div
                 className={`flex items-center gap-2 text-sm text-gray-500 mt-1 ${i18n.language === "ar" ? "right" : ""
                   }`}
               >
                 <FaMapMarkerAlt className="text-green-600" />
                 <span>
-                  {product?.creator?.city
-                    ? `${t("City")}: ${product?.creator?.city}`
-                    : `${t("Location")}: ${product?.creator?.billing_address}`}
+                  {product?.creator?.region_name
+                    ? (`${card?.creator?.city_name ? `${card?.creator?.city_name}, ` : ""} ${card?.creator?.governorate_name}, ${card?.creator?.region_name}`) : ""}
                 </span>
               </div>
             )}
@@ -1017,6 +1017,11 @@ export default function ProductDetailsClient({ product: initialProduct }) {
             ))}
         </div>
       </div>
+
+      {/* ======= PROPERTY MAP SECTION ======= */}
+      {product.listing_type === 'property' && (
+        <PropertyMapSection property={product} />
+      )}
 
       {/* ======= PRODUCT DESCRIPTION ======= */}
       <div className="max-w-7xl mx-auto  bg-white rounded-lg px-6 md:px-20 py-10 space-y-4">

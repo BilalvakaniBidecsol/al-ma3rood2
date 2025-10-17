@@ -76,7 +76,7 @@ const PropertyCard = ({ listing, viewMode }) => {
           <img
             src={`${Image_URL}/${listing.images[0].image_path}`}
             alt={listing.title}
-            className={`w-[500px] h-52 object-cover"}`}
+            className={`h-52 w-full object-cover"}`}
           />
         ) : (
           <div

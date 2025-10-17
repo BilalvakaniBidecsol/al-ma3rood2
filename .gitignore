@@ -3,6 +3,8 @@
 #cursor
 /.cursor
 
+/GOOGLE_MAPS_SETUP.md
+
 # dependencies
 /node_modules
 /.pnp

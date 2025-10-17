@@ -161,7 +161,7 @@ const Page = () => {
           {/* PRODUCT DETAILS */}
           <div className="order-3 mt-6 px-4">
             <h3 className="text-sm font-semibold mb-4">
-              <h3>{t("Details")}</h3>
+              {t("Details")}
             </h3>
             {details.map((item, idx) => {
               return (
@@ -203,16 +203,19 @@ const Page = () => {
                       className="w-20 h-20 object-cover rounded-full"
                     />
                   ) : (
-                    listing?.creator?.name?.charAt(0)?.toUpperCase()
+                    listing?.creator?.username?.charAt(0)?.toUpperCase()
                   )}
                 </div>
                 <h3 className="text-lg font-medium text-gray-800">
-                  {listing?.creator?.name}
+                  {listing?.creator?.username}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  {t("Location")}:{" "}
-                  {listing.creator?.billing_address || "Unknown"}
-                </p>
+  {t("Location")}:{" "}
+  {listing.creator?.region_name
+    ? `${listing.creator?.city_name ? `${listing.creator?.city_name}, ` : ""}${listing.creator?.governorate_name}, ${listing.creator?.region_name}`
+    : ""}
+</p>
+
                 <p className="text-sm text-gray-500">
                   {t("Member Since")}:{" "}
                   {listing.creator?.created_at
@@ -234,6 +237,7 @@ const Page = () => {
         {/* ==== RIGHT COLUMN: BIDS SECTION ==== */}
         <div className="order-2 lg:order-none space-y-4">
           <h3 className="font-semibold text-4xl mb-2">{meta.productName}</h3>
+          {listing.listing_type !== 'property' &&(
           <div className="flex items-start text-sm text-gray-700">
             <FiClock className="text-gray-500 mt-1 mr-2 text-xl" />
             <div>
@@ -245,7 +249,7 @@ const Page = () => {
               </p>
             </div>
           </div>
-
+)}
           <div className="flex flex-col gap-2">
             <p
               className="text-blue-500 text-sm cursor-pointer"
@@ -271,6 +275,7 @@ const Page = () => {
                 {listing.buy_now_price}
               </p>
             </div>
+            {listing.listing_type !== 'property' && (
             <div className="p-4">
               <h3 className="text-sm text-center text-gray-600">
                 {t("Bidding Starts At")}
@@ -280,6 +285,7 @@ const Page = () => {
                 {listing.start_price}
               </p>
             </div>
+            )}
             {listing.winning_bid && (
               <div className="p-4">
                 <h3 className="text-sm text-center text-gray-600">

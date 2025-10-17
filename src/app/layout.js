@@ -28,9 +28,16 @@ export default async function RootLayout({ children }) {
   const dir = lang === "ar" ? "rtl" : "ltr";
   return (
     <html lang="en" dir={dir}>
+      <head>
+        <script
+          src={`https://maps.googleapis.com/maps/api/js?key=${process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY}&libraries=places,geometry`}
+          async
+          defer
+        />
+      </head>
       <body
         // className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-gray-50`}
-        className={`${lang === "ar" ? "font-Amiri" : "font-Poppins"} antialiased min-h-screen bg-gray-50`}
+        className={`${lang === "ar" ? "font-Amiri" : "font-Poppins"} antialiased min-h-screen bg-gray-50`}
       >
         <Toaster />
         <AuthCleanup />

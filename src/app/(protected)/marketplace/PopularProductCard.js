@@ -584,6 +584,7 @@ import Link from "next/link";
 import { useTranslation } from "react-i18next";
 import { listingsApi } from "@/lib/api/listings";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import MarketplaceCard from "./MarketplaceCard";
 
 const PopularProductCard = ({
   cards: initialCards,
@@ -707,100 +708,108 @@ const [isAtStart, setIsAtStart] = useState(true);
     {t("No products available")}
   </div>
 ) : (
-  <div className="relative">
-{/* Left Arrow */}
-      <button
-        onClick={scrollLeft}
-        // disabled={isAtStart}
-        className={`hidden sm:flex absolute top-1/2 -translate-y-1/2 rounded-full p-2 z-10 bg-white
-            ${isRTL ? "right-0" : "left-0"} 
-           `}
-      >
-        {isRTL ? <FaChevronRight size={22} /> : <FaChevronLeft size={22} />}
-      </button>
+//   <div className="relative">
+// {/* Left Arrow */}
+//       <button
+//         onClick={scrollLeft}
+//         // disabled={isAtStart}
+//         className={`hidden sm:flex absolute top-1/2 -translate-y-1/2 rounded-full p-2 z-10 bg-white
+//             ${isRTL ? "right-0" : "left-0"} 
+//            `}
+//       >
+//         {isRTL ? <FaChevronRight size={22} /> : <FaChevronLeft size={22} />}
+//       </button>
 
-    <div
-      ref={scrollRef}
-      className={
-        layout === "grid"
-          ? "flex gap-4 overflow-x-auto px-8 scrollbar-hide snap-x snap-mandatory"
-          : "flex flex-col gap-4 overflow-x-auto px-8 scrollbar-hide"
-      }
-    >
-      {cards.slice(0, 6).map((card, index) => {
-        if (index === 5) {
-          return (
-            <Link
-              key="see-more"
-              href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug}`}
-              className="min-w-[250px] max-w-[250px] flex flex-col items-center justify-center 
-                bg-[#F5F5F5] border-2 border-gray-300 rounded-xl shadow-sm 
-                hover:shadow-md transition-all duration-300  
-                flex-shrink-0 group"
-            >
-              <span className="text-lg font-semibold text-gray-700 mb-1 group-hover:text-black">
-                {t("See More")}
-              </span>
-              <span className="flex items-center gap-2 text-sm text-gray-500 font-medium group-hover:text-gray-700">
-                {t("Explore All")}
-                {isRTL ? (
-                  <FaChevronLeft className="transition-transform duration-300 group-hover:-translate-x-1" />
-                ) : (
-                  <FaChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
-                )}
-              </span>
-            </Link>
-          );
-        }
+//     <div
+//       ref={scrollRef}
+//       className={
+//         layout === "grid"
+//           ? "flex gap-4 overflow-x-auto px-8 scrollbar-hide snap-x snap-mandatory"
+//           : "flex flex-col gap-4 overflow-x-auto px-8 scrollbar-hide"
+//       }
+//     >
+//       {cards.slice(0, 6).map((card, index) => {
+//         if (index === 5) {
+//           return (
+//             <Link
+//               key="see-more"
+//               href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug}`}
+//               className="min-w-[250px] max-w-[250px] flex flex-col items-center justify-center 
+//                 bg-[#F5F5F5] border-2 border-gray-300 rounded-xl shadow-sm 
+//                 hover:shadow-md transition-all duration-300  
+//                 flex-shrink-0 group"
+//             >
+//               <span className="text-lg font-semibold text-gray-700 mb-1 group-hover:text-black">
+//                 {t("See More")}
+//               </span>
+//               <span className="flex items-center gap-2 text-sm text-gray-500 font-medium group-hover:text-gray-700">
+//                 {t("Explore All")}
+//                 {isRTL ? (
+//                   <FaChevronLeft className="transition-transform duration-300 group-hover:-translate-x-1" />
+//                 ) : (
+//                   <FaChevronRight className="transition-transform duration-300 group-hover:translate-x-1" />
+//                 )}
+//               </span>
+//             </Link>
+//           );
+//         }
 
-        return (
-          <Link
-            key={index}
-            href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug}`}
-            className="flex-shrink-0 block bg-[#FBFBFB] p-2 rounded hover:shadow-lg transition-shadow w-60 snap-start"
-          >
-            <img
-              src={
-                card.images?.[0]?.image_path
-                  ? `${Image_URL}${card.images?.[0]?.image_path}`
-                  : Image_NotFound
-              }
-              alt={card.images?.[0]?.alt_text || "Product Image"}
-              className="w-full h-48 object-cover rounded-t bg-white"
-            />
+//         return (
+//           <Link
+//             key={index}
+//             href={`/marketplace/${card.category?.slug?.split("/").pop() || "unknown"}/${card.slug}`}
+//             className="flex-shrink-0 block bg-[#FBFBFB] p-2 rounded hover:shadow-lg transition-shadow w-60 snap-start"
+//           >
+//             <img
+//               src={
+//                 card.images?.[0]?.image_path
+//                   ? `${Image_URL}${card.images?.[0]?.image_path}`
+//                   : Image_NotFound
+//               }
+//               alt={card.images?.[0]?.alt_text || "Product Image"}
+//               className="w-full h-48 object-cover rounded-t bg-white"
+//             />
 
-            <div className="px-3 pt-3">
-              <div className="flex items-center justify-between gap-2 mb-1">
-                {card.category?.name && (
-                  <span className="text-xs text-gray-600 font-medium">
-                    {t("Category")}: {card.category.name}
-                  </span>
-                )}
-              </div>
+//             <div className="px-3 pt-3">
+//               <div className="flex items-center justify-between gap-2 mb-1">
+//                 {card.category?.name && (
+//                   <span className="text-xs text-gray-600 font-medium">
+//                     {t("Category")}: {card.category.name}
+//                   </span>
+//                 )}
+//               </div>
 
-              <div className="text-lg font-semibold">
-                {card.title.length > 18
-                  ? `${card.title.slice(0, 18)}...`
-                  : card.title}
-              </div>
-            </div>
-          </Link>
-        );
-      })}
-    </div>
+//               <div className="text-lg font-semibold">
+//                 {card.title.length > 18
+//                   ? `${card.title.slice(0, 18)}...`
+//                   : card.title}
+//               </div>
+//             </div>
+//           </Link>
+//         );
+//       })}
+//     </div>
 
-   {/* Right Arrow */}
-<button
-        onClick={scrollRight}
-        // disabled={isAtEnd}
-        className={`hidden sm:flex absolute top-1/2 -translate-y-1/2 rounded-full p-2 z-10 bg-white
-             ${isRTL ? "left-0" : "right-0"} 
+//    {/* Right Arrow */}
+// <button
+//         onClick={scrollRight}
+//         // disabled={isAtEnd}
+//         className={`hidden sm:flex absolute top-1/2 -translate-y-1/2 rounded-full p-2 z-10 bg-white
+//              ${isRTL ? "left-0" : "right-0"} 
             
-          `}
-      >
-        {isRTL ? <FaChevronLeft size={22} /> : <FaChevronRight size={22} />}
-      </button>
-  </div>
+//           `}
+//       >
+//         {isRTL ? <FaChevronLeft size={22} /> : <FaChevronRight size={22} />}
+//       </button>
+//   </div>
+<div className="mx-0 md:mx-6">
+<MarketplaceCard
+          heading=""
+          // cards={listings?.data?.slice(0, 8) || []}
+          cards={cards}
+          seeMoreLink="/hotDeals"
+        />
+        </div>
 )}
 
     </div>

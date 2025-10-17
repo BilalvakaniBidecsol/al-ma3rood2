@@ -133,6 +133,11 @@ export default function CategoryClient({
         error={null}
       />
 
+      
+
+      {/* 🔹 Sorting + Layout Controls */}
+      <div className="flex flex-col gap-4 mt-4 mb-4 bg-white md:p-3 rounded shadow-sm md:flex-row md:justify-between md:items-end">
+        
       {/* 🔹 Filter Section */}
       <div className="w-full">
         <FilterComponent
@@ -141,10 +146,7 @@ export default function CategoryClient({
           onClear={handleClearFilters}
         />
       </div>
-
-      {/* 🔹 Sorting + Layout Controls */}
-      <div className="flex flex-col gap-4 mt-4 mb-4 bg-white p-3 rounded shadow-sm md:flex-row md:justify-between md:items-center">
-        <div className="flex justify-center gap-2">
+        <div className="hidden md:flex justify-center gap-2">
           <button
             className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${
               layout === "list"
@@ -172,13 +174,13 @@ export default function CategoryClient({
       </div>
 
       {/* 🔹 Product Grid */}
-      <div className="p-10">
+      <div className="py-10">
         <Market heading={slug} cards={productsToShow} layout={layout} />
       </div>
 
       {/* 🔹 Loading Skeleton */}
       {isLoading && (
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-4">
           {Array.from({ length: 8 }).map((_, i) => (
             <div key={i} className="h-60 bg-gray-200 animate-pulse rounded-lg" />
           ))}

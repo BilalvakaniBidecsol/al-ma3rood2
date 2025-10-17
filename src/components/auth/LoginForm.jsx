@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { BsFillEyeSlashFill } from "react-icons/bs";
 import { IoEyeSharp } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
+import Link from "next/link";
 
 export default function LoginForm({ onSubmit, isLoading, resetError }) {
   const [email, setEmail] = useState("");
@@ -123,14 +124,15 @@ export default function LoginForm({ onSubmit, isLoading, resetError }) {
 
       {/* Forgot Password Link */}
       {/* <div className="flex justify-end">
-        <button
-          type="button"
-          onClick={() => router.push('/forgot-password')}
+        <Link
+          href="/forgot-password"
+          // type="button"
+          // onClick={() => router.push('/forgot-password')}
           className="text-sm text-green-600 hover:text-green-800 cursor-pointer"
-          disabled={isLoading}
+          // disabled={isLoading}
         >
           Forgot password?
-        </button>
+        </Link>
       </div> */}
 
       {/* Submit Button */}

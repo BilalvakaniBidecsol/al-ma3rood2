@@ -3,6 +3,7 @@ import { listingsApi } from '@/lib/api/listings';
 import React, { useState } from 'react';
 import { useAuthStore } from '@/lib/stores/authStore';
 import { useTranslation } from 'react-i18next';
+import { toast } from 'react-toastify';
 
 
 function MakeOfferModal({ isOpen, onClose, product, onOfferMade }) {
@@ -40,6 +41,7 @@ function MakeOfferModal({ isOpen, onClose, product, onOfferMade }) {
       await listingsApi.makeOffer(product.id, formData);
       setSuccess('Offer sent!');
       setAmount('');
+      toast.success('Offer sent!')
       if (onOfferMade) onOfferMade();
       setTimeout(() => {
         setSuccess('');
@@ -87,7 +89,7 @@ function MakeOfferModal({ isOpen, onClose, product, onOfferMade }) {
             disabled={loading || isMaxedOut}
           />
           {error && <div className="text-red-500 text-xs mt-2 text-left pl-2">{error}</div>}
-          {success && <div className="text-green-600 text-xs mt-2">{success}</div>}
+          {/* {success && <div className="text-green-600 text-xs mt-2">{success}</div>} */}
           <label className="block mb-2 font-medium text-gray-700 text-left mt-4">{t("Message (optional)")}</label>
           <textarea
             value={message}

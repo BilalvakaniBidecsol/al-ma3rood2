@@ -55,7 +55,7 @@ const Market = ({
       <div
         className={
           layout === "grid"
-            ? "grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4"
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4"
             : "flex flex-col gap-4"
         }
       >
@@ -92,7 +92,7 @@ const Market = ({
                     : "flex-1 flex flex-col justify-between py-2"
                 }
               >
-                <div className="flex items-center justify-between gap-2 mb-1">
+                <div className="flex items-start justify-between gap-2 mb-1 line-clamp-2 min-h-[2.5rem]">
                   {card.category?.name && (
                     <span className="text-xs text-gray-600 font-medium">
                       {t("Category")}: {card.category.name}
@@ -124,7 +124,7 @@ const Market = ({
                     <div className="border-t border-gray-200 my-1" />
 
                     <div className="flex justify-between mt-1">
-                      {(card.creator?.city ||
+                      {/* {(card.creator?.city ||
                         card.creator?.billing_address) && (
                           <div className="text-gray-700">
                             <div className="text-[10px] text-gray-400  tracking-wide">
@@ -134,7 +134,19 @@ const Market = ({
                               {card.creator.city || card.creator.billing_address}
                             </div>
                           </div>
-                        )}
+                        )} */}
+                        <div className="text-gray-700">
+                         {(card.creator?.region_name || card.creator?.city) && (
+                          <>
+                        <div className="text-[10px] text-gray-400 tracking-wide">
+                          {t("Location")}:
+                        </div>
+                        <div className="font-bold text-xs">
+                          {(`${card?.creator?.city_name ? `${card?.creator?.city_name}, ` : ""} ${card?.creator?.governorate_name}, ${card?.creator?.region_name}`)}
+                        </div>
+                        </>
+                         )}
+                      </div>
 
                       {card.buy_now_price && (
                         <div className="text-right text-gray-700 flex flex-col items-end">

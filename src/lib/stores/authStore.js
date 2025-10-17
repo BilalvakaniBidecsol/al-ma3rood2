@@ -89,8 +89,8 @@ login: async (email, password) => {
             governorate: userData.governorate,
             password: userData.password,
                 country_id: userData.country_id,
-    region_id: userData.region_id,
-    governorate_id: userData.governorate_id,
+    regions_id: userData.regions_id,
+    governorates_id: userData.governorates_id,
     // city_id: userData.city_id,
           });
 

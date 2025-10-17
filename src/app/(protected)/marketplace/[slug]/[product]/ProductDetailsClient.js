@@ -64,7 +64,7 @@ function BidHistoryModal({ bids, open, onClose }) {
                   .map((bid) => (
                     <tr key={bid.id} className="border-b">
                       <td className="py-2 px-3 border whitespace-nowrap">
-                        {bid.user?.name || "Unknown"}
+                        {bid.user?.username || "Unknown"}
                       </td>
                       <td className="py-2 px-3 border whitespace-nowrap">
                         <span className="price">$</span>
@@ -509,7 +509,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
     { label: "Marketplace", href: "/marketplace" },
     {
       label: product.category?.name || "Category",
-      href: `/marketplace/${product.category?.slug}?categoryId=${product.category?.id}`,
+      href: `/marketplace/${product.category?.slug?.split("/").pop()}?categoryId=${product.category?.id}`,
     },
     { label: product.title || "Product" },
   ];
@@ -646,9 +646,19 @@ export default function ProductDetailsClient({ product: initialProduct }) {
               >
                 <FaMapMarkerAlt className="text-green-600" />
                 <span>
-                  {product?.creator?.region_name
+                  {/* {product?.creator?.region_name
                     ? `${t("Region")}: ${product?.creator?.region_name}`
-                    : `${t("Location")}: ${product?.creator?.billing_address}`}
+                    : `${t("Location")}: ${product?.creator?.billing_address}`} */}
+                    {product.creator?.region_name ? (
+                    <>
+                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorate_name}, ${product?.creator?.region_name}`)}
+                    </>
+                  ) : (
+                    <>
+                      {/* {t("Location")}:{" "}
+                      {product.creator?.billing_address || "Unknown"} */}
+                    </>
+                  )}
                 </span>
               </div>
             )}
@@ -890,7 +900,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                 <div className="text-xs text-gray-500 mt-0.5">
                   {product.creator?.region_name ? (
                     <>
-                      {t("Region")}: {product.creator.region_name}
+                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorate_name}, ${product?.creator?.region_name}`)}
                     </>
                   ) : (
                     <>
@@ -999,7 +1009,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                   {/* Question Row */}
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 bg-gray-200 flex items-center justify-center rounded-full shadow text-sm font-semibold text-gray-800 uppercase">
-                      {c.user?.name?.charAt(0) || "U"}
+                      {c.user?.username?.charAt(0) || "U"}
                     </div>
 
                     <div className="w-full">

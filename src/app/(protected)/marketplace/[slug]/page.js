@@ -82,7 +82,7 @@ const staticItems = [
 // Combine static and dynamic breadcrumbs
 const items = [...staticItems, ...getCategoryBreadcrumbs(products?.category_tree)];
 
-  console.log('first category', category);
+  console.log('first product', products);
 
   return (
     <>

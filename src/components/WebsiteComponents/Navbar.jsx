@@ -120,7 +120,14 @@ const Navbar = () => {
             </Link>
           </div>
           :
-          <div className="hidden md:flex items-center gap-8 text-sm min-w-36"></div>
+          <div className="hidden md:flex items-center gap-8 text-sm min-w-36">
+            <Link href="/login">
+              <div className="flex items-center gap-2 cursor-pointer hover:text-green-500 transition-colors">
+                <FaPlus className="text-lg" />
+                <span>{t("Start a Listing")}</span>
+              </div>
+            </Link>
+          </div>
         }
 
         <div className={`md:hidden mt-2 ${isRTL ? "mr-auto" : "ml-auto"}`}>

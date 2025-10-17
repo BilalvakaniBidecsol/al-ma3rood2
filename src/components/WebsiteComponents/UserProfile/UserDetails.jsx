@@ -454,7 +454,7 @@ const UserDetails = ({ profile }) => {
             {
               icon: "/Profile/location.png",
               label: "Location",
-              value: user?.address_1,
+              value: (user?.address_1 == null || user?.address_1 == "") ? `${user?.governorate_name}, ${user?.region_name}` : user?.address_1,
             },
             {
               icon: "/Profile/since.png",
@@ -491,12 +491,12 @@ const UserDetails = ({ profile }) => {
             {
               icon: "/Profile/name.png",
               label: "Name",
-              value: user?.name,
+              value: user?.username,
             },
             {
               icon: "/Profile/member.png",
               label: "Member number",
-              value: user?.customer_number,
+              value: user?.memberId,
             },
             {
               icon: "/Profile/authenticated.png",
@@ -511,7 +511,7 @@ const UserDetails = ({ profile }) => {
             {
               icon: "/Profile/location.png",
               label: "Location",
-              value: user?.billing_address,
+              value: (user?.address_1 == null || user?.address_1 == "") ? `${user?.governorate_name}, ${user?.region_name}` : user?.address_1,
             },
             {
               icon: "/Profile/since.png",

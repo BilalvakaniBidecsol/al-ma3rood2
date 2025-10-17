@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { Country, State, City } from "country-state-city";
 import Select from "react-select";
 import { useLocationStore } from "@/lib/stores/locationStore";
+import PhoneInput from "react-phone-input-2";
 
 // const schema = yup.object().shape({
 //   firstname: yup.string().required("Firstname is required"),
@@ -72,7 +73,7 @@ const EditContactDetails = () => {
       lastname: user?.last_name || "",
       name: `${user?.firstname} ${user?.lastname}` || "",
       phone: user?.phone || "",
-      mobile: user?.landline || "",
+      mobile: user?.mobile || "",
       gender: user?.gender || "",
       accountType: user?.account_type || "",
       country: user?.country || "",
@@ -308,7 +309,7 @@ const EditContactDetails = () => {
             <div>
               <label
                 htmlFor="firstname"
-                className="block text-sm font-semibold mb-1"
+                className="block text-sm mb-1"
               >
                 {t("Firstname")} <span className="text-red-500">*</span>
               </label>
@@ -326,7 +327,7 @@ const EditContactDetails = () => {
             <div>
               <label
                 htmlFor="lastname"
-                className="block text-sm font-semibold mb-1"
+                className="block text-sm mb-1"
               >
                 {t("Lastname")} <span className="text-red-500">*</span>
               </label>
@@ -346,7 +347,7 @@ const EditContactDetails = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Landline */}
             <div className="mt-4">
-              <h4 className="text-sm font-semibold mb-2">
+              <h4 className="text-sm mb-2">
                 {t("Landline")} (optional)
               </h4>
               <div className="flex items-center gap-2">
@@ -359,29 +360,47 @@ const EditContactDetails = () => {
             </div>
 
             {/* Mobile */}
-            <div className="mt-4">
-              <h4 className="text-sm font-semibold mb-2">
+            <div className="mt-4 pt-1">
+              {/* <h4 className="text-sm font-semibold mb-2">
                 {t("Mobile")} (optional)
-              </h4>
-              <div className="flex items-center gap-2">
-                <input
-                  type="number"
-                  {...register("mobile")}
-                  className="w-full border border-gray-300 rounded-[10px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-500"
-                  // className="w-52 border border-gray-300 rounded-[10px] px-2 py-1"
-                />
-              </div>
-              {/* {errors.mobile && (
-              <p className="text-red-500 text-xs mt-1">
-                {errors.mobile.message}
-              </p>
-            )} */}
-            </div>
+              </h4> */}
+  <Controller
+  name="mobile"
+  control={control}
+  render={({ field }) => (
+    <PhoneInput
+      country="sa"
+      onlyCountries={["sa"]}
+      disableDropdown
+      countryCodeEditable={false}
+      value={field.value || ""}
+      onChange={(value) => field.onChange(value)} // ✅ update field value properly
+      inputClass={`w-full p-2 border rounded-md ${
+        errors.mobile ? "border-red-500" : "border-gray-300"
+      }`}
+      inputStyle={{
+        width: "100%",
+        height: "40px",
+        fontSize: "14px",
+      }}
+      buttonStyle={{
+        border: "none",
+        backgroundColor: "transparent",
+      }}
+      placeholder="5XXXXXXXX"
+    />
+  )}
+/>
+
+</div>
+{errors.mobile && (
+  <p className="text-red-500 text-sm mt-1">{errors.mobile.message}</p>
+)}
           </div>
 
           {/* Gender */}
           <div className="mt-4">
-            <h4 className="text-sm font-semibold mb-2">{t("Gender")}</h4>
+            <h4 className="text-sm mb-2">{t("Gender")}</h4>
             <div className="flex flex-wrap gap-6 items-center">
               <label className="flex items-center space-x-2">
                 <input type="radio" {...register("gender")} value="male" />
@@ -392,7 +411,7 @@ const EditContactDetails = () => {
                 <span>{t("Female")}</span>
               </label>
               <label className="flex items-center space-x-2">
-                <input type="radio" {...register("gender")} value="notSay" />
+                <input type="radio" {...register("gender")} value="other" />
                 <span>{t("Rather not say")}</span>
               </label>
             </div>
@@ -426,10 +445,10 @@ const EditContactDetails = () => {
         )} */}
 
         {/* Street address */}
-        <h3 className="text-md font-semibold mb-2">{t("Street address")}</h3>
+        <h3 className="text-md mb-2 font-semibold">{t("Street address")}</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6 p-4 bg-white rounded">
           <div className="mb-4 w-full">
-            <label className="text-sm font-semibold mb-1 block">
+            <label className="text-sm mb-1 block">
               {t("Country")}
             </label>
             <Select
@@ -442,7 +461,7 @@ const EditContactDetails = () => {
           </div>
 
           <div className="mb-4 w-full">
-            <label className="text-sm font-semibold mb-1 block">
+            <label className="text-sm mb-1 block">
               {t("Region")}
             </label>
             <Controller
@@ -476,7 +495,7 @@ const EditContactDetails = () => {
           </div>
 
           <div className="mb-4 w-full">
-            <label className="text-sm font-semibold mb-1 block">
+            <label className="text-sm mb-1 block">
               {t("Governorate")}
             </label>
             <Controller
@@ -511,7 +530,7 @@ const EditContactDetails = () => {
           
           {/* <div className="mt-6 space-y-4"> */}
           {/* <div>
-              <h4 className="text-sm font-semibold mb-1">
+              <h4 className="text-sm mb-1">
                 {t("Address Finder")}
               </h4>
               <input
@@ -527,7 +546,7 @@ const EditContactDetails = () => {
               )}
             </div> */}
           <div className="col-span-full">
-            <h4 className="text-sm font-semibold mb-1">{t("Address")}</h4>
+            <h4 className="text-sm mb-1">{t("Address")}</h4>
             <textarea
               {...register("addressLine1")}
               placeholder={t("Enter address")}

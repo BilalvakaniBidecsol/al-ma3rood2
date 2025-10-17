@@ -12,6 +12,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import CategoryModal from "./CategoryModal";
+import GooglePlacesAutocomplete from "../GooglePlacesAutocomplete";
 
 /**
  * Zod schema for property listing
@@ -36,6 +37,8 @@ const propertyListingSchema = z
     // Generic property detail fields will be plain strings (optional)
     address: z.string().optional(),
     country: z.string().optional(),
+    region: z.string().optional(),
+    governorate: z.string().optional(),
     city: z.string().optional(),
     floor_area: z.string().optional(),
     land_area: z.string().optional(),
@@ -55,7 +58,8 @@ const propertyListingSchema = z
     water_supply: z.string().optional(),
     floor: z.string().optional(),
     area: z.string().optional(),
-    property_type_field: z.string().optional(), // to avoid clash with top property_type
+    property_type_field: z.string().optional(), 
+    business_type: z.string().optional(), // to avoid clash with top property_type
     floor_level: z.string().optional(),
     parking: z.string().optional(),
     terrace: z.string().optional(),
@@ -66,22 +70,22 @@ const propertyListingSchema = z
     water_availability: z.string().optional(),
     soil_type: z.string().optional(),
   })
-  .refine((data) => {
-    // If buy_now_price filled -> ok
-    if (data.buy_now_price && data.buy_now_price.trim() !== "") return true;
-    // If both start and reserve present -> ok
-    if (
-      data.start_price &&
-      data.start_price.trim() !== "" &&
-      data.reserve_price &&
-      data.reserve_price.trim() !== ""
-    )
-      return true;
-    return false;
-  }, {
-    message: "Either enter Buy Now Price, or both Start Price and Reserve Price",
-    path: ["buy_now_price"],
-  });
+  // .refine((data) => {
+  //   // If buy_now_price filled -> ok
+  //   if (data.buy_now_price && data.buy_now_price.trim() !== "") return true;
+  //   // If both start and reserve present -> ok
+  //   if (
+  //     data.start_price &&
+  //     data.start_price.trim() !== "" &&
+  //     data.reserve_price &&
+  //     data.reserve_price.trim() !== ""
+  //   )
+  //     return true;
+  //   return false;
+  // }, {
+  //   message: "Either enter Buy Now Price, or both Start Price and Reserve Price",
+  //   path: ["buy_now_price"],
+  // });
 
 
 // Steps
@@ -126,6 +130,7 @@ const Properties = ({initialValues,
   const [currentCategories, setCurrentCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
     const normalizedInitialValues = useMemo(() => {
       if (!initialValues) return {};
@@ -301,8 +306,12 @@ const Properties = ({initialValues,
         "sub_type",
         "address",
         "country",
+        "region",
+        "governorate",
         "city",
         "area",
+        "property_type_field",
+        "business_type",
         "floor_area",
         "land_area",
         "rv",
@@ -315,6 +324,15 @@ const Properties = ({initialValues,
         "bathrooms",
         "hide_rv"
       ];
+
+      // Add location data if available
+      if (selectedLocation) {
+        formData.append("latitude", selectedLocation.lat.toString());
+        formData.append("longitude", selectedLocation.lng.toString());
+        formData.append("place_id", selectedLocation.place_id || "");
+      }
+      formData.append("address", data.address || "");
+
 
       let attributeIndex = 0;
       propertyFields.forEach((field) => {
@@ -364,12 +382,12 @@ const Properties = ({initialValues,
       } else {
         router.push("/account");
       }
+    setIsSubmitting(false);
     } catch (error) {
       console.error("Error creating property listing:", error);
       toast.error("Failed to create property listing. Please try again.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    setIsSubmitting(false);
+    } 
   };
 
   const nextStep = () => {
@@ -414,7 +432,7 @@ const conditionOptions = [
   { value: "recently_renovated", label: "Recently Renovated" },
 ];
 
-
+// console.log('check', selectedCategory)
   const landAreaOptions = [
     { value: "", label: "Select Land Area" },
     { value: "100", label: "100 sqm" },
@@ -426,6 +444,7 @@ const conditionOptions = [
 
   const parkingOptions = [
     { value: "", label: "Select Parking" },
+    { value: "0", label: "None" },
     { value: "1", label: "1 Slot" },
     { value: "2", label: "2 Slots" },
     { value: "3", label: "3 Slots" },
@@ -558,19 +577,57 @@ const conditionOptions = [
               name="address"
               control={control}
               render={({ field }) => (
-                <input
-                  {...field}
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+                <GooglePlacesAutocomplete
+                  value={field.value}
+                  onChange={field.onChange}
+                  onPlaceSelect={(location) => {
+                    setSelectedLocation(location);
+                    console.log("🗺️ Location object received:", location);
+
+                    if (location.address_components) {
+            const components = location.address_components;
+
+            // Helper to extract component by type
+            const getComponent = (type) =>
+              components.find((c) => c.types.includes(type))?.long_name || "";
+
+            // Extract relevant fields
+            const city =
+              getComponent("locality") ||
+              getComponent("administrative_area_level_2");
+            const governorate = getComponent("administrative_area_level_2");
+            const region = getComponent("administrative_area_level_1");
+            const country = getComponent("country");
+
+            console.log("🏙️ City:", city);
+          console.log("🏛️ Governorate:", governorate);
+          console.log("🌍 Region:", region);
+          console.log("🇸🇦 Country:", country);
+
+            // Update form fields automatically
+            setValue("city", city);
+            setValue("governorate", governorate);
+            setValue("region", region);
+            setValue("country", country);
+          }
+                  }}
                   placeholder="Enter property address"
                 />
               )}
             />
+            {selectedLocation && (
+              <div className="mt-2 text-sm text-gray-600">
+                <p>📍 {selectedLocation.address}</p>
+                <p className="text-xs text-gray-500">
+                  Coordinates: {selectedLocation.lat.toFixed(6)}, {selectedLocation.lng.toFixed(6)}
+                </p>
+              </div>
+            )}
           </div>
 
       
       {/* Country */}
-<div>
+{/* <div>
   <label className="block text-sm font-medium text-gray-700 mb-2">
     Country
   </label>
@@ -595,10 +652,10 @@ const conditionOptions = [
       </select>
     )}
   />
-</div>
+</div> */}
 
 {/* City */}
-<div>
+{/* <div>
   <label className="block text-sm font-medium text-gray-700 mb-2">
     City
   </label>
@@ -625,7 +682,7 @@ const conditionOptions = [
       );
     }}
   />
-</div>
+</div> */}
 
 
 
@@ -685,6 +742,56 @@ const conditionOptions = [
     )}
   />
 </div>
+{(selectedCategory?.parent_id || selectedCategory?.parent_id  ) == 6154 &&(
+<div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Property Type
+    </label>
+    <Controller
+      name="property_type_field"
+      control={control}
+      render={({ field }) => (
+        <select
+          {...field}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+        >
+          <option value="">Select Property Type</option>
+          <option value="warehouse">Warehouse</option>
+          <option value="shop">Shop</option>
+          <option value="office">Office</option>
+          <option value="restaurant">Restaurant</option>
+          <option value="factory">Factory</option>
+        </select>
+      )}
+    />
+  </div>
+)}
+
+{(selectedCategory?.parent_id || selectedCategory?.id) == 6468 && ( // assuming 6153 is "Businesses"
+  <div>
+    <label className="block text-sm font-medium text-gray-700 mb-2">
+      Business Type
+    </label>
+    <Controller
+      name="business_type"
+      control={control}
+      render={({ field }) => (
+        <select
+          {...field}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500"
+        >
+          <option value="">Select Business Type</option>
+          <option value="restaurant">Restaurant / Café</option>
+          <option value="retail_shop">Retail Shop</option>
+          <option value="salon_spa">Salon / Spa</option>
+          <option value="gym_fitness_center">Gym / Fitness Center</option>
+          <option value="supermarket">Supermarket / Grocery</option>
+          <option value="other">Other</option>
+        </select>
+      )}
+    />
+  </div>
+)}
 
 
 {/* Land Area */}
@@ -734,6 +841,7 @@ const conditionOptions = [
 </div>
 
 {/* Bedrooms */}
+{![6154, 6468].includes(selectedCategory?.parent_id || selectedCategory?.id  )&&(
 <div>
   <label className="block text-sm font-medium text-gray-700 mb-2">
     Number of Bedrooms
@@ -751,7 +859,7 @@ const conditionOptions = [
     )}
   />
 </div>
-
+)}
 {/* Bathrooms */}
 <div>
   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -773,7 +881,7 @@ const conditionOptions = [
 
 
           {/* RV & Price */}
-          <div>
+          {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Rateable Value (RV)
             </label>
@@ -805,10 +913,10 @@ const conditionOptions = [
                 />
               )}
             />
-          </div>
+          </div> */}
 
           {/* Agency Reference */}
-          <div className="md:col-span-2">
+          {/* <div className="md:col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Agency Reference
             </label>
@@ -823,7 +931,7 @@ const conditionOptions = [
                 />
               )}
             />
-          </div>
+          </div> */}
 
           {/* Details */}
           <div className="md:col-span-2">
@@ -861,7 +969,7 @@ const conditionOptions = [
             />
           </div> */}
 
-          <div className="md:col-span-2 flex items-center gap-2">
+          {/* <div className="md:col-span-2 flex items-center gap-2">
             <Controller
               name="hide_rv"
               control={control}
@@ -875,7 +983,7 @@ const conditionOptions = [
               )}
             />
             <span className="text-gray-700">Hide RV on Listing</span>
-          </div>
+          </div> */}
 
           {/* <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Condition *</label>
@@ -951,7 +1059,7 @@ const conditionOptions = [
             <h3 className="text-xl font-semibold text-gray-900">Pricing</h3>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Buy Now Price</label>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Expected Price</label>
               <Controller
                 name="buy_now_price"
                 control={control}
@@ -966,7 +1074,7 @@ const conditionOptions = [
               />
             </div>
 
-            <div>
+            {/* <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Allow Offers</label>
               <Controller
                 name="allow_offers"
@@ -1010,10 +1118,10 @@ const conditionOptions = [
                   />
                 )}
               />
-            </div>
+            </div> */}
           </div>
 
-          <div className="space-y-4">
+          {/* <div className="space-y-4">
             <h3 className="text-xl font-semibold text-gray-900">Additional Options</h3>
 
             <div>
@@ -1032,22 +1140,7 @@ const conditionOptions = [
               />
             </div>
 
-            {/* <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Registration / Notes</label>
-              <Controller
-                name="registration"
-                control={control}
-                render={({ field }) => (
-                  <input
-                    {...field}
-                    type="text"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="Any extra reference or registration info (optional)"
-                  />
-                )}
-              />
-            </div> */}
-          </div>
+          </div> */}
         </div>
 
         {/* errors from refine show under buy_now_price (per schema) */}

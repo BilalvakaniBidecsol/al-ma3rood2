@@ -150,7 +150,7 @@ const MotorListingCard = ({ listing, viewMode }) => {
         <div className="flex justify-between items-center text-xs text-gray-500 mb4">
           <div className="flex items-center">
             <MapPin className="w-3 h-3 mr-1" />
-            {`${listing.creator.city}, ${listing.creator.country}` || 'Location not specified'}
+            {`${listing.creator.regions?.name}, ${listing.creator.countries?.name}` || 'Location not specified'}
           </div>
           <div>
             Listed {new Date(listing.created_at).toLocaleDateString()}
@@ -185,4 +185,4 @@ const MotorListingCard = ({ listing, viewMode }) => {
   );
 };
 
-export default MotorListingCard; 
+export default MotorListingCard;

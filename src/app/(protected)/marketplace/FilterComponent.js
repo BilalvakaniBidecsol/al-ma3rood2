@@ -629,9 +629,9 @@ const FilterComponent = ({ categoryId, onResults }) => {
   };
 
   return (
-    <div className="w-full bg-white p-4 space-y-4">
+    <div className="w-full bg-white px-4 space-y4">
       {/* Header with Active Filters & Clear All */}
-      <div className="flex justify-between items-center mb-3">
+    <div className="flex justify-between items-start mb-2 max-w-xl">
         {/* Active Filters */}
         <div className="flex flex-wrap gap-2">
          {newUsed && (
@@ -668,10 +668,10 @@ const FilterComponent = ({ categoryId, onResults }) => {
           )}
         </div>
 
-        {/* Clear All Button (Right Side) */}
+{(newUsed || selectedCity || priceFrom || priceTo) && ( 
         <button
           onClick={clearFilters}
-          className={`flex items-center gap-1 text-gray-500 hover:text-red-500 ${
+          className={`flex items-center gap-1 text-gray-500 hover:text-red-500 min-w-32 ${
             !newUsed && !selectedCity && !priceFrom && !priceTo
               ? "opacity-50 cursor-not-allowed"
               : ""
@@ -681,11 +681,11 @@ const FilterComponent = ({ categoryId, onResults }) => {
           <RiDeleteBin6Line size={18} />
           {t("Clear All")}
         </button>
-      </div>
-
+    
+      )}
+  </div>
      
 
-{/* Tabs + Show Results in Same Row */}
 {/* Tabs + Show Results in Same Row */}
 {/*  */}
 {/* Tabs + Show Results in Same Row */}
@@ -754,7 +754,7 @@ const FilterComponent = ({ categoryId, onResults }) => {
 
 {/* Dropdowns */}
   {openTab === "condition" && (
-    <div className="absolute z-10 mt-2 w-1/3 bg-white border border-gray-200 rounded-lg shadow-md p-3">
+    <div className="absolute z-10 mt-2 w-80 md:w-1/3 bg-white border border-gray-200 rounded-lg shadow-md p-3">
       <div className="space-y-2 grid grid-cols-1 md:grid-cols-2">
         {conditions.map((item) => (
           <label

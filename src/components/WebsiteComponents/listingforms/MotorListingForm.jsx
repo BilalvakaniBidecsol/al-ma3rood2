@@ -204,6 +204,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
     handleSubmit,
     setValue,
     watch,
+    register,
     reset,
     formState: { errors },
     control,
@@ -238,6 +239,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
 
       setLoadingVehicleData(true);
       try {
+        console.log('type',vehicle_type)
         const vehicleType = getVehicleTypeFromCategory(vehicle_type);
         const data = await getTransformedVehicleData(vehicleType);
         setVehicleData(data);
@@ -541,12 +543,15 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
       } else {
         router.push("/account");
       }
+      setIsSubmitting(false);
     } catch (error) {
       console.error("Error creating motor listing:", error);
       toast.error("Failed to create motor listing. Please try again.");
-    } finally {
       setIsSubmitting(false);
-    }
+    } 
+    // finally {
+    //   setIsSubmitting(false);
+    // }
   };
 
   const nextStep = () => {
@@ -836,7 +841,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
                     type="radio"
                     value={item.key}
                     {...register("condition")}
-                    checked={condition === item.key}
+                    // checked={condition === item.key}
                     className="accent-green-500"
                   />
                   <span className="text-sm">{t(item.label)}</span>

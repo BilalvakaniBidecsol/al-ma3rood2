@@ -28,8 +28,8 @@ export const propertiesApi = {
       };
 
         // ✅ add vehicle_type only if present
-  if (payload?.vehicle_type) {
-    formattedPayload.filters.vehicle_type = payload.vehicle_type;
+  if (payload?.parking) {
+    formattedPayload.filters.parking = payload.parking;
   }
 
           // ✅ add make only if present
@@ -56,6 +56,13 @@ export const propertiesApi = {
   if (payload?.land_area) {
     formattedPayload.filters.land_area = payload.land_area;
   }
+
+  if (payload?.region) {
+    formattedPayload.filters.region = payload.region;
+  }
+  if (payload?.governorate) {
+    formattedPayload.filters.governorate = payload.governorate;
+  }
   
         // ✅ add category_id conditionally
       // if (payload?.category_id !== undefined && payload?.category_id !== null) {
@@ -65,8 +72,12 @@ export const propertiesApi = {
       //   }
       // }
        // ✅ add city if present
-      if (payload?.city) {
-        formattedPayload.city = payload.city;
+      if (payload?.min_price) {
+        formattedPayload.min_price = payload.min_price;
+      }
+  
+      if (payload?.max_price) {
+        formattedPayload.max_price = payload.max_price;
       }
   
       // ✅ add condition if present

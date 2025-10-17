@@ -106,6 +106,11 @@ export async function generateMetadata() {
   };
 }
 
+// export const metadata = {
+//   title: "Account | Ma3rood",
+//   description: "Manage your account information, update personal details, and view your activity – all in one place on your Ma3rood account dashboard..",
+// };
+
 const page = () => {
   return (
   <AccountClientPage/>
