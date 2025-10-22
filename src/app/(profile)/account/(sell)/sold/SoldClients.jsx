@@ -487,7 +487,7 @@ const handleUpdateFeedback = async (feedbackId, { feedback, rating }) => {
               image: listing.images?.[0]?.image_path
                 ? `${Image_URL}${listing.images[0].image_path}`
                 : "/default-image.jpg",
-              link: `/marketplace/${listing.category?.slug || "unknown"}/${listing.slug
+              link: `/marketplace/${listing.category?.slug?.split("/").pop() || "unknown"}/${listing.slug
                 }`,
             }}
             actions={[

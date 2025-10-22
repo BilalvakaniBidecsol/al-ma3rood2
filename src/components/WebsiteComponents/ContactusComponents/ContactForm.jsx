@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import InputField from "../ReuseableComponenets/InputField";
 import { useTranslation } from "react-i18next";
 import { useForm, Controller } from "react-hook-form";
@@ -10,13 +10,31 @@ import { userApi } from "@/lib/api/user";
 import { Country, City, State } from "country-state-city";
 import Select from "react-select";
 import { useAuthStore } from "@/lib/stores/authStore";
+import { useLocationStore } from "@/lib/stores/locationStore";
 
 const ContactForm = () => {
   const { t } = useTranslation();
-   const { user } = useAuthStore();
+  const { user } = useAuthStore();
   const [category, setCategory] = useState("Account");
   const [helpWith, setHelpWith] = useState("Emails");
   const [option, setOption] = useState("trouble receiving Ma3rood emails");
+  const { locations, getAllLocations } = useLocationStore();
+
+  useEffect(() => {
+    getAllLocations();
+  }, [getAllLocations]);
+
+  const country = locations.find((c) => c.id == 1);
+  const regions = country?.regions || [];
+
+  const [selectedRegion, setSelectedRegion] = useState(null);
+  const [selectedGovernorate, setSelectedGovernorate] = useState(null);
+
+  const governorates = useMemo(() => {
+    if (!selectedRegion) return [];
+    const region = regions.find((r) => r.id === selectedRegion.value);
+    return region?.governorates || [];
+  }, [regions, selectedRegion]);
 
   const schema = yup.object().shape({
     name: yup.string().required("Name is required"),
@@ -31,10 +49,13 @@ const ContactForm = () => {
       .required("Phone is required"),
     subject: yup.string().required("Subject is required"),
     message: yup.string().required("Message is required"),
-    state: yup.string().required("State is required"),
-    city: yup.string().required("City is required"),
-    address: yup.string().required("Address is required"),
-  });
+    region: yup
+.object()
+.required("Region is required"),
+governorate: yup
+.object()
+.required("Governorate is required"),
+});
 
   const {
     control,
@@ -44,18 +65,51 @@ const ContactForm = () => {
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
-     defaultValues: {
-    name: user?.name || "",
-    email: user?.email || "",
-    phone: user?.phone || "",
-    subject: "",
-    message: "",
-    country: "Saudi Arabia", // fixed
-    state: user?.state,
-    city: user?.city,
-    address: user?.billing_address,
-  },
-  });
+defaultValues: {
+name: "",
+email: "",
+phone: "",
+subject: "",
+message: "",
+country: "Saudi Arabia",
+region: "",
+governorate: "",
+},
+});
+
+
+
+
+// ✅ Populate form when user data is available
+useEffect(() => {
+if (user) {
+reset({
+name: user.name || "",
+email: user.email || "",
+phone: user.phone || "",
+subject: "",
+message: "",
+country: "Saudi Arabia",
+region: user.regions,
+governorate: user.governorates,
+});
+
+setSelectedRegion(
+user.regions
+? { label: user.regions.name, value: user.regions?.id }
+: null
+);
+
+setSelectedGovernorate(
+user.governorates
+? {
+label: user.governorates.name,
+value: user.governorates?.id,
+}
+: null
+);
+}
+}, [user, reset]);
 
   const [formData, setFormData] = useState({
     state: "",
@@ -98,10 +152,9 @@ const ContactForm = () => {
         subject: data.subject,
         message: data.message,
         country: data.country,
-        state: data.state,
-        city: data.city,
-        address: data.address,
-
+        region_id: selectedRegion?.value || null,
+        governorate_id:
+          selectedGovernorate?.value || null,
       };
 
       const response = await userApi.contactmessage(payload);
@@ -224,100 +277,79 @@ const ContactForm = () => {
                 className="w-full p-1.5 border border-gray-200 rounded bg-gray-100 cursor-not-allowed"
               />
             </div>
-
-            {/* State */}
+            {/* Region */}{" "}
             <div>
-              <label className="block text-sm font-medium">{t("State")}</label>
-              <Controller
-                control={control}
-                name="state"
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    options={states.map((s) => ({
-                      label: s.name,
-                      value: s.name,
-                    }))}
-                    onChange={(selected) => {
-                      field.onChange(selected?.value);
-                      setFormData((prev) => ({
-                        ...prev,
-                        state: selected?.value,
-                      }));
-                    }}
-                    value={
-                      field.value
-                        ? { label: field.value, value: field.value }
-                        : null
-                    }
-                    placeholder={t("Select a state")}
-                    isClearable
-                    classNamePrefix="react-select"
-                  />
-                )}
-              />
-              {errors.state && (
-                <p className="text-red-600 text-sm mt-1">
-                  {errors.state.message}
-                </p>
-              )}
-            </div>
-
-            {/* City */}
-            <div>
-              <label className="block text-sm font-medium">{t("City")}</label>
-              <Controller
-                control={control}
-                name="city"
-                render={({ field }) => (
-                  <Select
-                    {...field}
-                    options={cities.map((c) => ({
-                      label: c.name,
-                      value: c.name,
-                    }))}
-                    onChange={(selected) => {
-                      field.onChange(selected?.value);
-                      setFormData((prev) => ({
-                        ...prev,
-                        city: selected?.value,
-                      }));
-                    }}
-                    value={
-                      field.value
-                        ? { label: field.value, value: field.value }
-                        : null
-                    }
-                    placeholder={t("Select a city")}
-                    isClearable
-                    classNamePrefix="react-select"
-                  />
-                )}
-              />
-              {errors.city && (
-                <p className="text-red-600 text-sm mt-1">
-                  {errors.city.message}
-                </p>
-              )}
-            </div>
-
-            {/* Address */}
-            {/* <div className="md:col-span-3">
+              {" "}
               <label className="block text-sm font-medium">
-                {t("Address")}
-              </label>
-              <input
-                type="text"
-                {...register("address")}
-                className="w-full p-2.5 border border-green-300 rounded focus:outline-none focus:ring-2 focus:ring-green-600"
-                placeholder={t("Enter your address")}
-              />
-              {errors.address && (
+                {t("Region")}
+              </label>{" "}
+              <Controller
+                control={control}
+                name="region"
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={regions.map((r) => ({
+                      label: r.name,
+                      value: r.id,
+                    }))}
+                    onChange={(selected) => {
+                      setSelectedRegion(selected);
+                      setSelectedGovernorate(null);
+                      field.onChange(selected?.label);
+                    }}
+                    value={selectedRegion}
+                    placeholder={t("Select region")}
+                    isClearable
+                  />
+                )}
+              />{" "}
+              {errors.region && (
                 <p className="text-red-600 text-sm mt-1">
-                  {errors.address.message}
+                  {" "}
+                  {errors.region.message}{" "}
                 </p>
-              )}
-            </div> */}
+              )}{" "}
+            </div>{" "}
+            {/* Governorate */}{" "}
+            <div>
+              {" "}
+              <label className="block text-sm font-medium">
+                {" "}
+                {t("Governorate")}{" "}
+              </label>{" "}
+              <Controller
+                control={control}
+                name="governorate"
+                render={({ field }) => (
+                  <Select
+                    {...field}
+                    options={governorates.map((g) => ({
+                      label: g.name,
+                      value: g.id,
+                    }))}
+                    onChange={(selected) => {
+                      setSelectedGovernorate(selected);
+                      field.onChange(selected?.label);
+                    }}
+                    value={selectedGovernorate}
+                    placeholder={
+                      selectedRegion
+                        ? t("Select governorate")
+                        : t("Select region first")
+                    }
+                    isDisabled={!selectedRegion}
+                    isClearable
+                  />
+                )}
+              />{" "}
+              {errors.governorate && (
+                <p className="text-red-600 text-sm mt-1">
+                  {" "}
+                  {errors.governorate.message}{" "}
+                </p>
+              )}{" "}
+            </div>{" "}
           </div>
 
           {/* Message */}

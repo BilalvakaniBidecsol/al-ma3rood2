@@ -22,7 +22,7 @@ const page = async ({ params }) => {
       {/* {product?.listing?.vehicle_type !== "Car parts & accessories" ? (
         <CarListing product={product.listing} dealer_listing={product.dealers_other_listings} motors={motors?.data}/>
       ) : ( */}
-        <ProductDetailsClient product={product?.listing} />
+        <ProductDetailsClient product={product?.listing} initialnearBy={product?.nearby_listings} />
       {/* )} */}
     </div>
   );

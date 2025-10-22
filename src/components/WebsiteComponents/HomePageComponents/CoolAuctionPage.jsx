@@ -1,4 +1,3 @@
-
 // // "use client";
 // // import React, { useEffect } from "react";
 // // import Link from "next/link";
@@ -133,7 +132,7 @@
 
 // //     const fetchListings = async () => {
 // //       try {
-// //         const response = await listingsApi.getListings(); 
+// //         const response = await listingsApi.getListings();
 // //         console.log("Listings API Response:", response);
 // //       } catch (error) {
 // //         console.error("Error fetching listings:", error);
@@ -249,11 +248,11 @@
 //   useEffect(() => {
 //     const fetchListings = async () => {
 //       try {
-//         const response = await listingsApi.getListings(); 
+//         const response = await listingsApi.getListings();
 //         console.log("Listings API Response:", response);
 
 //         // Agar response me data array hai
-//         setListings(response?.data || []); 
+//         setListings(response?.data || []);
 //       } catch (error) {
 //         console.error("Error fetching listings:", error);
 //       }
@@ -362,20 +361,22 @@ import { Image_NotFound, Image_URL } from "@/config/constants";
 import { listingsApi } from "@/lib/api/listings";
 import { useTranslation } from "react-i18next";
 
-const CoolAuctionPage = ({ heading = "All Cool Auctions", noDataText = "No Cool Auctions Found" }) => {
+const CoolAuctionPage = ({
+  heading = "All Cool Auctions",
+  noDataText = "No Cool Auctions Found",
+}) => {
   const [listings, setListings] = useState([]); // ✅ Listings state
   const [loading, setLoading] = useState(true); // ✅ Loading state
   const { t, i18n } = useTranslation();
-
 
   useEffect(() => {
     const fetchListings = async () => {
       try {
         const payload = {
-              listing_type: "marketplace",
-              page: 1,
-            }
-        const response = await listingsApi.getListingsByFilter({payload});
+          listing_type: "marketplace",
+          page: 1,
+        };
+        const response = await listingsApi.getListingsByFilter({ payload });
         console.log("Listings API Response:", response);
 
         setListings(response || []);
@@ -475,7 +476,9 @@ const CoolAuctionPage = ({ heading = "All Cool Auctions", noDataText = "No Cool 
           ))} */}
           {listings?.map((item, index) => {
             const lastSlug = item.category?.slug?.split("/").pop() || "unknown";
-
+            if (item?.bids_count > 0) {
+              console.log("item", item);
+            }
             return (
               <Link
                 key={index}
@@ -503,11 +506,14 @@ const CoolAuctionPage = ({ heading = "All Cool Auctions", noDataText = "No Cool 
                       {item.expire_at && (
                         <>
                           Closes:{" "}
-                          {new Date(item.expire_at).toLocaleDateString("en-US", {
-                            weekday: "short",
-                            day: "numeric",
-                            month: "short",
-                          })}
+                          {new Date(item.expire_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              weekday: "short",
+                              day: "numeric",
+                              month: "short",
+                            }
+                          )}
                         </>
                       )}
                     </div>
@@ -525,17 +531,24 @@ const CoolAuctionPage = ({ heading = "All Cool Auctions", noDataText = "No Cool 
                         {t("Location")}:
                       </div>
                       <div className="font-bold text-xs">
-                        {(item.creator?.region_name || item.creator?.billing_address) && (
+                        {(item.creator?.region_name ||
+                          item.creator?.billing_address) && (
                           <>
-                        <div className="font-bold text-xs">
-                          {(`${item?.creator?.city_name ? `${item?.creator?.city_name}, ` : ""} ${item?.creator?.governorate_name}, ${item?.creator?.region_name}`)}
-                        </div>
-                        </>
-                         )}
+                            <div className="font-bold text-xs">
+                              {`${
+                                item?.creator?.city_name
+                                  ? `${item?.creator?.city_name}, `
+                                  : ""
+                              } ${item?.creator?.governorate_name}, ${
+                                item?.creator?.region_name
+                              }`}
+                            </div>
+                          </>
+                        )}
                       </div>
                     </div>
 
-                    {item.buy_now_price && (
+                    {/* {item.buy_now_price && (
                       <div className="text-right text-gray-700">
                         <div className="text-[9px] text-gray-400 uppercase tracking-wide">
                           Buy Now:
@@ -545,19 +558,40 @@ const CoolAuctionPage = ({ heading = "All Cool Auctions", noDataText = "No Cool 
                           {item.buy_now_price}
                         </div>
                       </div>
-                    )}
+                    )} */}
+                    {item.bids_count === 0
+                      ? item.buy_now_price && (
+                          <div className="text-right text-gray-700 flex flex-col items-end">
+                            <div className="text-[9px] text-gray-400 uppercase tracking-wide">
+                              {t("Buy Now")}:
+                            </div>
+                            <div className="font-bold">
+                              <span className="price">$</span>
+                              {item.buy_now_price}
+                            </div>
+                          </div>
+                        )
+                      : item.bids_count &&
+                        item.bids?.length > 0 && (
+                          <div className="text-right text-gray-700 flex flex-col items-end">
+                            <div className="text-[9px] text-gray-400 uppercase tracking-wide">
+                              {t("Current Bid")}:
+                            </div>
+                            <div className="font-bold">
+                              <span className="price">$</span>
+                              {item.bids?.[0]?.amount}
+                            </div>
+                          </div>
+                        )}
                   </div>
                 </div>
               </Link>
             );
           })}
-
         </div>
       ) : (
         // ✅ No data text props se aaya
-        <div className="text-center text-gray-500 py-10">
-          {noDataText}
-        </div>
+        <div className="text-center text-gray-500 py-10">{noDataText}</div>
       )}
     </div>
   );

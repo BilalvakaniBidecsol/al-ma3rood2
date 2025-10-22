@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { FaStar, FaRegStar, FaTimes } from "react-icons/fa";
 import Button from "@/components/WebsiteComponents/ReuseableComponenets/Button";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 import { userApi } from "@/lib/api/user";
 import { useAuthStore } from "@/lib/stores/authStore";
 
@@ -33,6 +34,7 @@ export default function FeedbackModal({
     setHoveredRating(0);
     onClose();
   };
+  
 
   if (!isOpen) return null;
 
@@ -106,7 +108,12 @@ export default function FeedbackModal({
           <Button
   title={t("Submit")}
   onClick={() => {
-    if (!feedback && rating === 0) {
+    if (rating === 0) {
+      toast.error(t("Please select at least 1 star before submitting."));
+      return; // empty rating prevent karne ke liye (optional)
+    }
+     if (!feedback) {
+      toast.error(t("Please write your feedback before submitting."));
       return; // empty feedback prevent karne ke liye (optional)
     }
     onSave({ feedback, rating });

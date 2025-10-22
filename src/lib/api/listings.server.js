@@ -155,6 +155,12 @@ export async function fetchAllListingsByFilter(payload) {
     if (payload?.city) {
       formattedPayload.city = payload.city;
     }
+    if (payload?.region_id) {
+      formattedPayload.regions_id = payload.region_id;
+    }
+    if (payload?.governorate_id) {
+      formattedPayload.governorates_id = payload.governorate_id;
+    }
 
     // ✅ add condition if present
     if (payload?.condition) {

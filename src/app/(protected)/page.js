@@ -44,12 +44,9 @@ import Watch from "@/components/WebsiteComponents/HomePageComponents/Watch";
 // ];
 
 export const metadata = {
-  title: "MA3rood",
-  description:
-    "Browse and discover the best deals on MA3rood Marketplace. Find products, categories, and more.",
   title: "Ma3rood",
   description:
-    "Browse and discover the best deals on Ma3rood Marketplace. Find products, categories, and more.",
+    "Browse and discover the best deals on MA3rood Marketplace. Find products, categories, and more.",
   // openGraph: {
   //   title: "Marketplace | Ma3rood",
   //   description: "Browse and discover the best deals on Ma3rood Marketplace. Find products, categories, and more.",
@@ -84,7 +81,9 @@ export default async function Home({ params, searchParams }) {
     fetchAllListings(categoryId, categoryIdFilter, search, city),
   ]);
   const {token} = useAuthStore
-console.log('tok', token)
+// console.log('tok', token)
+console.log('aaa listings', listings)
+console.log('aaa reserveCards', reserveCards)
 
 
 

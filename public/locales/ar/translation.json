@@ -911,10 +911,25 @@
   "Consent": "الموافقة",
   "Contract performance": "تنفيذ العقد",
   "Legal obligation": "الالتزام القانوني",
-  "Legitimate interests (safety, fraud prevention)": "المصالح المشروعة (السلامة، منع الاحتيال)"
-
-
-
+  "Legitimate interests (safety, fraud prevention)": "المصالح المشروعة (السلامة، منع الاحتيال)",
+"CATEGORY":"الفئة",
+"BUY, SELL & RENT <br /> PROPERTIES WITH EASE": "اشترِ، بِعْ، واستأجر العقارات بسهولة",
+  "Land Area": "مساحة الأرض",
+  "Parking": "موقف سيارات",
+  "Min Price": "السعر الأدنى",
+  "Max Price": "السعر الأقصى",
+    "Region": "المنطقة",
+  "Governorate": "المحافظة",
+  "No properties found": "لم يتم العثور على عقارات",
+  "Asking price": "سعر الطلب",
+  "All Conditions": "كل الشروط",
+  "Properties": "العقارات",
+  "Bed": "غرف نوم",
+  "Bath": "حمامات",
+  "Sqft": "قدم مربع",
+    "Property Location": "موقع العقار",
+  "Nearby Places": "الأماكن القريبة",
+  "Nearby Properties": "العقارات القريبة"
 
 
 

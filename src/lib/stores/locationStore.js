@@ -6,6 +6,11 @@ export const useLocationStore = create((set, get) => ({
   isLoading: false,
   error: null,
 
+  // Selected values
+  selectedCountry: null,
+  selectedRegion: null,
+  selectedGovernorate: null,
+
   getAllLocations: async () => {
     const { locations } = get();
     if (locations.length > 0) return locations;
@@ -21,4 +26,22 @@ export const useLocationStore = create((set, get) => ({
       throw error;
     }
   },
+
+   // Setters for selected values
+  setSelectedCountry: (country) =>
+    set({
+      selectedCountry: country,
+      selectedRegion: null,
+      selectedGovernorate: null, // reset dependent values
+    }),
+
+  setSelectedRegion: (region) =>
+    set({
+      selectedRegion: region,
+      selectedGovernorate: null, // reset dependent value
+    }),
+
+  setSelectedGovernorate: (governorate) =>
+    set({ selectedGovernorate: governorate }),
+
 }));

@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import RegisterForm from "@/components/auth/RegisterForm";
 import { useAuthStore } from "@/lib/stores/authStore";
@@ -13,15 +14,12 @@ export default function RegisterPage() {
   const { register, error, isLoading, resetError } = useAuthStore();
   const { t, i18n } = useTranslation();
 
-  // const handleRegister = async (formData) => {
-  //   try {
-  //     const { token } = await register(formData);
-  //     setAuthToken(token);
-  //     router.push("/login");
-  //   } catch (err) {
-  //     console.log("Registration failed:", err);
-  //   }
-  // };
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      router.replace("/"); 
+    }
+  }, [router]);
 
   const handleRegister = async (formData) => {
     try {

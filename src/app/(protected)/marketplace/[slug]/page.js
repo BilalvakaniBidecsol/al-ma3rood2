@@ -37,7 +37,7 @@ export async function generateMetadata({ params, searchParams}) {
 
 export default async function CategoryPage({ params, searchParams }) {
   const { slug } = await params;
-  const { categoryId, search, city, page = 1 } = await searchParams;
+  const { categoryId, search, city, page = 1, region_id, governorate_id } = await searchParams;
   const category = await fetchCategory(categoryId);
   const allCategories = await fetchAllCategories();
   const currentCategory = allCategories?.categories?.data?.find((cat) => cat.id == categoryId);
@@ -45,7 +45,7 @@ export default async function CategoryPage({ params, searchParams }) {
   const products = await fetchAllListingsByFilter({ 
     listing_type: "marketplace", 
     category_id: categoryId, 
-    search: search, city: city, page: 1
+    search: search, city: city, page: 1, region_id, governorate_id
    });
 
   // Extract pagination info from API response

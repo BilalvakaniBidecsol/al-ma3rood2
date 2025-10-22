@@ -32,15 +32,15 @@ const motorListingSchema = z
     subtitle: z.string().nullable().optional(),
     category_id: z.number().optional().default(1),
     description: z.string().min(1, "Description is required"),
-    // condition: z.enum(["new", "used"]),
-    condition: z.enum([
-      "brand_new_unused",
-      "like_new",
-      "gently_used_excellent_condition",
-      "good_condition",
-      "fair_condition",
-      "for_parts_or_not_working",
-    ]),
+    condition: z.enum(["new", "used"]),
+    // condition: z.enum([
+    //   "brand_new_unused",
+    //   "like_new",
+    //   "gently_used_excellent_condition",
+    //   "good_condition",
+    //   "fair_condition",
+    //   "for_parts_or_not_working",
+    // ]),
     images: z.array(z.any()).min(1, "At least one image is required"),
 
     buy_now_price: z.string().optional(),
@@ -456,7 +456,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
       formData.append("subtitle", data.subtitle || "");
       formData.append("category_id", data.category_id || 1);
       formData.append("description", data.description);
-      formData.append("condition", data.condition || "New");
+      formData.append("condition", data.condition || "new");
       formData.append("buy_now_price", data.buy_now_price || "");
       formData.append("allow_offers", data.allow_offers ? "1" : "0");
       formData.append("start_price", data.start_price || "");
@@ -588,28 +588,12 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
   };
   const conditions = [
     {
-      key: "brand_new_unused",
-      label: "Brand New / Unused – never opened or used.",
+      key: "new",
+      label: "New",
     },
     {
-      key: "like_new",
-      label: "Like New – opened but looks and works like new.",
-    },
-    {
-      key: "gently_used_excellent_condition",
-      label: "Gently Used / Excellent Condition – minor signs of use.",
-    },
-    {
-      key: "good_condition",
-      label: "Good Condition – visible wear but fully functional.",
-    },
-    {
-      key: "fair_condition",
-      label: "Fair Condition – heavily used but still works.",
-    },
-    {
-      key: "for_parts_or_not_working",
-      label: "For Parts or Not Working – damaged or needs repair.",
+      key: "used",
+      label: "Used",
     },
   ];
 

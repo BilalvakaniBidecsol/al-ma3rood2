@@ -213,7 +213,6 @@ const MarketplaceCard = ({
   pagination,
   onPageChange,
   seeMoreLink = "/coolAuction",
-
 }) => {
   const { t, i18n } = useTranslation();
   const categoryNames = categories?.data?.map((category) => category.name);
@@ -224,7 +223,7 @@ const MarketplaceCard = ({
   const [isAtEnd, setIsAtEnd] = useState(false);
 
   const visibleCards = cards?.slice(0, 19) || [];
-  console.log("visibleCards", visibleCards);
+  console.log("aaa visibleCards", visibleCards);
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -252,27 +251,25 @@ const MarketplaceCard = ({
     }
   };
 
-
   return (
     <div className="relative mx-5 md:mx-0">
       {/* Heading */}
       {heading && (
-      <h2
-        className={`text-2xl font-semibold pb-1 mb-6 ${centerHeading ? "text-center" : ""
+        <h2
+          className={`text-2xl font-semibold pb-1 mb-6 ${
+            centerHeading ? "text-center" : ""
           }`}
-      >
-        <span className="inline-block border-b-2 border-gray-400">
-          {t(
-            decodeURIComponent(heading)
-              .split(" ")
-              .map(
-                (word) => word.charAt(0).toUpperCase() + word.slice(1)
-              )
-              .join(" ")
-          )}
-        </span>
-      </h2>
-)}
+        >
+          <span className="inline-block border-b-2 border-gray-400">
+            {t(
+              decodeURIComponent(heading)
+                .split(" ")
+                .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(" ")
+            )}
+          </span>
+        </h2>
+      )}
       {showCategoryFilters && (
         <div className="flex flex-wrap gap-2 mb-6 justify-center">
           {categoryNames?.map((category, index) => (
@@ -292,10 +289,11 @@ const MarketplaceCard = ({
         disabled={isAtStart}
         className={`hidden sm:flex absolute top-1/2 -translate-y-1/2 rounded-full p-2 z-10
             ${isRTL ? "-right-7" : "-left-10"} 
-            ${isAtStart
-            ? "bg-gray-200 cursor-not-allowed"
-            : "bg-white shadow-md hover:bg-gray-100"
-          }`}
+            ${
+              isAtStart
+                ? "bg-gray-200 cursor-not-allowed"
+                : "bg-white shadow-md hover:bg-gray-100"
+            }`}
       >
         {isRTL ? <FaChevronRight size={22} /> : <FaChevronLeft size={22} />}
       </button>
@@ -395,13 +393,13 @@ const MarketplaceCard = ({
               <Link
                 key={index}
                 // href={`/marketplace/${lastSlug}/${card.slug}`}
-                 href={
-    card.listing_type === "motors"
-      ? `/search/${card.slug}`
-      : card.listing_type === "property"
-      ? `/property/${card.slug}`
-      : `/marketplace/${lastSlug}/${card.slug}`
-  }
+                href={
+                  card.listing_type === "motors"
+                    ? `/search/${card.slug}`
+                    : card.listing_type === "property"
+                    ? `/property/${card.slug}`
+                    : `/marketplace/${lastSlug}/${card.slug}`
+                }
                 className="min-w-[250px] max-w-[250px] bg-[#FBFBFB] p-2 rounded hover:shadow-lg transition-shadow flex-shrink-0"
               >
                 <img
@@ -425,11 +423,14 @@ const MarketplaceCard = ({
                       {card.expire_at ? (
                         <>
                           <span>{t("Closes")}</span>:{" "}
-                          {new Date(card.expire_at).toLocaleDateString("en-US", {
-                            weekday: "short",
-                            day: "numeric",
-                            month: "short",
-                          })}
+                          {new Date(card.expire_at).toLocaleDateString(
+                            "en-US",
+                            {
+                              weekday: "short",
+                              day: "numeric",
+                              month: "short",
+                            }
+                          )}
                         </>
                       ) : (
                         <span className="invisible">placeholder</span>
@@ -446,31 +447,50 @@ const MarketplaceCard = ({
                   <div className="border-t border-gray-200 my-1" />
 
                   <div className="flex justify-between mt-1">
-                   
-                      <div className="text-gray-700">
-                         {(card.creator?.region_name || card.creator?.billing_address) && (
-                          <>
-                        <div className="text-[10px] text-gray-400 tracking-wide">
-                          {t("Location")}:
-                        </div>
-                        <div className="font-bold text-xs">
-                          {(`${card?.creator?.city_name ? `${card?.creator?.city_name}, ` : ""} ${card?.creator?.governorate_name}, ${card?.creator?.region_name}`)}
-                        </div>
+                    <div className="text-gray-700">
+                      {(card.creator?.region_name ||
+                        card.creator?.billing_address) && (
+                        <>
+                          <div className="text-[10px] text-gray-400 tracking-wide">
+                            {t("Location")}:
+                          </div>
+                          <div className="font-bold text-xs">
+                            {`${
+                              card?.creator?.city_name
+                                ? `${card?.creator?.city_name}, `
+                                : ""
+                            } ${card?.creator?.governorate_name}, ${
+                              card?.creator?.region_name
+                            }`}
+                          </div>
                         </>
-                         )}
-                      </div>
-                   
-                    {card.buy_now_price && (
-                      <div className="text-right text-gray-700 flex flex-col items-end">
-                        <div className="text-[9px] text-gray-400 uppercase tracking-wide">
-                          {t("Buy Now")}:
-                        </div>
-                        <div className="font-bold">
-                          <span className="price">$</span>
-                          {card.buy_now_price}
-                        </div>
-                      </div>
-                    )}
+                      )}
+                    </div>
+
+                    {card.bids_count === 0
+                      ? card.buy_now_price && (
+                          <div className="text-right text-gray-700 flex flex-col items-end">
+                            <div className="text-[9px] text-gray-400 uppercase tracking-wide">
+                              {t("Buy Now")}:
+                            </div>
+                            <div className="font-bold">
+                              <span className="price">$</span>
+                              {card.buy_now_price}
+                            </div>
+                          </div>
+                        )
+                      : card.bids_count &&
+                        card.bids?.length > 0 && (
+                          <div className="text-right text-gray-700 flex flex-col items-end">
+                            <div className="text-[9px] text-gray-400 uppercase tracking-wide">
+                              {t("Current Bid")}:
+                            </div>
+                            <div className="font-bold">
+                              <span className="price">$</span>
+                              {card.bids?.[0]?.amount}
+                            </div>
+                          </div>
+                        )}
                   </div>
                 </div>
               </Link>
@@ -499,7 +519,7 @@ const MarketplaceCard = ({
             </span>
           </Link> */}
         <Link
-          href={seeMoreLink}   // 👈 ab hardcoded nahi, dynamic
+          href={seeMoreLink} // 👈 ab hardcoded nahi, dynamic
           className="min-w-[250px] max-w-[250px] flex flex-col items-center justify-center 
     bg-[#F5F5F5] border-2 border-gray-300 rounded-xl shadow-sm 
     hover:shadow-md transition-all duration-300  
@@ -517,7 +537,6 @@ const MarketplaceCard = ({
             )}
           </span>
         </Link>
-
       </div>
 
       <button
@@ -525,10 +544,11 @@ const MarketplaceCard = ({
         disabled={isAtEnd}
         className={`hidden sm:flex absolute top-1/2 -translate-y-1/2 rounded-full p-2 z-10
              ${isRTL ? "-left-10" : "-right-7"} 
-             ${isAtEnd
-            ? "bg-gray-200 cursor-not-allowed"
-            : "bg-white shadow-md hover:bg-gray-100"
-          }`}
+             ${
+               isAtEnd
+                 ? "bg-gray-200 cursor-not-allowed"
+                 : "bg-white shadow-md hover:bg-gray-100"
+             }`}
       >
         {isRTL ? <FaChevronLeft size={22} /> : <FaChevronRight size={22} />}
       </button>

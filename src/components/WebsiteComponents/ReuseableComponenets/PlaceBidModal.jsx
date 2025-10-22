@@ -3,6 +3,7 @@ import { Image_NotFound, Image_URL } from "@/config/constants";
 import React, { useState } from "react";
 import { listingsApi } from "@/lib/api/listings";
 import { useTranslation } from "react-i18next";
+import { toast } from 'react-toastify';
 
 const PlaceBidModal = ({ isOpen, onClose, product, onBidPlaced }) => {
   const [amount, setAmount] = useState("");
@@ -24,13 +25,13 @@ const PlaceBidModal = ({ isOpen, onClose, product, onBidPlaced }) => {
     // Client-side bid validation
     const bidValue = parseFloat(amount);
     if (isNaN(bidValue) || bidValue <= 0) {
-      setError("Please enter a valid bid amount.");
+      toast.error("Please enter a valid bid amount.");
       return;
     }
     if (product?.bids?.length > 0) {
       const highestBid = parseFloat(product.bids[0].amount);
       if (bidValue <= highestBid) {
-        setError(
+        toast.error(
           `Your bid must be higher than the current highest bid ($${highestBid}).`
         );
         return;
@@ -38,7 +39,7 @@ const PlaceBidModal = ({ isOpen, onClose, product, onBidPlaced }) => {
     } else {
       const startPrice = parseFloat(product?.start_price || 0);
       if (bidValue <= startPrice) {
-        setError(
+        toast.error(
           `Your bid must be higher than the starting price ($${startPrice}).`
         );
         return;
@@ -59,7 +60,8 @@ const PlaceBidModal = ({ isOpen, onClose, product, onBidPlaced }) => {
       formData.append("type", autoBid ? "auto" : "manual");
       formData.append("max_auto_bid_amount", autoBid ? amount : "");
       await listingsApi.placeBid(product.id, formData);
-      setSuccess("Bid placed successfully!");
+      // setSuccess("Bid placed successfully!");
+      toast.success('Bid placed successfully!')
       setAmount("");
       setAutoBid(false);
       if (onBidPlaced) onBidPlaced();
@@ -68,7 +70,8 @@ const PlaceBidModal = ({ isOpen, onClose, product, onBidPlaced }) => {
         onClose();
       }, 1200);
     } catch (err) {
-      setError(err?.message || "Failed to place bid");
+      // setError(err?.message || "Failed to place bid");
+      toast.error(err?.message || "Failed to place bid")
     } finally {
       setLoading(false);
     }
@@ -112,9 +115,9 @@ const PlaceBidModal = ({ isOpen, onClose, product, onBidPlaced }) => {
               <div>
                 <span className="text-lg font-bold text-green-600">
                   <span className="mr-1 price">$</span>
-                  {product?.start_price ||
+                  {product.bids[0]?.amount ||
+                    product?.start_price ||
                     product?.reserve_price ||
-                    product?.buy_now_price ||
                     "0.00"}
                 </span>
 
@@ -225,7 +228,7 @@ const PlaceBidModal = ({ isOpen, onClose, product, onBidPlaced }) => {
             <button
               type="submit"
               className="w-full sm:flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 rounded-lg transition disabled:opacity-60"
-              disabled={loading || !agreeToPayment}
+              disabled={loading || !agreeToPayment || amount == ""}
             >
               {loading ? t("Placing...") : t("Place bid")}
             </button>

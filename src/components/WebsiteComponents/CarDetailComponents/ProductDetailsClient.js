@@ -283,7 +283,7 @@ function LoginConfirmationModal({ isOpen, onClose, onLogin }) {
   );
 }
 
-export default function ProductDetailsClient({ product: initialProduct }) {
+export default function ProductDetailsClient({ product: initialProduct, initialnearBy }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -297,6 +297,8 @@ export default function ProductDetailsClient({ product: initialProduct }) {
 
   const [carouselIndex, setCarouselIndex] = useState(0);
   const [product, setProduct] = useState(initialProduct);
+  const [nearBy, setNearBy] = useState(initialnearBy);
+
   const { watchlist, addToWatchlist, removeFromWatchlist } =
     useWatchlistStore();
   const isInWatchlist = watchlist?.some(
@@ -312,8 +314,6 @@ export default function ProductDetailsClient({ product: initialProduct }) {
 
   // Seller check
   const isSeller = currentUser?.id === product?.seller_id;
-
-  console.log('product', product);
 
   //   const handlePostQuestion = async () => {
   //   if (!newQuestion.trim()) {
@@ -647,15 +647,14 @@ export default function ProductDetailsClient({ product: initialProduct }) {
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
               {product.title}
             </h1>
-            {(product?.creator?.region_name || product?.creator?.address_1) && (
+            {(product?.creator?.address) && (
               <div
                 className={`flex items-center gap-2 text-sm text-gray-500 mt-1 ${i18n.language === "ar" ? "right" : ""
                   }`}
               >
                 <FaMapMarkerAlt className="text-green-600" />
                 <span>
-                  {product?.creator?.region_name
-                    ? (`${card?.creator?.city_name ? `${card?.creator?.city_name}, ` : ""} ${card?.creator?.governorate_name}, ${card?.creator?.region_name}`) : ""}
+                  {product?.address ? product?.address : ""}
                 </span>
               </div>
             )}
@@ -948,7 +947,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                     {/* Location & Specs */}
                     <div className="flex flex-wrap gap-4 text-sm mb-3">
                       <span className="flex items-center gap-1 text-green-500">
-                        <FaMapMarkerAlt /> {`${product?.creator?.city}, ${product?.creator?.country}` || "Unknown Location"}
+                        <FaMapMarkerAlt /> {`${product?.address}` || "Unknown Location"}
                       </span>
                       </div>
                     <div className="flex flex-wrap gap-4 text-sm mb-3">
@@ -978,7 +977,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
           
                     {/* Price */}
                     <div className="mb-6">
-                      <p className="text-gray-500 text-sm">Asking price:</p>
+                      <p className="text-gray-500 text-sm">{t("Asking price")}:</p>
                       <p className="text-3xl font-bold text-black">
                         <span className="price">$</span>{Number(product?.buy_now_price)}{" "}
                       </p>
@@ -1020,7 +1019,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
 
       {/* ======= PROPERTY MAP SECTION ======= */}
       {product.listing_type === 'property' && (
-        <PropertyMapSection property={product} />
+        <PropertyMapSection property={product} nearBy={nearBy}/>
       )}
 
       {/* ======= PRODUCT DESCRIPTION ======= */}

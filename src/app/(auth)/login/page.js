@@ -137,6 +137,13 @@ function LoginPageContent() {
   const router = useRouter();
   const { t } = useTranslation();
 
+  // useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     router.replace("/"); 
+  //   }
+  // }, [router]);
+
   // const handleLogin = async (credentials) => {
   //   try {
   //     const res = await login(credentials.email, credentials.password);

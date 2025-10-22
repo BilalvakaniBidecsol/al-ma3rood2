@@ -56,6 +56,14 @@ export const motorsApi = {
   if (payload?.body_style) {
     formattedPayload.filters.body_style = payload.body_style;
   }
+
+  if (payload?.region) {
+    formattedPayload.filters.region = payload.region;
+  }
+
+  if (payload?.governorate) {
+    formattedPayload.filters.governorate = payload.governorate;
+  }
   
         // ✅ add category_id conditionally
       // if (payload?.category_id !== undefined && payload?.category_id !== null) {

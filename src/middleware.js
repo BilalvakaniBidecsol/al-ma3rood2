@@ -1,34 +1,31 @@
 import { NextResponse } from "next/server";
 
-// Only protect these routes
-const protectedRoutes = new Set([
-  "/listing",
-  "/account",
-]);
+const protectedRoutes = ["/listing", "/account"];
 
 export async function middleware(request) {
   const { pathname } = request.nextUrl;
+  const token = request.cookies.get("auth-token")?.value;
 
-  // Only run middleware for protected routes
-  if (!protectedRoutes.has(pathname)) {
+  // Check if current route starts with any protected route
+  const isProtected = protectedRoutes.some((route) =>
+    pathname.startsWith(route)
+  );
+
+  if (!isProtected) {
     return NextResponse.next();
   }
 
-  const token = request.cookies.get("auth-token")?.value;
-
-  // If no token, redirect to login
+  // Redirect to login if token is missing
   if (!token) {
     const loginUrl = new URL("/login", request.url);
     loginUrl.searchParams.set("redirect", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
+  // Otherwise, allow request
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: [
-    "/listing/:path*",
-    "/account/:path*",
-  ],
+  matcher: ["/listing/:path*", "/account/:path*"],
 };

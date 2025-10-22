@@ -39,7 +39,7 @@ function getCategorySchema(selectedCategoryName) {
 
 const baseListingSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  subtitle: z.string().optional(),
+  subtitle: z.string().optional().nullable(),
   category_id: z.number({ invalid_type_error: "Category is required" }),
   description: z.string().min(1, "Description is required"),
   // condition: z.enum(["new", "used"]),
@@ -182,6 +182,18 @@ const ListingForm = ({ initialValues, mode = "create", onSubmit }) => {
       }
     }
     initCategoryForEdit();
+
+      if (mode === "edit") {
+      // Wait a tick to ensure reset is applied before marking touched
+      setTimeout(() => {
+        const allFields = Object.keys(methods.getValues());
+        allFields.forEach((field) => {
+          methods.setValue(field, methods.getValues(field), {
+            shouldTouch: true,
+          });
+        });
+      }, 0);
+    }
     // eslint-disable-next-line
   }, [mode, initialValues, selectedCategory]);
 
@@ -254,11 +266,24 @@ const ListingForm = ({ initialValues, mode = "create", onSubmit }) => {
   };
 
   // Stepper navigation
+  // const handleNext = async () => {
+  //   const fields = getStepFields(activeStep, parentCategoryName);
+  //   const valid = await methods.trigger(fields);
+  //   if (valid) setActiveStep((prev) => prev + 1);
+  // };
   const handleNext = async () => {
-    const fields = getStepFields(activeStep, parentCategoryName);
-    const valid = await methods.trigger(fields);
-    if (valid) setActiveStep((prev) => prev + 1);
-  };
+  const fields = getStepFields(activeStep, parentCategoryName);
+  console.log("Checking fields:", fields);
+  const valid = await methods.trigger(fields);
+  console.log("Validation result:", valid, methods.formState.errors);
+
+  if (valid) {
+    setActiveStep((prev) => prev + 1);
+  } else {
+    console.warn("Validation failed for step:", activeStep);
+  }
+};
+
 
   const categoryFieldNames = useMemo(() => {
     // Always use toFieldName for consistency

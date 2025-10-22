@@ -44,7 +44,7 @@
 
 "use client";
 import { useCategoryStore } from "@/lib/stores/categoryStore";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter, useSearchParams } from "next/navigation";
 import { listingsApi } from "@/lib/api/listings";
@@ -52,6 +52,7 @@ import Select from "react-select";
 import { Image_URL } from "@/config/constants";
 import { City } from "country-state-city";
 import { useCityStore } from "@/lib/stores/cityStore";
+import { useLocationStore } from "@/lib/stores/locationStore";
 
 export const SearchFilter = () => {
   const { t } = useTranslation();
@@ -68,6 +69,26 @@ export const SearchFilter = () => {
     // const [selectedCity, setSelectedCity] = useState("");
   const [loading, setLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
+     const {
+    locations,
+    getAllLocations,
+    selectedCountry,
+    selectedRegion,
+    selectedGovernorate,
+    setSelectedCountry,
+    setSelectedRegion,
+    setSelectedGovernorate,
+  } = useLocationStore();
+    const country = locations.find((c) => c.id == 1); 
+   const regions = country?.regions || [];
+
+const governorates = useMemo(() => {
+  // guard clause — prevents error if selectedRegion is null
+  if (!selectedRegion || !selectedRegion.name) return [];
+
+  const region = regions.find((r) => r.name === selectedRegion.name);
+  return region?.governorates || [];
+}, [regions, selectedRegion]);
 
   const {
     categories,
@@ -93,6 +114,10 @@ export const SearchFilter = () => {
   setCities(uniqueCities);
 
   }, [getAllCategories]);
+
+   useEffect(() => {
+      getAllLocations(); 
+    }, [getAllLocations]);
 
   useEffect(() => {
     function handleClickOutside(event) {
@@ -140,6 +165,8 @@ export const SearchFilter = () => {
     const params = new URLSearchParams();
     if (searchTerm) params.set("search", searchTerm);
     if (selectedCity !== "" && (selectedCity !== null)) params.set("city", selectedCity);
+      if (selectedRegion !== "" && (selectedRegion !== null)) params.set("region_id", selectedRegion?.id);
+    if (selectedGovernorate !== "" && (selectedGovernorate !== null)) params.set("governorate_id", selectedGovernorate?.id);
     if (selectedCategory) {
       params.set("categoryId", selectedCategory);
       const selected = categories.find(
@@ -175,7 +202,7 @@ export const SearchFilter = () => {
           />
         </div>
 
-         <div className="flex flex-col w-full md:w-1/4">
+         {/* <div className="flex flex-col w-full md:w-1/4">
           <label className="text-sm text-gray-500 mb-1">
             {t("City")}
           </label>
@@ -200,7 +227,54 @@ export const SearchFilter = () => {
           isClearable
         />
         )}
-        </div>
+        </div> */}
+
+                        <div className="flex flex-col w-full md:w-1/4">
+                  <label className="text-sm text-gray-500 mb-1">{t("Region")}</label>
+          {/* {states.length > 0 && ( */}
+            <Select
+              name="region"
+              value={
+  selectedRegion
+    ? { value: selectedRegion.name, label: selectedRegion.name }
+    : null
+}
+onChange={(selected) => {
+  if (selected) {
+    const region = regions.find((r) => r.name === selected.value);
+    setSelectedRegion(region ? { id: region.id, name: region.name } : null);
+  } else {
+    setSelectedRegion(null);
+  }
+}}
+          options={regions.map((r) => ({ value: r.name, label: r.name }))}
+              placeholder={t("Select a Region")}
+              className="text-xs"
+              classNamePrefix="react-select"
+              isClearable
+            />
+                </div>
+<div className="flex flex-col w-full md:w-1/4">
+  <label className="text-sm text-gray-500 mb-1">{t("Governorate")}</label>
+          {/* {cities.length > 0 && ( */}
+            <Select
+              name="governorate"
+           value={
+  selectedGovernorate
+    ? { value: selectedGovernorate.name, label: selectedGovernorate.name }
+    : null
+}
+onChange={(selected) => {
+  const gov = governorates.find((g) => g.name === selected?.value);
+  setSelectedGovernorate(gov ? { id: gov.id, name: gov.name } : null);
+}}
+          options={governorates.map((g) => ({ value: g.name, label: g.name }))}
+              placeholder={t("Select a Governorate")}
+              className="text-xs"
+              classNamePrefix="react-select"
+              isClearable
+            />
+</div>
 
         <div className="flex flex-col w-full md:w-1/4">
           <label className="text-sm text-gray-500 mb-1">
@@ -239,7 +313,7 @@ export const SearchFilter = () => {
               label: city.name,
             }))}
             placeholder={t("Select a Category")}
-            className="text-sm"
+            className="text-xs"
             classNamePrefix="react-select"
             isClearable
           />

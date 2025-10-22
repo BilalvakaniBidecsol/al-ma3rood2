@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
-import { FaRegHeart, FaHeart, FaMapMarkerAlt } from "react-icons/fa";
+import { FaRegHeart, FaHeart, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaBed, FaBath, FaRulerCombined } from "react-icons/fa";
 import { Image_URL } from "@/config/constants";
 import { Image_NotFound } from "@/config/constants";
 import { useWatchlistStore } from "@/lib/stores/watchlistStore";
@@ -15,13 +15,13 @@ import { userApi } from "@/lib/api/user";
 import Breadcrumbs from "@/components/WebsiteComponents/ReuseableComponenets/Breadcrumbs";
 import { toast } from "react-toastify";
 import { RxCross2 } from "react-icons/rx";
+import ImageCarousel from "./ImageCarousel";
+import PropertyMapSection from "../PropertyMapSection";
 import { formatSaudiTime } from "@/lib/common/format";
 
 function BidHistoryModal({ bids, open, onClose }) {
   const { t } = useTranslation();
   if (!open) return null;
-
-
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
       <div className="bg-white rounded-lg shadow-lg w-full max-w-3xl max-h-[80vh] overflow-y-auto p-4 sm:p-6 relative">
@@ -67,11 +67,14 @@ function BidHistoryModal({ bids, open, onClose }) {
                   .map((bid) => (
                     <tr key={bid.id} className="border-b">
                       <td className="py-2 px-3 border whitespace-nowrap">
-                        {bid.user?.username || "Unknown"}
+                        {bid.user?.name || "Unknown"}
                       </td>
                       <td className="py-2 px-3 border whitespace-nowrap">
                         <span className="price">$</span>
-                        {Number(bid.amount).toLocaleString()}
+                        {Number(bid.amount)?.toLocaleString("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}
                       </td>
                       <td className="py-2 px-3 border capitalize whitespace-nowrap">
                         {bid.type}
@@ -141,7 +144,10 @@ function BuyNowModal({ isOpen, onClose, product, onBuyNow }) {
           </p>
           <p className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">
             <span className="price">$</span>
-            {product.buy_now_price}
+            {product.buy_now_price?.toLocaleString("en-US", {
+  style: "currency",
+  currency: "SAR",
+})}
           </p>
           <p className="text-sm sm:text-base text-gray-500 truncate">
             {product.title}
@@ -276,7 +282,7 @@ function LoginConfirmationModal({ isOpen, onClose, onLogin }) {
   );
 }
 
-export default function ProductDetailsClient({ product: initialProduct }) {
+export default function MotorDetailsClient({ product: initialProduct }) {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
@@ -295,7 +301,13 @@ export default function ProductDetailsClient({ product: initialProduct }) {
   const isInWatchlist = watchlist?.some(
     (item) => item.listing?.slug === product.slug
   );
-  const currentUser = useAuthStore((state) => state.user); // ya jo bhi tumhara auth hook hai
+  const currentUser = useAuthStore((state) => state.user); 
+    const [isOpen, setIsOpen] = useState(false);
+    const [isOpenContact, setIsOpenContact] = useState(false);
+  const dealer = product?.creator;
+  const images = product?.images?.length
+    ? product.images.map((img) => `${Image_URL}${img.image_path}`)
+    : ["/placeholder.svg?height=400&width=600"];
 
   // Seller check
   const isSeller = currentUser?.id === product?.seller_id;
@@ -470,7 +482,6 @@ export default function ProductDetailsClient({ product: initialProduct }) {
   };
 
 
-  const images = product?.images?.map((img) => img.image_path) || [];
   const [isImageModalOpen, setImageModalOpen] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
   const [favoriteStatus, setFavoriteStatus] = useState(null);
@@ -501,10 +512,10 @@ export default function ProductDetailsClient({ product: initialProduct }) {
 
   const items = [
     { label: "Home", href: "/" },
-    { label: "Marketplace", href: "/marketplace" },
+    { label: "Motors", href: "/motors" },
     {
       label: product.category?.name || "Category",
-      href: `/marketplace/${product.category?.slug?.split("/").pop()}?categoryId=${product.category?.id}`,
+      href: `/search/${product?.slug}`,
     },
     { label: product.title || "Product" },
   ];
@@ -522,8 +533,8 @@ export default function ProductDetailsClient({ product: initialProduct }) {
       />
 
       <section className="mx-auto px-4 py-2">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-          <div className="bg-white rounded-lg p-4 w-full max-w-[700px] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-white rounded-lg p-4 w-full max-w-[700px] mx-auto">
             {/* Carousel */}
             <div className="relative w-full h-[400px] flex items-center justify-center">
               {/* Left Arrow (hide on mobile if only 1 image) */}
@@ -556,7 +567,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
               <img
                 src={
                   images[carouselIndex]
-                    ? `${Image_URL}${images[carouselIndex]}`
+                    ? `${images[carouselIndex]}`
                     : Image_NotFound
                 }
                 alt={`Product Image ${carouselIndex + 1}`}
@@ -622,7 +633,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                   onClick={() => setCarouselIndex(idx)}
                 >
                   <img
-                    src={`${Image_URL}${img}`}
+                    src={`${img}`}
                     alt={`thumb-${idx}`}
                     className="object-cover rounded-md w-full h-full"
                   />
@@ -630,30 +641,20 @@ export default function ProductDetailsClient({ product: initialProduct }) {
               ))}
             </div>
           </div>
-          <div className="space-y-6 mt-5">
+
+{   product.listing_type == 'motors' ?       <div className="space-y-6 mt-5">
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
               {product.title}
             </h1>
-            {(product?.creator?.region_name || product?.creator?.billing_address) && (
+            {(product?.creator?.region_name || product?.creator?.address_1) && (
               <div
                 className={`flex items-center gap-2 text-sm text-gray-500 mt-1 ${i18n.language === "ar" ? "right" : ""
                   }`}
               >
                 <FaMapMarkerAlt className="text-green-600" />
                 <span>
-                  {/* {product?.creator?.region_name
-                    ? `${t("Region")}: ${product?.creator?.region_name}`
-                    : `${t("Location")}: ${product?.creator?.billing_address}`} */}
-                    {product.creator?.region_name ? (
-                    <>
-                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorate_name}, ${product?.creator?.region_name}`)}
-                    </>
-                  ) : (
-                    <>
-                      {/* {t("Location")}:{" "}
-                      {product.creator?.billing_address || "Unknown"} */}
-                    </>
-                  )}
+                  {product?.creator?.region_name
+                    ? (`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorate_name}, ${product?.creator?.region_name}`) : ""}
                 </span>
               </div>
             )}
@@ -752,7 +753,13 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                     <span className="block text-sm text-gray-600">Buy Now</span>
                     <span className="block text-4xl font-bold text-gray-900">
                       <span className="price">$</span>
-                      {product.buy_now_price}
+            {(Number(product.buy_now_price) || product.buy_now_price === 0)
+  ? Number(product.buy_now_price).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    })
+  : "-"}
+
                     </span>
                   </div>
                   {(!isLister && product?.status == 1) && (
@@ -779,7 +786,10 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                   </p>
                   <p className="text-4xl font-bold text-gray-900">
                     <span className="price">$</span>
-                    {product.bids[0]?.amount || "0.00"}
+                    {product.bids[0]?.amount?.toLocaleString("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+}) || "0.00"}
                   </p>
                 </div>
               ) : (
@@ -789,7 +799,10 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                   </p>
                   <p className="text-4xl font-bold text-gray-900">
                     <span className="price">$</span>
-                    {product.start_price || "0.00"}
+                    {product.start_price?.toLocaleString("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+}) || "0.00"}
                   </p>
                 </div>
               )}
@@ -837,7 +850,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
               <p className="text-xs text-gray-500">
                 <span className="text-green-600 font-medium">
                   {" "}
-                  {product.bids_count || 0} {t("bids so far")}
+                  {product.bid_count || 0} {t("bids so far")}
                 </span>{" "}
                 –{" "}
                 <span
@@ -901,14 +914,14 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                   100% {t("positive feedback")}
                 </div> */}
                 <div className="text-xs text-gray-500 mt-0.5">
-                  {product.creator?.region_name ? (
+                  {product.creator?.city ? (
                     <>
-                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorate_name}, ${product?.creator?.region_name}`)}
+                      {t("City")}: {product.creator.city}
                     </>
                   ) : (
                     <>
-                      {/* {t("Location")}:{" "}
-                      {product.creator?.billing_address || "Unknown"} */}
+                      {t("Location")}:{" "}
+                      {product.creator?.billing_address || "Unknown"}
                     </>
                   )}
                 </div>
@@ -941,8 +954,67 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                 )}
               </div>
             </div>
-          </div>
-        </div>
+          </div> :
+          <div>
+                    {/* Title */}
+                    <div className="flex justify-between items-start mb-2">
+                      <h1 className="text-2xl font-bold">{product?.title}</h1>
+                    </div>
+                    <p className="text-gray-500 text-sm mb-4">
+                     {product?.description}
+                     </p>
+          
+                    {/* Location & Specs */}
+                    <div className="flex flex-wrap gap-4 text-sm mb-3">
+                      <span className="flex items-center gap-1 text-green-500">
+                        <FaMapMarkerAlt /> {`${product?.creator?.city}, ${product?.creator?.country}` || "Unknown Location"}
+                      </span>
+                      </div>
+                    <div className="flex flex-wrap gap-4 text-sm mb-3">
+                     
+                      {/* Bedrooms */}
+  {product?.bedrooms && (
+    <span className="flex items-center gap-1">
+      <FaBed /> {product.bedrooms}
+    </span>
+  )}
+
+  {/* Bathrooms */}
+  {product?.bathrooms && (
+    <span className="flex items-center gap-1">
+      <FaBath /> {product.bathrooms}
+    </span>
+  )}
+
+  {/* Plot Size */}
+  {product?.plot_size && (
+    <span className="flex items-center gap-1">
+      <FaRulerCombined /> {product.plot_size} sqft
+    </span>
+  )}
+
+                    </div>
+          
+                    {/* Price */}
+                    <div className="mb-6">
+                      <p className="text-gray-500 text-sm">Asking price:</p>
+                      <p className="text-3xl font-bold text-black">
+                        <span className="price">$</span>{Number(product?.buy_now_price)?.toLocaleString("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+})}{" "}
+                      </p>
+                    </div>
+          
+                     <button
+                  onClick={() => setIsOpen(true)}
+                  className="w-full cursor-pointer bg-green-500 text-white py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+                >
+                  <FaPhoneAlt /> Contact Seller
+                </button>
+                  </div>
+          }
+      </div>
       </section>
       {/* ======= PRODUCT DETAILS ======= */}
       <div className="max-w-7xl mx-auto bg-white rounded-lg px-6 md:px-20 py-10">
@@ -950,7 +1022,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-4 text-sm">
           {Object.entries({
             condition: product.condition,
-            brand: product.brand || product.category?.name,
+            category: product.brand || product.category?.name,
             color: product.color,
             storage: product.storage,
           })
@@ -961,12 +1033,17 @@ export default function ProductDetailsClient({ product: initialProduct }) {
             )
             .map(([key, value]) => (
               <div key={key}>
-                <div className="font-bold">{t(key.toLocaleUpperCase())}</div>
-                <div className="text-gray-700">{String(value).replace(/_/g, " ")}</div>
+                <div className="font-bold uppercase">{t(key.toLocaleUpperCase())}</div>
+                <div className="text-gray-700 uppercase">{value}</div>
               </div>
             ))}
         </div>
       </div>
+
+      {/* ======= PROPERTY MAP SECTION ======= */}
+      {product.listing_type === 'property' && (
+        <PropertyMapSection property={product} />
+      )}
 
       {/* ======= PRODUCT DESCRIPTION ======= */}
       <div className="max-w-7xl mx-auto  bg-white rounded-lg px-6 md:px-20 py-10 space-y-4">
@@ -1012,7 +1089,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                   {/* Question Row */}
                   <div className="flex items-start gap-3">
                     <div className="w-10 h-10 bg-gray-200 flex items-center justify-center rounded-full shadow text-sm font-semibold text-gray-800 uppercase">
-                      {c.user?.username?.charAt(0) || "U"}
+                      {c.user?.name?.charAt(0) || "U"}
                     </div>
 
                     <div className="w-full">
@@ -1298,7 +1375,80 @@ export default function ProductDetailsClient({ product: initialProduct }) {
               </div>
             </div>
           )}
+    {/* Modal */}
+{isOpenContact && (
+  <div className="fixed inset-0 flex items-center justify-center z-50">
+    {/* Background Overlay */}
+    <div
+      className="absolute inset-0 bg-black opacity-50"
+      onClick={() => setIsOpen(false)}
+    ></div>
 
+    {/* Modal Content */}
+    <div className="relative bg-white rounded-lg shadow-lg max-w-lg w-full p-6 z-10">
+      {/* Close Button */}
+      <button
+        onClick={() => setIsOpen(false)}
+        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+      >
+        ✕
+      </button>
+
+      {/* Dealer Info */}
+      <h2 className="text-xl font-semibold mb-4">Seller Information</h2>
+
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+        {/* Left Side - Profile Photo */}
+        <div className="bg-[#113f2e] w-36 h-36 rounded-full overflow-hidden border border-gray-300 flex justify-center items-center">
+           {dealer?.profile_photo ? (
+    <img
+      src={`${Image_URL}${dealer.profile_photo}`}
+      alt={dealer?.name}
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <span className="text-white text-5xl">{dealer?.name?.charAt(0)?.toUpperCase()}</span>
+  )}
+        </div>
+
+        {/* Right Side - Details */}
+        <div className="flex-1 space-y-2 text-gray-700 text-md md:text-md">
+          <p>
+            <strong>Name:</strong> {dealer?.name}
+          </p>
+          <p>
+            <strong>Email:</strong> {dealer?.email}
+          </p>
+          <p>
+            <strong>Phone:</strong> {dealer?.phone}
+          </p>
+          <p>
+            <strong>City:</strong> {dealer?.city}
+          </p>
+          <p>
+            <strong>Country:</strong> {dealer?.country}
+          </p>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 mt-6">
+        <a
+          href={`mailto:${dealer?.email}`}
+          className="flex-1 bg-gray-200 text-gray-900 py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+        >
+          <FaEnvelope /> Email
+        </a>
+        <a
+          href={`tel:${dealer?.phone}`}
+          className="flex-1 bg-green-500 text-white py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+        >
+          <FaPhoneAlt /> Call
+        </a>
+      </div>
+    </div>
+  </div>
+)}
 
         </div>
 
@@ -1365,6 +1515,81 @@ export default function ProductDetailsClient({ product: initialProduct }) {
           </button>
         </div>
       )}
+
+        {/* Modal */}
+{isOpen && (
+  <div className="fixed inset-0 flex items-center justify-center z-50">
+    {/* Background Overlay */}
+    <div
+      className="absolute inset-0 bg-black opacity-50"
+      onClick={() => setIsOpen(false)}
+    ></div>
+
+    {/* Modal Content */}
+    <div className="relative bg-white rounded-lg shadow-lg max-w-lg w-full p-6 z-10">
+      {/* Close Button */}
+      <button
+        onClick={() => setIsOpen(false)}
+        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+      >
+        ✕
+      </button>
+
+      {/* Dealer Info */}
+      <h2 className="text-xl font-semibold mb-4">Seller Information</h2>
+
+      <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+        {/* Left Side - Profile Photo */}
+        <div className="bg-[#113f2e] w-36 h-36 rounded-full overflow-hidden border border-gray-300 flex justify-center items-center">
+           {dealer?.profile_photo ? (
+    <img
+      src={`${Image_URL}${dealer.profile_photo}`}
+      alt={dealer?.name}
+      className="w-full h-full object-cover"
+    />
+  ) : (
+    <span className="text-white text-5xl">{dealer?.name?.charAt(0)?.toUpperCase()}</span>
+  )}
+        </div>
+
+        {/* Right Side - Details */}
+        <div className="flex-1 space-y-2 text-gray-700 text-md md:text-md">
+          <p>
+            <strong>Name:</strong> {dealer?.name}
+          </p>
+          <p>
+            <strong>Email:</strong> {dealer?.email}
+          </p>
+          <p>
+            <strong>Phone:</strong> {dealer?.phone}
+          </p>
+          <p>
+            <strong>City:</strong> {dealer?.city}
+          </p>
+          <p>
+            <strong>Country:</strong> {dealer?.country}
+          </p>
+        </div>
+      </div>
+
+      {/* Action Buttons */}
+      <div className="flex gap-3 mt-6">
+        <a
+          href={`mailto:${dealer?.email}`}
+          className="flex-1 bg-gray-200 text-gray-900 py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+        >
+          <FaEnvelope /> Email
+        </a>
+        <a
+          href={`tel:${dealer?.phone}`}
+          className="flex-1 bg-green-500 text-white py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+        >
+          <FaPhoneAlt /> Call
+        </a>
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 }

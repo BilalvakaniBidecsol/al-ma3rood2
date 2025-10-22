@@ -148,17 +148,30 @@ const Market = ({
                          )}
                       </div>
 
-                      {card.buy_now_price && (
-                        <div className="text-right text-gray-700 flex flex-col items-end">
-                          <div className="text-[9px] text-gray-400 uppercase tracking-wide">
-                            {t("Buy Now")}:
+                     {card.bids_count === 0
+                      ? card.buy_now_price && (
+                          <div className="text-right text-gray-700 flex flex-col items-end">
+                            <div className="text-[9px] text-gray-400 uppercase tracking-wide">
+                              {t("Buy Now")}:
+                            </div>
+                            <div className="font-bold">
+                              <span className="price">$</span>
+                              {card.buy_now_price}
+                            </div>
                           </div>
-                          <div className="font-bold">
-                            <span className="price">$</span>
-                            {card.buy_now_price}
+                        )
+                      : card.bids_count &&
+                        card.bids?.length > 0 && (
+                          <div className="text-right text-gray-700 flex flex-col items-end">
+                            <div className="text-[9px] text-gray-400 uppercase tracking-wide">
+                              {t("Current Bid")}:
+                            </div>
+                            <div className="font-bold">
+                              <span className="price">$</span>
+                              {card.bids?.[0]?.amount}
+                            </div>
                           </div>
-                        </div>
-                      )}
+                        )}
                     </div>
                   </div>
 

@@ -1,7 +1,6 @@
 import React from "react";
 import { fetchProduct, fetchAllMotorsApi } from "@/lib/api/listings.server";
-import CarListing from "@/components/WebsiteComponents/CarDetailComponents/car-listing";
-import ProductDetailsClient from "@/components/WebsiteComponents/CarDetailComponents/ProductDetailsClient";
+import MotorDetailsClient from "@/components/WebsiteComponents/CarDetailComponents/MotorDetailsClient";
 
 const page = async ({ params }) => {
   const { productSlug } = await params;
@@ -26,7 +25,7 @@ const page = async ({ params }) => {
       {/* {product?.listing?.vehicle_type !== "Car parts & accessories" ? (
         <CarListing product={product.listing} dealer_listing={product.dealers_other_listings} motors={motors?.data}/>
       ) : ( */}
-        <ProductDetailsClient product={product?.listing} />
+        <MotorDetailsClient product={product?.listing} />
       {/* )} */}
     </div>
   );

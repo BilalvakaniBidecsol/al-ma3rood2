@@ -3,12 +3,16 @@ import React, { useState, useEffect } from "react";
 import PropertyMap from "./PropertyMap";
 import { getNearbyProperties } from "@/lib/api/nearbyProperties";
 import { geocodeAddress } from "@/lib/googleMaps";
+import { Image_URL } from "@/config/constants";
+import { useTranslation } from "react-i18next";
+import Link from "next/link";
 
-const PropertyMapSection = ({ property }) => {
+const PropertyMapSection = ({ property, nearBy }) => {
   const [propertyLocation, setPropertyLocation] = useState(null);
   const [nearbyProperties, setNearbyProperties] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const initializeMap = async () => {
@@ -61,6 +65,7 @@ const PropertyMapSection = ({ property }) => {
       initializeMap();
     }
   }, [property]);
+  console.log('nearBy', nearBy);
 
   if (loading) {
     return (
@@ -104,7 +109,7 @@ const PropertyMapSection = ({ property }) => {
   return (
     <div className="mx-auto p-4 sm:px-6 md:px-10 font-sans max-w-6xl">
       <div className="mb-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">Property Location</h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">{t("Property Location")}</h2>
         <p className="text-gray-600">
           {propertyLocation.address}
         </p>
@@ -116,21 +121,22 @@ const PropertyMapSection = ({ property }) => {
         showPopularPlaces={true}
         height="500px"
         className="mb-6"
+        t={t}
       />
 
       {/* Nearby Properties Section */}
-      {nearbyProperties.length > 0 && (
+      {nearBy.length > 0 && (
         <div className="mt-8">
           <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            Nearby Properties ({nearbyProperties.length})
+            {t("Nearby Properties")} ({nearBy?.length})
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {nearbyProperties.map((property) => (
-              <div key={property.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            {nearBy?.map((property) => (
+              <Link href={`/property/${property?.slug}`} key={property.id} className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
                 <div className="flex items-start space-x-3">
                   <div className="w-16 h-16 bg-gray-200 rounded-lg flex-shrink-0">
                     <img
-                      src={property.image}
+                      src={`${Image_URL}${property.images[0]?.image_path}`}
                       alt={property.title}
                       className="w-full h-full object-cover rounded-lg"
                       onError={(e) => {
@@ -147,21 +153,21 @@ const PropertyMapSection = ({ property }) => {
                     </p>
                     <div className="flex items-center space-x-2 mt-2 text-xs text-gray-600">
                       {property.bedrooms && (
-                        <span>{property.bedrooms} bed</span>
+                        <span>{property.bedrooms} {t("Bed")}</span>
                       )}
                       {property.bathrooms && (
-                        <span>{property.bathrooms} bath</span>
+                        <span>{property.bathrooms} {t("Bath")}</span>
                       )}
-                      {property.area && (
-                        <span>{property.area}</span>
+                      {property.land_area && (
+                        <span>{property.land_area} {t("Sqft")}</span>
                       )}
                     </div>
                     <p className="text-sm font-bold text-green-600 mt-2">
-                      ${property.price}
+                     <span className="price"> $</span> {property.buy_now_price}
                     </p>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         </div>

@@ -381,7 +381,7 @@ useEffect(() => {
           <h1
             className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug mb-6 sm:mb-8"
             dangerouslySetInnerHTML={{
-              __html: t("SHOP NEW & USED ITEMS <br /> FOR SALE"),
+              __html: t("BUY, SELL & RENT <br /> PROPERTIES WITH EASE"),
             }}
           />
         </div>
@@ -443,7 +443,7 @@ useEffect(() => {
                 {[6157, 6156, 6154].includes(filters.category_id) && (
                 <div>
                   <label className="block mb-1 text-sm font-medium text-gray-700">
-                    Type
+                    {t("Type")}
                   </label>
                  <Select
                     instanceId="type-select"
@@ -460,7 +460,7 @@ useEffect(() => {
                 {/* Condition */}
                 <div>
                   <label className="block mb-1 text-sm font-medium text-gray-700">
-                    Condition
+                    {t("Condition")}
                   </label>
                   <Select
                     instanceId="condition-select"
@@ -477,7 +477,7 @@ useEffect(() => {
                 {/* Price Range */}
                 <div className="z-20">
                   <label className="block mb-1 text-sm font-medium text-gray-700">
-                    Min Price
+                    {t("Min Price")}
                   </label>
                   <Select
                     instanceId="min-price-select"
@@ -493,7 +493,7 @@ useEffect(() => {
 
                 <div>
                   <label className="block mb-1 text-sm font-medium text-gray-700">
-                    Max Price
+                    {t("Max Price")}
                   </label>
                   <Select
                     instanceId="max-price-select"
@@ -510,7 +510,7 @@ useEffect(() => {
                 {/* Land Area */}
                 <div>
                   <label className="block mb-1 text-sm font-medium text-gray-700">
-                    Land Area
+                    {t("Land Area")}
                   </label>
                   <Select
                     instanceId="land-area-select"
@@ -527,7 +527,7 @@ useEffect(() => {
                 {/* Parking */}
                 <div className="z-10">
                   <label className="block mb-1 text-sm font-medium text-gray-700">
-                    Parking
+                    {t("Parking")}
                   </label>
                   <Select
                     instanceId="parking-select"
@@ -763,14 +763,14 @@ useEffect(() => {
   <div className="text-center py-12">
     <div className="text-gray-500 mb-4">
       <Search className="w-16 h-16 mx-auto mb-4" />
-      <h3 className="text-xl font-semibold mb-2">No properties found</h3>
-      <p>Try adjusting your search criteria or filters</p>
+      <h3 className="text-xl font-semibold mb-2">{t("No properties found")}</h3>
+      <p>{t("Try adjusting your search criteria or filters")}</p>
     </div>
     <button
       onClick={clearFilters}
       className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors"
     >
-      Clear Filters
+      {t("Clear Filters")}
     </button>
   </div>
 )}

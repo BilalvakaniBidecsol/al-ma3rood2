@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import {
   Search,
   BikeIcon as Motorbike,
@@ -13,6 +13,7 @@ import MotorListingCard from "@/components/WebsiteComponents/MotorListingCard";
 import { useTranslation } from "react-i18next";
 import Select from "react-select";
 import { getTransformedVehicleData, getVehicleTypeFromCategory, loadVehiclesData } from "@/lib/vehicles";
+import { useLocationStore } from "@/lib/stores/locationStore";
 
 const allowedTabs = [
   { key: "Cars", name: "Cars", icon: "./car.png" },
@@ -83,6 +84,8 @@ const MotorsClient = ({
     odometer_min: '',
     odometer_max: '',
     search: "",
+    governorate: "",
+    region: "",
     category_id: null,
   });
   const { t } = useTranslation();
@@ -91,6 +94,14 @@ const MotorsClient = ({
   const [models, setModels] = useState([]);
   const [yearOptions, setYearOptions] = useState([]);
   const [vehicleType, setVehicleType] = useState("cars");
+   const { locations, getAllLocations } = useLocationStore();
+   const country = locations.find((c) => c.id == 1);
+const regions = country?.regions || [];
+
+const governorates = useMemo(() => {
+  const region = regions.find((r) => r.name === filters.region);
+  return region?.governorates || [];
+}, [regions, filters.region]);
 
   // 🎯 Load vehicle data from JSON
   useEffect(() => {
@@ -171,28 +182,12 @@ useEffect(() => {
   };
     const conditions = [
       {
-        key: "brand_new_unused",
-        label: "Brand New / Unused – never opened or used.",
+        key: "new",
+        label: "New",
       },
-      {
-        key: "like_new",
-        label: "Like New – opened but looks and works like new.",
-      },
-      {
-        key: "gently_used_excellent_condition",
-        label: "Gently Used / Excellent Condition – minor signs of use.",
-      },
-      {
-        key: "good_condition",
-        label: "Good Condition – visible wear but fully functional.",
-      },
-      {
-        key: "fair_condition",
-        label: "Fair Condition – heavily used but still works.",
-      },
-      {
-        key: "for_parts_or_not_working",
-        label: "For Parts or Not Working – damaged or needs repair.",
+       {
+        key: "used",
+        label: "Used",
       },
     ];
       const conditionOptions = [
@@ -269,6 +264,8 @@ useEffect(() => {
         max_price: filters?.price_max,
         min_price: filters?.price_min,
         search: filters?.search,
+regions_id: regions.find((r) => r.name === filters.region)?.id || null,
+governorates_id: governorates.find((g) => g.name === filters.governorate)?.id || null,
         category_id:
   filters?.category_id
     ? filters.category_id
@@ -309,6 +306,7 @@ useEffect(() => {
       }
     };
 
+    getAllLocations(); 
     fetchCategories();
   }, []);
 
@@ -411,26 +409,32 @@ useEffect(() => {
 
   const clearFilters = () => {
     setFilters({
-      vehicle_type: '',
-      make: '',
-      model: '',
-      year_min: '',
-      year_max: '',
-      price_min: '',
-      price_max: '',
-      fuel_type: '',
-      transmission: '',
-      body_style: '',
-      condition: '',
-      odometer_min: '',
-      odometer_max: '',
-      search: "",
-      category_id: null,
+         vehicle_type: '',
+    make: '',
+    model: '',
+    year_min: '',
+    year_max: '',
+    price_min: undefined,
+    price_max: undefined,
+    fuel_type: '',
+    transmission: '',
+    body_style: '',
+    condition: '',
+    odometer_min: '',
+    odometer_max: '',
+    search: "",
+    governorate: "",
+    region: "",
+    category_id: null,
     });
     setActiveTab("cars");
     setSearchQuery('');
     setCurrentPage(1);
-    loadMotorListings();
+
+    setTimeout(() => {
+      loadMotorListings();
+    }, 100);
+    // loadMotorListings();
   };
     // 🎨 React Select Styles
   const customStyles = {
@@ -721,6 +725,51 @@ useEffect(() => {
                   </select>
                 </div>
 
+                <div>
+                  <label className="block mb-1 text-sm font-medium">{t("Region")}</label>
+          {/* {states.length > 0 && ( */}
+            <Select
+              name="region"
+              value={filters.region ? { value: filters.region, label: filters.region } : null}
+          onChange={(selected) =>
+            setFilters((prev) => ({
+              ...prev,
+              region: selected?.value || "",
+              governorate: "",
+              city: "",
+            }))
+          }
+          options={regions.map((r) => ({ value: r.name, label: r.name }))}
+              placeholder={t("Select a Region")}
+              className="text-sm"
+              classNamePrefix="react-select"
+              isClearable
+            />
+                </div>
+<div>
+  <label className="block mb-1 text-sm font-medium">{t("Governorate")}</label>
+          {/* {cities.length > 0 && ( */}
+            <Select
+              name="governorate"
+              value={
+            filters.governorate
+              ? { value: filters.governorate, label: filters.governorate }
+              : null
+          }
+          onChange={(selected) =>
+            setFilters((prev) => ({
+              ...prev,
+              governorate: selected?.value || "",
+              city: "",
+            }))
+          }
+          options={governorates.map((g) => ({ value: g.name, label: g.name }))}
+              placeholder={t("Select a Governorate")}
+              className="text-sm"
+              classNamePrefix="react-select"
+              isClearable
+            />
+</div>
               </div>
             )}
             {/* ✅ BOTTOM Search Box for cars */}
@@ -876,14 +925,14 @@ useEffect(() => {
           <div className="text-center py-12">
             <div className="text-gray-500 mb-4">
               <Search className="w-16 h-16 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">No motors found</h3>
-              <p>Try adjusting your search criteria or filters</p>
+              <h3 className="text-xl font-semibold mb-2">{t("No motors found")}</h3>
+              <p>{t("Try adjusting your search criteria or filters")}</p>
             </div>
             <button
               onClick={clearFilters}
               className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors"
             >
-              Clear Filters
+              {t("Clear Filters")}
             </button>
           </div>
         )}

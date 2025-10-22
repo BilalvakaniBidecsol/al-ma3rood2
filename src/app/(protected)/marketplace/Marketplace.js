@@ -16,6 +16,9 @@ export default async function Marketplace({ searchParams }) {
   const categoryIdFilter = searchParams?.category_id || "";
   const search = searchParams?.search || "";
   const city = searchParams?.city || "";
+  const region_id = searchParams?.region_id || "";
+  const governorate_id = searchParams?.governorate_id || "";
+
 
   const [catResult, listings] = await Promise.all([
     fetchAllCategories(),
@@ -23,6 +26,8 @@ export default async function Marketplace({ searchParams }) {
       listing_type: "marketplace",
       category_id: categoryIdFilter,
       search: search,
+      region_id: region_id,
+      governorate_id: governorate_id,
       city: city,
       page: 1,
     }),
