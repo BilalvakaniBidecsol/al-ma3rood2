@@ -6,13 +6,22 @@ import ListingForm from "@/components/WebsiteComponents/listingforms/ListingForm
 import { toast } from "react-toastify";
 import MotorListingForm from "@/components/WebsiteComponents/listingforms/MotorListingForm";
 import Properties from "@/components/WebsiteComponents/listingforms/Properties";
+import { useAuthStore } from "@/lib/stores/authStore";
 
 
 const EditListingPage = ({ params: paramsPromise }) => {
+  const { user } = useAuthStore();
   const params = use(paramsPromise);
   const { slug } = params;
   const [listing, setListing] = useState(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.replace("/"); 
+    }
+  }, [router]);
 
   useEffect(() => {
     if (slug) {
@@ -21,6 +30,17 @@ const EditListingPage = ({ params: paramsPromise }) => {
       });
     }
   }, [slug]);
+
+    // ✅ Protect: Only creator can edit
+  useEffect(() => {
+    console.log("listing", listing);
+    if (listing && user) {
+      if (user.id !== listing.creator.id) {
+        toast.error("You are not authorized to edit this listing.");
+        router.replace("/");
+      }
+    }
+  }, [listing, user]);
 
   if (!listing) return <div>Loading...</div>;
 

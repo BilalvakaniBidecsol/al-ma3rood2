@@ -979,7 +979,7 @@ export default function ProductDetailsClient({ product: initialProduct, initialn
                     <div className="mb-6">
                       <p className="text-gray-500 text-sm">{t("Asking price")}:</p>
                       <p className="text-3xl font-bold text-black">
-                        <span className="price">$</span>{Number(product?.buy_now_price)}{" "}
+                        <span className="price">$</span>{product?.buy_now_price}{" "}
                       </p>
                     </div>
           

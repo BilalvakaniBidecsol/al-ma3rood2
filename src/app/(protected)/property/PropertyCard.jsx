@@ -103,7 +103,7 @@ const PropertyCard = ({ listing, viewMode }) => {
 
             <p className="text-xs opacity-80">
               <span className="price mr-2 mt-2">$</span>
-              {Number(listing.buy_now_price)}
+              {listing.buy_now_price}
             </p>
           </div>
 
