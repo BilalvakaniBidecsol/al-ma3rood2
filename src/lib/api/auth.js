@@ -24,10 +24,15 @@ export const setAuthToken = (token) => {
   // document.cookie = `auth-token=${token}; path=/; max-age=86400; SameSite=None; Secure`;
    if (typeof window !== "undefined") {
     if (token) {
+      // Save token with expiry (24 hours)
+      const expiryTime = new Date().getTime() + 24 * 60 * 60 * 1000; // 24h
+      // const expiryTime = new Date().getTime() + 1 * 60 * 1000; // 1 min for testing
       localStorage.setItem("token", token);
+      localStorage.setItem("token_expiry", expiryTime.toString());
     } else {
       // 🚫 If no token, clear everything
       localStorage.removeItem("token");
+      localStorage.removeItem("token_expiry");
       localStorage.removeItem("auth-storage");
     }
   }
@@ -44,6 +49,7 @@ export const setAuthToken = (token) => {
 export const removeAuthToken = () => {
    if (typeof window !== "undefined") {
     localStorage.removeItem("token");
+    localStorage.removeItem("token_expiry");
     localStorage.removeItem("auth-storage"); 
   }
   try {
@@ -58,9 +64,12 @@ export const getAuthToken = () => {
   if (typeof window === "undefined") return null;
 
   const token = localStorage.getItem("token");
-  if (!token) {
+  const expiry = localStorage.getItem("token_expiry");
+  if (!token || !expiry || new Date().getTime() > parseInt(expiry, 10)) {
     // Auto cleanup if token missing
+    localStorage.removeItem("token_expiry");
     localStorage.removeItem("auth-storage");
+    localStorage.removeItem("auth-storage"); 
   }
   return token;
 };

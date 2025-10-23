@@ -29,7 +29,7 @@ const CarListings = ({ motors, product, dealer_listing }) => {
       <h3 className="font-medium text-gray-900 mb-1 truncate" title={car?.title}>{car?.title}</h3>
       <p className="text-gray-900 text-sm mb-2">
          <span className="price">$</span>{Number(car?.buy_now_price)}</p>
-      <Link href={`/search/${car?.slug}`} className="text-blue-600 text-sm hover:underline">
+      <Link href={`/motors/${car?.slug}`} className="text-blue-600 text-sm hover:underline">
         View vehicle
       </Link>
     </div>

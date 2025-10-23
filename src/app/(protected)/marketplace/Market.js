@@ -136,13 +136,13 @@ const Market = ({
                           </div>
                         )} */}
                         <div className="text-gray-700">
-                         {(card.creator?.region_name || card.creator?.city) && (
+                         {(card.creator?.regions?.name || card.creator?.city) && (
                           <>
                         <div className="text-[10px] text-gray-400 tracking-wide">
                           {t("Location")}:
                         </div>
                         <div className="font-bold text-xs">
-                          {(`${card?.creator?.city_name ? `${card?.creator?.city_name}, ` : ""} ${card?.creator?.governorate_name}, ${card?.creator?.region_name}`)}
+                          {(`${card?.creator?.city_name ? `${card?.creator?.city_name}, ` : ""} ${card?.creator?.governorates?.name}, ${card?.creator?.regions?.name}`)}
                         </div>
                         </>
                          )}

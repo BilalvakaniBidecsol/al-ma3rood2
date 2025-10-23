@@ -395,7 +395,7 @@ const MarketplaceCard = ({
                 // href={`/marketplace/${lastSlug}/${card.slug}`}
                 href={
                   card.listing_type === "motors"
-                    ? `/search/${card.slug}`
+                    ? `/motors/${card.slug}`
                     : card.listing_type === "property"
                     ? `/property/${card.slug}`
                     : `/marketplace/${lastSlug}/${card.slug}`
@@ -448,7 +448,7 @@ const MarketplaceCard = ({
 
                   <div className="flex justify-between mt-1">
                     <div className="text-gray-700">
-                      {(card.creator?.region_name ||
+                      {(card.creator?.regions?.name ||
                         card.creator?.billing_address) && (
                         <>
                           <div className="text-[10px] text-gray-400 tracking-wide">
@@ -459,8 +459,8 @@ const MarketplaceCard = ({
                               card?.creator?.city_name
                                 ? `${card?.creator?.city_name}, `
                                 : ""
-                            } ${card?.creator?.governorate_name}, ${
-                              card?.creator?.region_name
+                            } ${card?.creator?.governorates?.name}, ${
+                              card?.creator?.regions?.name
                             }`}
                           </div>
                         </>

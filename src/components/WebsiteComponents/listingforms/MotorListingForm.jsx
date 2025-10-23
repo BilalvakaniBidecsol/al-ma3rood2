@@ -1149,7 +1149,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Odometer (km)
+                Kilometers
               </label>
               <Controller
                 name="odometer"

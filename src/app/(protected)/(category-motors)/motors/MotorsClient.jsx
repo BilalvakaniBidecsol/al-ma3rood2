@@ -1,9 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback, useMemo } from "react";
-import {
-  Search,
-  BikeIcon as Motorbike,
-} from "lucide-react";
+import { Search, BikeIcon as Motorbike } from "lucide-react";
 import CustomDropdown from "@/components/WebsiteComponents/MotorsPageComponents/CustomDropdown";
 import { categoriesApi } from "@/lib/api/category";
 import Link from "next/link";
@@ -12,18 +9,29 @@ import { FaTh, FaThList } from "react-icons/fa";
 import MotorListingCard from "@/components/WebsiteComponents/MotorListingCard";
 import { useTranslation } from "react-i18next";
 import Select from "react-select";
-import { getTransformedVehicleData, getVehicleTypeFromCategory, loadVehiclesData } from "@/lib/vehicles";
+import {
+  getTransformedVehicleData,
+  getVehicleTypeFromCategory,
+  loadVehiclesData,
+} from "@/lib/vehicles";
 import { useLocationStore } from "@/lib/stores/locationStore";
 
 const allowedTabs = [
   { key: "Cars", name: "Cars", icon: "./car.png" },
   { key: "Motorbikes", name: "Motorbikes", icon: "./motorbikes.png" },
-  { key: "caravans-motorhomes", name: "Caravans & Motorhomes", icon: "./caravans.png" },
+  {
+    key: "caravans-motorhomes",
+    name: "Caravans & Motorhomes",
+    icon: "./caravans.png",
+  },
   { key: "boats_and_marine", name: "Boats & marine", icon: "./boats.png" },
-  { key: "Car parts & accessories", name: "Car parts & accessories", icon: "./carparts.png" },
+  {
+    key: "Car parts & accessories",
+    name: "Car parts & accessories",
+    icon: "./carparts.png",
+  },
   { key: "allcat", name: "All categories", icon: "./categ.png" },
 ];
-
 
 function buildCategoryTree(categories) {
   const map = {};
@@ -44,77 +52,72 @@ function buildCategoryTree(categories) {
   return roots;
 }
 
-
-const MotorsClient = ({
-    category,
-  initialProducts,
-  pagination,
-}) => {
+const MotorsClient = ({ category, initialProducts, pagination }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [categories, setCategories] = useState([]);
   const categoryTree = buildCategoryTree(categories);
-  const [viewMode, setViewMode] = useState('grid'); // 'grid' or 'list'
-  const [sortBy, setSortBy] = useState('price_low');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [viewMode, setViewMode] = useState("grid"); // 'grid' or 'list'
+  const [sortBy, setSortBy] = useState("price_low");
+  const [searchQuery, setSearchQuery] = useState("");
   const [motorListings, setMotorListings] = useState(initialProducts || []);
-    const [activeTab, setActiveTab] = useState("cars");
+  const [activeTab, setActiveTab] = useState("cars");
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("cars");
-   const [totalResults, setTotalResults] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [hasMore, setHasMore] = useState(
-      pagination?.currentPage < pagination?.totalPages
-    );
-    const [isLoading, setIsLoading] = useState(false);
-    const observerRef = useRef(null);
-    const firstLoad = useRef(true);
+  const [totalResults, setTotalResults] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [hasMore, setHasMore] = useState(
+    pagination?.currentPage < pagination?.totalPages
+  );
+  const [isLoading, setIsLoading] = useState(false);
+  const observerRef = useRef(null);
+  const firstLoad = useRef(true);
   // Filter states
   const [filters, setFilters] = useState({
-    vehicle_type: '',
-    make: '',
-    model: '',
-    year_min: '',
-    year_max: '',
+    vehicle_type: "",
+    make: "",
+    model: "",
+    year_min: "",
+    year_max: "",
     price_min: undefined,
     price_max: undefined,
-    fuel_type: '',
-    transmission: '',
-    body_style: '',
-    condition: '',
-    odometer_min: '',
-    odometer_max: '',
+    fuel_type: "",
+    transmission: "",
+    body_style: "",
+    condition: "",
+    odometer_min: "",
+    odometer_max: "",
     search: "",
     governorate: "",
     region: "",
     category_id: null,
   });
   const { t } = useTranslation();
- const [vehicleData, setVehicleData] = useState(null);
+  const [vehicleData, setVehicleData] = useState(null);
   const [makeOptions, setMakeOptions] = useState([]);
   const [models, setModels] = useState([]);
   const [yearOptions, setYearOptions] = useState([]);
   const [vehicleType, setVehicleType] = useState("cars");
-   const { locations, getAllLocations } = useLocationStore();
-   const country = locations.find((c) => c.id == 1);
-const regions = country?.regions || [];
+  const { locations, getAllLocations } = useLocationStore();
+  const country = locations.find((c) => c.id == 1);
+  const regions = country?.regions || [];
 
-const governorates = useMemo(() => {
-  const region = regions.find((r) => r.name === filters.region);
-  return region?.governorates || [];
-}, [regions, filters.region]);
+  const governorates = useMemo(() => {
+    const region = regions.find((r) => r.name === filters.region);
+    return region?.governorates || [];
+  }, [regions, filters.region]);
 
   // 🎯 Load vehicle data from JSON
   useEffect(() => {
     async function fetchData() {
-      console.log('active', activeTab)
+      console.log("active", activeTab);
       const type = getVehicleTypeFromCategory(activeTab);
-      console.log('type',type);
+      console.log("type", type);
       setVehicleType(type);
       const data = await loadVehiclesData();
       setVehicleData(data);
 
       const transformed = await getTransformedVehicleData(type);
-      console.log('transformed',transformed);
+      console.log("transformed", transformed);
       setMakeOptions(
         transformed.map((item) => ({
           value: item.make,
@@ -147,32 +150,32 @@ const governorates = useMemo(() => {
   }, [filters.make, vehicleData, vehicleType]);
 
   // 📅 Update year options based on selected make + model
-useEffect(() => {
-  async function fetchYears() {
-    if (filters.make && filters.model && vehicleData) {
-      const data = await loadVehiclesData();
-      const vehicles = data.vehicles[activeTab] || [];
+  useEffect(() => {
+    async function fetchYears() {
+      if (filters.make && filters.model && vehicleData) {
+        const data = await loadVehiclesData();
+        const vehicles = data.vehicles[activeTab] || [];
 
-      const selectedMake = vehicles.find(v => v.make === filters.make);
-      const selectedModel = selectedMake?.models.find(m => m.name === filters.model);
+        const selectedMake = vehicles.find((v) => v.make === filters.make);
+        const selectedModel = selectedMake?.models.find(
+          (m) => m.name === filters.model
+        );
 
-      const years = selectedModel?.years || [];
+        const years = selectedModel?.years || [];
 
-      setYearOptions(
-        years.map((year) => ({
-          value: year,
-          label: year,
-        }))
-      );
-    } else {
-      setYearOptions([]);
+        setYearOptions(
+          years.map((year) => ({
+            value: year,
+            label: year,
+          }))
+        );
+      } else {
+        setYearOptions([]);
+      }
     }
-  }
 
-  fetchYears();
-}, [filters.make, filters.model, vehicleData, activeTab]);
-
-
+    fetchYears();
+  }, [filters.make, filters.model, vehicleData, activeTab]);
 
   const modelsByMake = {
     Toyota: ["Corolla", "Camry", "Yaris"],
@@ -180,17 +183,17 @@ useEffect(() => {
     BMW: ["X5", "3 Series", "5 Series"],
     Ford: ["Mustang", "F-150", "Explorer"],
   };
-    const conditions = [
-      {
-        key: "new",
-        label: "New",
-      },
-       {
-        key: "used",
-        label: "Used",
-      },
-    ];
-      const conditionOptions = [
+  const conditions = [
+    {
+      key: "new",
+      label: "New",
+    },
+    {
+      key: "used",
+      label: "Used",
+    },
+  ];
+  const conditionOptions = [
     { value: "", label: t("All Conditions") },
     ...conditions.map((condition) => ({
       value: condition.key,
@@ -199,57 +202,53 @@ useEffect(() => {
   ];
 
   const loadMore = useCallback(async () => {
-      if (!hasMore || isLoading) return;
-  
-      setIsLoading(true);
-      try {
-        const nextPage = currentPage + 1;
-        const payload = {
-          ...filters,
-          max_price: filters?.price_max,
-          min_price: filters?.price_min,
-          search: filters?.search,
-          // vehicle_type: activeTab !== "allcat" ? activeTab : "",
-          sort: sortBy,
-          pagination: {
-            page: currentPage,
-            per_page: 12,
-          },
-          listing_type: "motors",
-          pagination: { page: nextPage, per_page: 6 },
-          category_id:
-  filters?.category_id
-    ? filters.category_id
-    : activeTab
-    ? categories.find(
-        (cat) => cat.name.toLowerCase() === activeTab.toLowerCase()
-      )?.id || ""
-    : ""
+    if (!hasMore || isLoading) return;
 
-        };
-  
-        console.log("📡 Loading page:", nextPage);
-        const response = await propertiesApi.getPropertiesByFilter(payload);
-  
-        // ✅ Adjust depending on API structure
-        const newData = response || [];
-        const totalPages =
-          response?.pagination?.last_page ||
-          1;
-  
-        if (newData.length > 0) {
-          setMotorListings((prev) => [...prev, ...newData]);
-          setCurrentPage(nextPage);
-          setHasMore(nextPage < totalPages);
-        } else {
-          setHasMore(false);
-        }
-      } catch (err) {
-        console.error("❌ Error loading more:", err);
-      } finally {
-        setIsLoading(false);
+    setIsLoading(true);
+    try {
+      const nextPage = currentPage + 1;
+      const payload = {
+        ...filters,
+        max_price: filters?.price_max,
+        min_price: filters?.price_min,
+        search: filters?.search,
+        // vehicle_type: activeTab !== "allcat" ? activeTab : "",
+        sort: sortBy,
+        pagination: {
+          page: currentPage,
+          per_page: 12,
+        },
+        listing_type: "motors",
+        pagination: { page: nextPage, per_page: 6 },
+        category_id: filters?.category_id
+          ? filters.category_id
+          : activeTab
+          ? categories.find(
+              (cat) => cat.name.toLowerCase() === activeTab.toLowerCase()
+            )?.id || ""
+          : "",
+      };
+
+      console.log("📡 Loading page:", nextPage);
+      const response = await propertiesApi.getPropertiesByFilter(payload);
+
+      // ✅ Adjust depending on API structure
+      const newData = response || [];
+      const totalPages = response?.pagination?.last_page || 1;
+
+      if (newData.length > 0) {
+        setMotorListings((prev) => [...prev, ...newData]);
+        setCurrentPage(nextPage);
+        setHasMore(nextPage < totalPages);
+      } else {
+        setHasMore(false);
       }
-    }, [currentPage, hasMore, isLoading, pagination?.totalPages]);
+    } catch (err) {
+      console.error("❌ Error loading more:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [currentPage, hasMore, isLoading, pagination?.totalPages]);
 
   // Load motor listings
   useEffect(() => {
@@ -264,30 +263,30 @@ useEffect(() => {
         max_price: filters?.price_max,
         min_price: filters?.price_min,
         search: filters?.search,
-regions_id: regions.find((r) => r.name === filters.region)?.id || null,
-governorates_id: governorates.find((g) => g.name === filters.governorate)?.id || null,
-        category_id:
-  filters?.category_id
-    ? filters.category_id
-    : activeTab
-    ? categories.find(
-        (cat) => cat.name.toLowerCase() === activeTab.toLowerCase()
-      )?.id || ""
-    : "",
+        regions_id: regions.find((r) => r.name === filters.region)?.id || null,
+        governorates_id:
+          governorates.find((g) => g.name === filters.governorate)?.id || null,
+        category_id: filters?.category_id
+          ? filters.category_id
+          : activeTab
+          ? categories.find(
+              (cat) => cat.name.toLowerCase() === activeTab.toLowerCase()
+            )?.id || ""
+          : "",
 
         // vehicle_type: activeTab !== "allcat" ? activeTab : "",
         sort: sortBy,
         pagination: {
           page: currentPage,
-          per_page: 30
-        }
+          per_page: 30,
+        },
       };
 
       const response = await motorsApi.getMotorsByFilter(payload);
       setMotorListings(response || []);
     } catch (error) {
-      console.error('Error loading motor listings:', error);
-      toast.error('Failed to load motor listings');
+      console.error("Error loading motor listings:", error);
+      toast.error("Failed to load motor listings");
       setMotorListings([]);
       setTotalResults(0);
     } finally {
@@ -297,16 +296,19 @@ governorates_id: governorates.find((g) => g.name === filters.governorate)?.id ||
 
   useEffect(() => {
     const fetchCategories = async () => {
-      const listing_type = "motors"
+      const listing_type = "motors";
       try {
-        const { data } = await categoriesApi.getAllCategories(null, listing_type);
+        const { data } = await categoriesApi.getAllCategories(
+          null,
+          listing_type
+        );
         setCategories(data || []);
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
 
-    getAllLocations(); 
+    getAllLocations();
     fetchCategories();
   }, []);
 
@@ -330,7 +332,6 @@ governorates_id: governorates.find((g) => g.name === filters.governorate)?.id ||
     };
   }, [isMobileMenuOpen]);
 
-
   const tabs = allowedTabs.filter((allowed) =>
     categories.some((cat) =>
       cat.name.toLowerCase().includes(allowed.name.toLowerCase())
@@ -339,45 +340,45 @@ governorates_id: governorates.find((g) => g.name === filters.governorate)?.id ||
   // Always include "All categories"
   tabs.push(allowedTabs.find((t) => t.key === "allcat"));
 
- // ✅ Intersection Observer (Infinite Scroll)
-useEffect(() => {
-  if (isLoading || !hasMore) return;
+  // ✅ Intersection Observer (Infinite Scroll)
+  useEffect(() => {
+    if (isLoading || !hasMore) return;
 
-  const observer = new IntersectionObserver(
-    (entries) => {
-      // Prevent first automatic trigger
-      if (firstLoad.current) {
-        firstLoad.current = false;
-        return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Prevent first automatic trigger
+        if (firstLoad.current) {
+          firstLoad.current = false;
+          return;
+        }
+
+        if (entries[0].isIntersecting && hasMore && !isLoading) {
+          console.log("🔥 Bottom reached → loading more...");
+          loadMore();
+        }
+      },
+      {
+        root: null,
+        rootMargin: "300px",
+        threshold: 0.1,
       }
+    );
 
-      if (entries[0].isIntersecting && hasMore && !isLoading) {
-        console.log("🔥 Bottom reached → loading more...");
-        loadMore(); 
-      }
-    },
-    {
-      root: null,
-      rootMargin: "300px",
-      threshold: 0.1,
-    }
-  );
+    const currentRef = observerRef.current;
+    if (currentRef) observer.observe(currentRef);
 
-  const currentRef = observerRef.current;
-  if (currentRef) observer.observe(currentRef);
-
-  return () => {
-    if (currentRef) observer.unobserve(currentRef);
-  };
-}, [hasMore, isLoading, loadMore]);
+    return () => {
+      if (currentRef) observer.unobserve(currentRef);
+    };
+  }, [hasMore, isLoading, loadMore]);
 
   const toggleMoreOptions = () => {
     setShowMoreOptions(!showMoreOptions);
   };
   const handleFilterChange = (filterName, value) => {
-    setFilters(prev => ({
+    setFilters((prev) => ({
       ...prev,
-      [filterName]: value
+      [filterName]: value,
     }));
     setCurrentPage(1); // Reset to first page when filters change
   };
@@ -409,26 +410,26 @@ useEffect(() => {
 
   const clearFilters = () => {
     setFilters({
-         vehicle_type: '',
-    make: '',
-    model: '',
-    year_min: '',
-    year_max: '',
-    price_min: undefined,
-    price_max: undefined,
-    fuel_type: '',
-    transmission: '',
-    body_style: '',
-    condition: '',
-    odometer_min: '',
-    odometer_max: '',
-    search: "",
-    governorate: "",
-    region: "",
-    category_id: null,
+      vehicle_type: "",
+      make: "",
+      model: "",
+      year_min: "",
+      year_max: "",
+      price_min: undefined,
+      price_max: undefined,
+      fuel_type: "",
+      transmission: "",
+      body_style: "",
+      condition: "",
+      odometer_min: "",
+      odometer_max: "",
+      search: "",
+      governorate: "",
+      region: "",
+      category_id: null,
     });
     setActiveTab("cars");
-    setSearchQuery('');
+    setSearchQuery("");
     setCurrentPage(1);
 
     setTimeout(() => {
@@ -436,7 +437,7 @@ useEffect(() => {
     }, 100);
     // loadMotorListings();
   };
-    // 🎨 React Select Styles
+  // 🎨 React Select Styles
   const customStyles = {
     control: (base, state) => ({
       ...base,
@@ -469,44 +470,45 @@ useEffect(() => {
           {/* Tabs section - blended with hero color */}
           <div className="bg-white rounded-lg  overflow-hidden">
             {/* Tabs section - flush with top of card */}
-<div className="flex border-b border-gray-200 overflow-x-auto no-scrollbar">
-  {tabs.map((tab) => (
-    <button
-      key={tab.key}
-      onClick={() => {
-        const selectedCat = categories.find(
-          (cat) => cat.name.toLowerCase() === tab.name.toLowerCase()
-        );
-        setActiveTab(tab.key);
-        setFilters({
-          ...filters,
-          category_id:
-            tab.key === "allcat"
-              ? null
-              : selectedCat
-              ? selectedCat.id
-              : null,
-        });
-      }}
-      className={`flex-shrink-0 text-sm font-medium h-10 px-4 text-center
+            <div className="flex border-b border-gray-200 overflow-x-auto no-scrollbar">
+              {tabs.map((tab) => (
+                <button
+                  key={tab.key}
+                  onClick={() => {
+                    const selectedCat = categories.find(
+                      (cat) => cat.name.toLowerCase() === tab.name.toLowerCase()
+                    );
+                    setActiveTab(tab.key);
+                    setFilters({
+                      ...filters,
+                      category_id:
+                        tab.key === "allcat"
+                          ? null
+                          : selectedCat
+                          ? selectedCat.id
+                          : null,
+                    });
+                  }}
+                  className={`flex-shrink-0 text-sm font-medium h-10 px-4 text-center
       ${
-     activeTab.toLowerCase() === tab.key.toLowerCase()
+        activeTab.toLowerCase() === tab.key.toLowerCase()
           ? "bg-white text-[#175f48]"
           : "bg-gray-50 text-gray-600 hover:bg-gray-100"
       } border-r border-gray-200 last:border-r-0`}
-    >
-      <div className="flex items-center justify-center gap-2 h-full">
-        <img
-          src={tab.icon}
-          alt={tab.name}
-          className="w-4 h-4 object-contain"
-        />
-        <span className="whitespace-nowrap text-sm">{tab.name}</span>
-      </div>
-    </button>
-  ))}
-</div>
-
+                >
+                  <div className="flex items-center justify-center gap-2 h-full">
+                    <img
+                      src={tab.icon}
+                      alt={tab.name}
+                      className="w-4 h-4 object-contain"
+                    />
+                    <span className="whitespace-nowrap text-sm">
+                      {tab.name}
+                    </span>
+                  </div>
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* <div className="px-6 py-4">
@@ -538,64 +540,121 @@ useEffect(() => {
                     ))}
                   </select> */}
                   <Select
-          options={conditionOptions}
-          value={
-            filters.condition ? { value: filters.condition, label: filters.condition } : null
-          }
-          onChange={(selected) =>
-            handleFilterChange("condition", selected ? selected.value : "")
-          }
-          placeholder={t("Select Condition")}
-          styles={customStyles}
-        />
+                    instanceId="condition-select"
+                    options={conditionOptions}
+                    value={
+                      filters.condition
+                        ? { value: filters.condition, label: filters.condition }
+                        : null
+                    }
+                    onChange={(selected) =>
+                      handleFilterChange(
+                        "condition",
+                        selected ? selected.value : ""
+                      )
+                    }
+                    placeholder={t("Select Condition")}
+                    styles={customStyles}
+                  />
                 </div>
 
                 {/* Make */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t("Make")}
-        </label>
-        <Select
-          options={makeOptions}
-          value={
-            filters.make ? { value: filters.make, label: filters.make } : null
-          }
-          onChange={(selected) =>
-            handleFilterChange("make", selected ? selected.value : "")
-          }
-          placeholder={t("Select Make")}
-          styles={customStyles}
-        />
-      </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t("Make")}
+                  </label>
+                  <Select
+                    instanceId="make-select"
+                    options={makeOptions}
+                    value={
+                      filters.make
+                        ? { value: filters.make, label: filters.make }
+                        : null
+                    }
+                    onChange={(selected) =>
+                      handleFilterChange("make", selected ? selected.value : "")
+                    }
+                    placeholder={t("Select Make")}
+                    styles={customStyles}
+                  />
+                </div>
 
                 {/* Model */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t("Model")}
-        </label>
-        <Select
-          options={models}
-          value={
-            filters.model
-              ? { value: filters.model, label: filters.model }
-              : null
-          }
-          onChange={(selected) =>
-            handleFilterChange("model", selected ? selected.value : "")
-          }
-          placeholder={t("Select Model")}
-          isDisabled={!filters.make}
-          styles={{
-            ...customStyles,
-            control: (base, state) => ({
-              ...base,
-              ...customStyles.control(base, state),
-              backgroundColor: !filters.make ? "#f9fafb" : "white",
-            }),
-          }}
-        />
-      </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t("Model")}
+                  </label>
+                  <Select
+                    instanceId="model-select"
+                    options={models}
+                    value={
+                      filters.model
+                        ? { value: filters.model, label: filters.model }
+                        : null
+                    }
+                    onChange={(selected) =>
+                      handleFilterChange(
+                        "model",
+                        selected ? selected.value : ""
+                      )
+                    }
+                    placeholder={t("Select Model")}
+                    isDisabled={!filters.make}
+                    styles={{
+                      ...customStyles,
+                      control: (base, state) => ({
+                        ...base,
+                        ...customStyles.control(base, state),
+                        backgroundColor: !filters.make ? "#f9fafb" : "white",
+                      }),
+                    }}
+                  />
+                </div>
 
+                {/* Year Range */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    {t("Year")}
+                  </label>
+                  <div className="grid grid-cols-2 gap-2">
+                    <Select
+                      instanceId="year-min-select"
+                      options={yearOptions}
+                      value={
+                        filters.year_min
+                          ? { value: filters.year_min, label: filters.year_min }
+                          : null
+                      }
+                      onChange={(selected) =>
+                        handleFilterChange(
+                          "year_min",
+                          selected ? selected.value : ""
+                        )
+                      }
+                      isDisabled={!filters.model}
+                      placeholder={t("Min")}
+                      styles={customStyles}
+                    />
+                    <Select
+                      instanceId="year-max-select"
+                      options={yearOptions}
+                      value={
+                        filters.year_max
+                          ? { value: filters.year_max, label: filters.year_max }
+                          : null
+                      }
+                      onChange={(selected) =>
+                        handleFilterChange(
+                          "year_max",
+                          selected ? selected.value : ""
+                        )
+                      }
+                      isDisabled={!filters.model}
+                      placeholder={t("Max")}
+                      styles={customStyles}
+                    />
+                  </div>
+                </div>
 
                 {/* Price Range */}
                 <div>
@@ -606,80 +665,54 @@ useEffect(() => {
                   <div className="grid grid-cols-2 gap-2">
                     <select
                       value={filters.price_min}
-                      onChange={(e) => handleFilterChange("price_min", e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange("price_min", e.target.value)
+                      }
                       className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="">{t("Min")}</option>
-                      {[0, 500, 1000, 5000, 10000, 20000, 50000].map((price) => (
-                        <option key={price} value={price}>
-                          {price.toLocaleString()}
-                        </option>
-                      ))}
+                      {[0, 500, 1000, 5000, 10000, 20000, 50000].map(
+                        (price) => (
+                          <option key={price} value={price}>
+                            {price.toLocaleString()}
+                          </option>
+                        )
+                      )}
                     </select>
 
                     <select
                       value={filters.price_max}
-                      onChange={(e) => handleFilterChange("price_max", e.target.value)}
+                      onChange={(e) =>
+                        handleFilterChange("price_max", e.target.value)
+                      }
                       className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     >
                       <option value="">{t("Max")}</option>
-                      {[1000, 5000, 10000, 20000, 50000, 100000].map((price) => (
-                        <option key={price} value={price}>
-                          {price.toLocaleString()}
-                        </option>
-                      ))}
+                      {[1000, 5000, 10000, 20000, 50000, 100000].map(
+                        (price) => (
+                          <option key={price} value={price}>
+                            {price.toLocaleString()}
+                          </option>
+                        )
+                      )}
                     </select>
                   </div>
                 </div>
 
-
-                {/* Year Range */}
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-2">
-          {t("Year")}
-        </label>
-        <div className="grid grid-cols-2 gap-2">
-          <Select
-            options={yearOptions}
-            value={
-              filters.year_min
-                ? { value: filters.year_min, label: filters.year_min }
-                : null
-            }
-            onChange={(selected) =>
-              handleFilterChange("year_min", selected ? selected.value : "")
-            }
-            placeholder={t("Min")}
-            styles={customStyles}
-          />
-          <Select
-            options={yearOptions}
-            value={
-              filters.year_max
-                ? { value: filters.year_max, label: filters.year_max }
-                : null
-            }
-            onChange={(selected) =>
-              handleFilterChange("year_max", selected ? selected.value : "")
-            }
-            placeholder={t("Max")}
-            styles={customStyles}
-          />
-        </div>
-      </div>
-
-
                 {/* Fuel Type */}
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    {t("Fuel Type")}                  </label>
+                    {t("Fuel Type")}{" "}
+                  </label>
                   <select
                     value={filters.fuel_type}
-                    onChange={(e) => handleFilterChange('fuel_type', e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("fuel_type", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="">{t("All Fuel Types")}</option>
-                    {motorSearchFilters.fuelTypes.map(fuel => (
+                    {motorSearchFilters.fuelTypes.map((fuel) => (
                       <option key={fuel} value={fuel}>
                         {fuel}
                       </option>
@@ -694,11 +727,13 @@ useEffect(() => {
                   </label>
                   <select
                     value={filters.transmission}
-                    onChange={(e) => handleFilterChange('transmission', e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("transmission", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="">{t("All Transmissions")}</option>
-                    {motorSearchFilters.transmissions.map(trans => (
+                    {motorSearchFilters.transmissions.map((trans) => (
                       <option key={trans} value={trans}>
                         {trans}
                       </option>
@@ -713,11 +748,13 @@ useEffect(() => {
                   </label>
                   <select
                     value={filters.body_style}
-                    onChange={(e) => handleFilterChange('body_style', e.target.value)}
+                    onChange={(e) =>
+                      handleFilterChange("body_style", e.target.value)
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                   >
                     <option value="">{t("All Body Styles")}</option>
-                    {motorSearchFilters.bodyStyles.map(style => (
+                    {motorSearchFilters.bodyStyles.map((style) => (
                       <option key={style} value={style}>
                         {style}
                       </option>
@@ -726,50 +763,69 @@ useEffect(() => {
                 </div>
 
                 <div>
-                  <label className="block mb-1 text-sm font-medium">{t("Region")}</label>
-          {/* {states.length > 0 && ( */}
-            <Select
-              name="region"
-              value={filters.region ? { value: filters.region, label: filters.region } : null}
-          onChange={(selected) =>
-            setFilters((prev) => ({
-              ...prev,
-              region: selected?.value || "",
-              governorate: "",
-              city: "",
-            }))
-          }
-          options={regions.map((r) => ({ value: r.name, label: r.name }))}
-              placeholder={t("Select a Region")}
-              className="text-sm"
-              classNamePrefix="react-select"
-              isClearable
-            />
+                  <label className="block mb-1 text-sm font-medium">
+                    {t("Region")}
+                  </label>
+                  {/* {states.length > 0 && ( */}
+                  <Select
+                    instanceId="region-select"
+                    name="region"
+                    value={
+                      filters.region
+                        ? { value: filters.region, label: filters.region }
+                        : null
+                    }
+                    onChange={(selected) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        region: selected?.value || "",
+                        governorate: "",
+                        city: "",
+                      }))
+                    }
+                    options={regions.map((r) => ({
+                      value: r.name,
+                      label: r.name,
+                    }))}
+                    placeholder={t("Select a Region")}
+                    className="text-sm"
+                    classNamePrefix="react-select"
+                    isClearable
+                  />
                 </div>
-<div>
-  <label className="block mb-1 text-sm font-medium">{t("Governorate")}</label>
-          {/* {cities.length > 0 && ( */}
-            <Select
-              name="governorate"
-              value={
-            filters.governorate
-              ? { value: filters.governorate, label: filters.governorate }
-              : null
-          }
-          onChange={(selected) =>
-            setFilters((prev) => ({
-              ...prev,
-              governorate: selected?.value || "",
-              city: "",
-            }))
-          }
-          options={governorates.map((g) => ({ value: g.name, label: g.name }))}
-              placeholder={t("Select a Governorate")}
-              className="text-sm"
-              classNamePrefix="react-select"
-              isClearable
-            />
-</div>
+                <div>
+                  <label className="block mb-1 text-sm font-medium">
+                    {t("Governorate")}
+                  </label>
+                  {/* {cities.length > 0 && ( */}
+                  <Select
+                    instanceId="governorate-select"
+                    name="governorate"
+                    value={
+                      filters.governorate
+                        ? {
+                            value: filters.governorate,
+                            label: filters.governorate,
+                          }
+                        : null
+                    }
+                    onChange={(selected) =>
+                      setFilters((prev) => ({
+                        ...prev,
+                        governorate: selected?.value || "",
+                        city: "",
+                      }))
+                    }
+                    options={governorates.map((g) => ({
+                      value: g.name,
+                      label: g.name,
+                    }))}
+                    placeholder={t("Select a Governorate")}
+                    className="text-sm"
+                    classNamePrefix="react-select"
+                    isClearable
+                  />
+                </div>
               </div>
             )}
             {/* ✅ BOTTOM Search Box for cars */}
@@ -779,8 +835,9 @@ useEffect(() => {
                   {t("Keywords")}
                 </label>
                 <div
-                  className={`relative ${showMoreOptions ? "w-full" : "w-full sm:w-[300px]"
-                    }`}
+                  className={`relative ${
+                    showMoreOptions ? "w-full" : "w-full sm:w-[300px]"
+                  }`}
                 >
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                   <input
@@ -801,9 +858,11 @@ useEffect(() => {
               <div className="w-full flex flex-col sm:flex-row sm:items-center sm:justify-end gap-4">
                 <button
                   onClick={() => {
-                    loadMotorListings()
+                    loadMotorListings();
                   }}
-                  type="button" className="w-full sm:w-auto bg-[#175f48] hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors text-center">
+                  type="button"
+                  className="w-full sm:w-auto bg-[#175f48] hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors text-center"
+                >
                   {t("View listings")}
                 </button>
               </div>
@@ -815,10 +874,11 @@ useEffect(() => {
                   <div key={parent.id}>
                     {/* ✅ Parent Category */}
                     <h3
-                      className={`text-lg font-semibold mb-3 cursor-pointer hover:underline ${filters.category_id === parent.id
-                        ? "text-blue-600 underline" // 🔵 Highlight parent differently
-                        : "text-[#175f48]"
-                        }`}
+                      className={`text-lg font-semibold mb-3 cursor-pointer hover:underline ${
+                        filters.category_id === parent.id
+                          ? "text-blue-600 underline" // 🔵 Highlight parent differently
+                          : "text-[#175f48]"
+                      }`}
                       onClick={() => {
                         setFilters({ ...filters, category_id: parent.id });
                       }}
@@ -834,10 +894,11 @@ useEffect(() => {
                           onClick={() => {
                             setFilters({ ...filters, category_id: child.id });
                           }}
-                          className={`block text-sm cursor-pointer hover:underline ${filters.category_id === child.id
-                            ? "text-green-600 font-semibold" // 🟢 Different from parent
-                            : "text-gray-700"
-                            }`}
+                          className={`block text-sm cursor-pointer hover:underline ${
+                            filters.category_id === child.id
+                              ? "text-green-600 font-semibold" // 🟢 Different from parent
+                              : "text-gray-700"
+                          }`}
                         >
                           {child.name}
                         </div>
@@ -847,23 +908,23 @@ useEffect(() => {
                 ))}
               </div>
             )}
-
-
           </div>
         </div>
       </div>
 
       <div className="mt-10 px-5 md:px-0 md:mx-10">
-
-
         {/* Results header */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <p className="text-gray-900 text-sm">
             {isLoading ? (
-              ''
+              ""
             ) : (
               <>
-                {t("Showing")} <span className="font-semibold">{motorListings.length || 0}</span> {t("Results")}
+                {t("Showing")}{" "}
+                <span className="font-semibold">
+                  {motorListings.length || 0}
+                </span>{" "}
+                {t("Results")}
               </>
             )}
           </p>
@@ -882,10 +943,11 @@ useEffect(() => {
             </select>
             <div className="flex justify-center gap-2">
               <button
-                className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${viewMode === "list"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${
+                  viewMode === "list"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
                 onClick={() => setViewMode("list")}
                 aria-pressed={viewMode === "list"}
               >
@@ -893,10 +955,11 @@ useEffect(() => {
                 <span>{t("List")}</span>
               </button>
               <button
-                className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${viewMode === "grid"
-                  ? "bg-green-100 text-green-700"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                  }`}
+                className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm ${
+                  viewMode === "grid"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
                 onClick={() => setViewMode("grid")}
                 aria-pressed={viewMode === "grid"}
               >
@@ -908,24 +971,33 @@ useEffect(() => {
         </div>
 
         {/* Motor listings */}
-            {isLoading ? (
+        {isLoading ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
           </div>
         ) : motorListings.length > 0 ? (
-          <div className={`grid gap-6 ${viewMode === 'grid'
-                ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
-                : 'grid-cols-1 md:mx-10'
-            }`}>
+          <div
+            className={`grid gap-6 ${
+              viewMode === "grid"
+                ? "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+                : "grid-cols-1 md:mx-10"
+            }`}
+          >
             {sortedListings.map((listing) => (
-              <MotorListingCard key={listing.id} listing={listing} viewMode={viewMode} />
+              <MotorListingCard
+                key={listing.id}
+                listing={listing}
+                viewMode={viewMode}
+              />
             ))}
           </div>
         ) : (
           <div className="text-center py-12">
             <div className="text-gray-500 mb-4">
               <Search className="w-16 h-16 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold mb-2">{t("No motors found")}</h3>
+              <h3 className="text-xl font-semibold mb-2">
+                {t("No motors found")}
+              </h3>
               <p>{t("Try adjusting your search criteria or filters")}</p>
             </div>
             <button
@@ -936,12 +1008,8 @@ useEffect(() => {
             </button>
           </div>
         )}
-
-        
       </div>
-
     </div>
-
   );
 };
 

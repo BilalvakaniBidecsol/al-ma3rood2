@@ -147,7 +147,7 @@ const Filtersidebar = () => {
 
       {/* Odometer */}
       <div className="py-3 ">
-        <p className="font-medium text-gray-600">Odometer</p>
+        <p className="font-medium text-gray-600">Kilometers</p>
         <div className="flex gap-2 mt-2">
           <input
             type="number"

@@ -531,7 +531,7 @@ const CoolAuctionPage = ({
                         {t("Location")}:
                       </div>
                       <div className="font-bold text-xs">
-                        {(item.creator?.region_name ||
+                        {(item.creator?.regions?.name ||
                           item.creator?.billing_address) && (
                           <>
                             <div className="font-bold text-xs">
@@ -539,8 +539,8 @@ const CoolAuctionPage = ({
                                 item?.creator?.city_name
                                   ? `${item?.creator?.city_name}, `
                                   : ""
-                              } ${item?.creator?.governorate_name}, ${
-                                item?.creator?.region_name
+                              } ${item?.creator?.governorates?.name}, ${
+                                item?.creator?.regions?.name
                               }`}
                             </div>
                           </>

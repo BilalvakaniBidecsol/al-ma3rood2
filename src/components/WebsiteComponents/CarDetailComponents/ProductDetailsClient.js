@@ -830,7 +830,7 @@ export default function ProductDetailsClient({ product: initialProduct, initialn
               <p className="text-xs text-gray-500">
                 <span className="text-green-600 font-medium">
                   {" "}
-                  {product.bid_count || 0} {t("bids so far")}
+                  {product?.bids_count || 0} {t("bids so far")}
                 </span>{" "}
                 –{" "}
                 <span

@@ -634,19 +634,19 @@ export default function ProductDetailsClient({ product: initialProduct }) {
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
               {product.title}
             </h1>
-            {(product?.creator?.region_name || product?.creator?.billing_address) && (
+            {(product?.creator?.regions?.name || product?.creator?.billing_address) && (
               <div
                 className={`flex items-center gap-2 text-sm text-gray-500 mt-1 ${i18n.language === "ar" ? "right" : ""
                   }`}
               >
                 <FaMapMarkerAlt className="text-green-600" />
                 <span>
-                  {/* {product?.creator?.region_name
-                    ? `${t("Region")}: ${product?.creator?.region_name}`
+                  {/* {product?.creator?.regions?.name
+                    ? `${t("Region")}: ${product?.creator?.regions?.name}`
                     : `${t("Location")}: ${product?.creator?.billing_address}`} */}
-                    {product.creator?.region_name ? (
+                    {product.creator?.regions?.name ? (
                     <>
-                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorate_name}, ${product?.creator?.region_name}`)}
+                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
                     </>
                   ) : (
                     <>
@@ -837,7 +837,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
               <p className="text-xs text-gray-500">
                 <span className="text-green-600 font-medium">
                   {" "}
-                  {product.bids_count || 0} {t("bids so far")}
+                  {`${product?.bids_count || 0} ${t("bids so far")}`}
                 </span>{" "}
                 –{" "}
                 <span
@@ -901,9 +901,9 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                   100% {t("positive feedback")}
                 </div> */}
                 <div className="text-xs text-gray-500 mt-0.5">
-                  {product.creator?.region_name ? (
+                  {product.creator?.regions?.name ? (
                     <>
-                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorate_name}, ${product?.creator?.region_name}`)}
+                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
                     </>
                   ) : (
                     <>

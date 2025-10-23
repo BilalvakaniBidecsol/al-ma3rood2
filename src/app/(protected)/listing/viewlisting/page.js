@@ -15,14 +15,34 @@ import { listingsApi } from "@/lib/api/listings";
 import { Image_URL } from "@/config/constants";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import { useAuthStore } from "@/lib/stores/authStore";
 
 const Page = () => {
+  const { user } = useAuthStore();
   const [openWithdrawDialog, setOpenWithdrawDialog] = useState(false);
   const [listing, setListing] = useState(null);
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug");
   const router = useRouter();
   const { t, i18n } = useTranslation();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      router.replace("/");
+    }
+  }, [router]);
+
+  // ✅ Protect: Only creator can edit
+  useEffect(() => {
+    if (listing && user) {
+      if (user.id !== listing.creator.id) {
+        toast.error("You are not authorized to view this listing.");
+        router.replace("/");
+      }
+    }
+  }, [listing, user]);
 
   useEffect(() => {
     if (slug) {
@@ -40,9 +60,12 @@ const Page = () => {
 
   // Example details array (customize as needed)
   const details = [
-    { label: "Condition", value: listing?.condition
-    ? listing.condition.replace(/_/g, " ").toUpperCase()
-    : "N/A" },
+    {
+      label: "Condition",
+      value: listing?.condition
+        ? listing.condition.replace(/_/g, " ").toUpperCase()
+        : "N/A",
+    },
     { label: "Description", value: listing.description },
     { label: "Payment Options", value: "Cash" },
   ];
@@ -160,9 +183,7 @@ const Page = () => {
 
           {/* PRODUCT DETAILS */}
           <div className="order-3 mt-6 px-4">
-            <h3 className="text-sm font-semibold mb-4">
-              {t("Details")}
-            </h3>
+            <h3 className="text-sm font-semibold mb-4">{t("Details")}</h3>
             {details.map((item, idx) => {
               return (
                 <div className="flex mb-4 flex-wrap" key={idx}>
@@ -210,11 +231,17 @@ const Page = () => {
                   {listing?.creator?.username}
                 </h3>
                 <p className="text-sm text-gray-500">
-  {t("Location")}:{" "}
-  {listing.creator?.region_name
-    ? `${listing.creator?.city_name ? `${listing.creator?.city_name}, ` : ""}${listing.creator?.governorate_name}, ${listing.creator?.region_name}`
-    : ""}
-</p>
+                  {t("Location")}:{" "}
+                  {listing.creator?.regions?.name
+                    ? `${
+                        listing.creator?.city_name
+                          ? `${listing.creator?.city_name}, `
+                          : ""
+                      }${listing.creator?.governorates?.name}, ${
+                        listing.creator?.regions?.name
+                      }`
+                    : ""}
+                </p>
 
                 <p className="text-sm text-gray-500">
                   {t("Member Since")}:{" "}
@@ -237,34 +264,35 @@ const Page = () => {
         {/* ==== RIGHT COLUMN: BIDS SECTION ==== */}
         <div className="order-2 lg:order-none space-y-4">
           <h3 className="font-semibold text-4xl mb-2">{meta.productName}</h3>
-          {listing.listing_type !== 'property' &&(
-          <div className="flex items-start text-sm text-gray-700">
-            <FiClock className="text-gray-500 mt-1 mr-2 text-xl" />
-            <div>
-              <p className="text-sm">
-                {t("Closes")}: {meta.endDate}
+          {listing.listing_type !== "property" && (
+            <div className="flex items-start text-sm text-gray-700">
+              <FiClock className="text-gray-500 mt-1 mr-2 text-xl" />
+              <div>
+                <p className="text-sm">
+                  {t("Closes")}: {meta.endDate}
+                </p>
+                <p className="text-xs text-gray-500 mt-0.5">
+                  {meta.remainingTime}
+                </p>
+              </div>
+            </div>
+          )}
+          {user.id == listing.creator.id && (
+            <div className="flex flex-col gap-2">
+              <p
+                className="text-blue-500 text-sm cursor-pointer"
+                onClick={() => router.push(`/listing/edit/${listing.slug}`)}
+              >
+                {t("Edit listing")}
               </p>
-              <p className="text-xs text-gray-500 mt-0.5">
-                {meta.remainingTime}
+              <p
+                className="text-red-500 text-sm cursor-pointer"
+                onClick={() => setOpenWithdrawDialog(true)}
+              >
+                {t("Withdraw listing")}
               </p>
             </div>
-          </div>
-)}
-          <div className="flex flex-col gap-2">
-            <p
-              className="text-blue-500 text-sm cursor-pointer"
-              onClick={() => router.push(`/listing/edit/${listing.slug}`)}
-            >
-              {t("Edit listing")}
-            </p>
-            <p
-              className="text-red-500 text-sm cursor-pointer"
-              onClick={() => setOpenWithdrawDialog(true)}
-            >
-              {t("Withdraw listing")}
-            </p>
-          </div>
-
+          )}
           <div className="border border-gray-400 rounded overflow-hidden bg-white w-full max-w-sm">
             <div className="p-4">
               <h3 className="text-sm text-center text-gray-600">
@@ -275,16 +303,16 @@ const Page = () => {
                 {listing.buy_now_price}
               </p>
             </div>
-            {listing.listing_type !== 'property' && (
-            <div className="p-4">
-              <h3 className="text-sm text-center text-gray-600">
-                {t("Bidding Starts At")}
-              </h3>
-              <p className="text-3xl font-bold text-center">
-                <span className="price">$</span>
-                {listing.start_price}
-              </p>
-            </div>
+            {listing.listing_type !== "property" && (
+              <div className="p-4">
+                <h3 className="text-sm text-center text-gray-600">
+                  {t("Bidding Starts At")}
+                </h3>
+                <p className="text-3xl font-bold text-center">
+                  <span className="price">$</span>
+                  {listing.start_price}
+                </p>
+              </div>
             )}
             {listing.winning_bid && (
               <div className="p-4">

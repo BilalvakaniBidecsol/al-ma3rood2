@@ -4,16 +4,6 @@ import { cookies } from "next/headers";
 import Toaster from "@/components/WebsiteComponents/Toaster";
 import AuthCleanup from "@/lib/common/AuthCleanup";
 
-// const geistSans = Geist({
-//   variable: "--font-geist-sans",
-//   subsets: ["latin"],
-// });
-
-// const geistMono = Geist_Mono({
-//   variable: "--font-geist-mono",
-//   subsets: ["latin"],
-// });
-
 export const metadata = {
   title: "Ma3rood",
   description: "Ma3rood - The Kingdom's marketplace for everything from household items and cars to homes, jobs, and services.",

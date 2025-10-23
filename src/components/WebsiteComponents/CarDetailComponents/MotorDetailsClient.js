@@ -515,7 +515,7 @@ export default function MotorDetailsClient({ product: initialProduct }) {
     { label: "Motors", href: "/motors" },
     {
       label: product.category?.name || "Category",
-      href: `/search/${product?.slug}`,
+      href: `/motors/${product?.slug}`,
     },
     { label: product.title || "Product" },
   ];
@@ -646,15 +646,15 @@ export default function MotorDetailsClient({ product: initialProduct }) {
             <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
               {product.title}
             </h1>
-            {(product?.creator?.region_name || product?.creator?.address_1) && (
+            {(product?.creator?.regions?.name || product?.creator?.address_1) && (
               <div
                 className={`flex items-center gap-2 text-sm text-gray-500 mt-1 ${i18n.language === "ar" ? "right" : ""
                   }`}
               >
                 <FaMapMarkerAlt className="text-green-600" />
                 <span>
-                  {product?.creator?.region_name
-                    ? (`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorate_name}, ${product?.creator?.region_name}`) : ""}
+                  {product?.creator?.regions?.name
+                    ? (`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`) : ""}
                 </span>
               </div>
             )}
@@ -850,7 +850,7 @@ export default function MotorDetailsClient({ product: initialProduct }) {
               <p className="text-xs text-gray-500">
                 <span className="text-green-600 font-medium">
                   {" "}
-                  {product.bid_count || 0} {t("bids so far")}
+                  {product?.bids_count || 0} {t("bids so far")}
                 </span>{" "}
                 –{" "}
                 <span
