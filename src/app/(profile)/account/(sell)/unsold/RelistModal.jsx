@@ -27,7 +27,7 @@ export default function RelistModal({
 
         <p className="text-sm text-gray-700 mb-5">
           {t("Make changes before relisting with")}  <strong>{t("Edit")}</strong>  {t("or choose")}{" "}
-          <strong>{t("Quick relist")}t</strong> {t("to relist it as it is")}
+          <strong>{t("Quick relist")}</strong> {t("to relist it as it is")}
         </p>
 
         <div className="flex gap-4">
