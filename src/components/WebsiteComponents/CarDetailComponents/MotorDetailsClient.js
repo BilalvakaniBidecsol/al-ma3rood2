@@ -914,14 +914,14 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                   100% {t("positive feedback")}
                 </div> */}
                 <div className="text-xs text-gray-500 mt-0.5">
-                  {product.creator?.city ? (
+                 {product.creator?.regions?.name ? (
                     <>
-                      {t("City")}: {product.creator.city}
+                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
                     </>
                   ) : (
                     <>
-                      {t("Location")}:{" "}
-                      {product.creator?.billing_address || "Unknown"}
+                      {/* {t("Location")}:{" "}
+                      {product.creator?.billing_address || "Unknown"} */}
                     </>
                   )}
                 </div>
