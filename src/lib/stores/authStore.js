@@ -44,7 +44,7 @@ login: async (email, password) => {
       } catch {
         useWatchlistStore.getState().setWatchlist([]);
       }
-
+set({ isLoading: false, error: null });
       return { success: true, user };
     }
 
