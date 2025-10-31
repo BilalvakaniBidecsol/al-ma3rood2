@@ -42,7 +42,6 @@ const motorListingSchema = z
     //   "for_parts_or_not_working",
     // ]),
     images: z.array(z.any()).min(1, "At least one image is required"),
-
     buy_now_price: z.string().optional(),
     allow_offers: z.boolean().optional(),
     start_price: z.string().optional(),
@@ -461,7 +460,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
       formData.append("allow_offers", data.allow_offers ? "1" : "0");
       formData.append("start_price", data.start_price || "");
       formData.append("reserve_price", data.reserve_price || "");
-      formData.append("pickup_option", "pickup_available");
+      formData.append("pickup_option", 1);
       if (data.expire_at) {
         formData.append("expire_at", data.expire_at.toISOString());
       }

@@ -314,7 +314,7 @@ const ListingForm = ({ initialValues, mode = "create", onSubmit }) => {
       );
       formData.append("payment_method_id", data.payment_method_id || 1);
       formData.append("quantity", data.quantity || 1);
-      formData.append("pickup_option", "pickup_available");
+      formData.append("pickup_option", 1);
       formData.append("listing_type", "marketplace");
       // Append dynamic category fields if present
       categoryFieldNames.forEach((fieldName) => {

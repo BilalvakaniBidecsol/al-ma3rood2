@@ -158,7 +158,7 @@
 //             },
 //             {
 //               icon: "/Profile/member.png",
-//               label: "Member number",
+//               label: "Member Number",
 //               value: user?.customer_number,
 //             },
 //             {
@@ -214,7 +214,7 @@
 //             },
 //             {
 //               icon: "/Profile/member.png",
-//               label: "Member number",
+//               label: "Member Number",
 //               value: user?.customer_number,
 //             },
 //             {
@@ -438,7 +438,7 @@ const UserDetails = ({ profile }) => {
             },
             {
               icon: "/Profile/member.png",
-              label: "Member number",
+              label: "Member Number",
               value: user?.memberId,
             },
             {
@@ -495,7 +495,7 @@ const UserDetails = ({ profile }) => {
             },
             {
               icon: "/Profile/member.png",
-              label: "Member number",
+              label: "Member Number",
               value: user?.memberId,
             },
             {

@@ -5,8 +5,9 @@ import { BsFillEyeSlashFill } from "react-icons/bs";
 import { IoEyeSharp } from "react-icons/io5";
 import { useTranslation } from "react-i18next";
 import Link from "next/link";
+import { authApi } from "@/lib/api/auth";
 
-export default function LoginForm({ onSubmit, isLoading, resetError }) {
+export default function LoginForm({ onSubmit, isLoading, resetError, isForgotMode, setIsForgotMode }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -18,17 +19,18 @@ export default function LoginForm({ onSubmit, isLoading, resetError }) {
 
   const validate = () => {
     const newErrors = {};
+    if (!email) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      newErrors.email = "Please enter a valid email";
+    }
 
-    // if (!email) {
-    //   newErrors.email = "Email is required";
-    // } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    //   newErrors.email = "Please enter a valid email";
-    // }
-
-    if (!password) {
-      newErrors.password = "Password is required";
-    } else if (password.length < 6) {
-      newErrors.password = "Password must be at least 6 characters";
+    if (!isForgotMode) {
+      if (!password) {
+        newErrors.password = "Password is required";
+      } else if (password.length < 6) {
+        newErrors.password = "Password must be at least 6 characters";
+      }
     }
 
     setErrors(newErrors);
@@ -41,6 +43,21 @@ export default function LoginForm({ onSubmit, isLoading, resetError }) {
       onSubmit({ email, password });
     }
   };
+
+  const handleForgotPassword = async () => {
+  if (!email) {
+    setErrors({ email: "Please enter your email first" });
+    return;
+  }
+
+  try {
+    await authApi.forgotPassword(email);
+    router.push(`/forgot-password?email=${encodeURIComponent(email)}`);
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    alert("Something went wrong. Please try again.");
+  }
+};
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
@@ -75,7 +92,8 @@ export default function LoginForm({ onSubmit, isLoading, resetError }) {
         )}
       </div>
 
-      {/* Password Field */}
+      {/* Password Field — hide when forgot mode */}
+      {!isForgotMode && (
       <div>
         <label
           htmlFor="password"
@@ -121,39 +139,55 @@ export default function LoginForm({ onSubmit, isLoading, resetError }) {
           </p>
         )}
       </div>
+      )}
 
-      {/* Forgot Password Link */}
-      {/* <div className="flex justify-end">
-        <Link
-          href="/forgot-password"
-          // type="button"
-          // onClick={() => router.push('/forgot-password')}
-          className="text-sm text-green-600 hover:text-green-800 cursor-pointer"
-          // disabled={isLoading}
-        >
-          Forgot password?
-        </Link>
-      </div> */}
+            {/* Forgot Password Link */}
+      {/* {!isForgotMode && (
+        <div className="flex justify-end">
+          <button
+            type="button"
+            onClick={() => setIsForgotMode(true)} // 👈 enable forgot mode
+            className="text-sm text-green-600 hover:text-green-800 cursor-pointer"
+          >
+            Forgot password?
+          </button>
+        </div>
+      )} */}
 
       {/* Submit Button */}
-      <button
-        type="submit"
-        disabled={isLoading}
-        className={`w-full py-2 px-4 cursor-pointer border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
-          isLoading
-            ? "bg-green-400 cursor-not-allowed"
-            : "bg-green-600 hover:bg-green-700"
-        }`}
-      >
-        {isLoading ? (
-          <span className="flex items-center justify-center">
-            <Spinner className="animate-spin h-4 w-4 mr-2" />
-            {t("Signing in...")}{" "}
-          </span>
-        ) : (
-          t("Sign In")
-        )}
-      </button>
+      {!isForgotMode ? (
+        <button
+          type="submit"
+          disabled={isLoading}
+          className={`w-full py-2 px-4 cursor-pointer border border-transparent rounded-md shadow-sm text-sm font-medium text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 ${
+            isLoading
+              ? "bg-green-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
+          }`}
+        >
+          {isLoading ? (
+            <span className="flex items-center justify-center">
+              <Spinner className="animate-spin h-4 w-4 mr-2" />
+              {t("Signing in...")}
+            </span>
+          ) : (
+            t("Sign In")
+          )}
+        </button>
+      ) : (
+        <button
+          type="button"
+          onClick={handleForgotPassword}
+          disabled={isLoading}
+          className={`w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
+            isLoading
+              ? "bg-green-400 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
+          }`}
+        >
+          {isLoading ? t("Sending...") : t("Send Code")}
+        </button>
+      )}
     </form>
   );
 }

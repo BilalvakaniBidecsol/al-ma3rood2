@@ -18,8 +18,9 @@ import ListingForm from "@/components/WebsiteComponents/listingforms/ListingForm
 import MotorListingForm from "@/components/WebsiteComponents/listingforms/MotorListingForm";
 import Properties from "@/components/WebsiteComponents/listingforms/Properties";
 import { toast } from "react-toastify";
-import { Car, HomeIcon, Package } from "lucide-react";
+import { Car, HomeIcon, Package, Briefcase } from "lucide-react";
 import { useRouter } from "next/navigation";
+import JobListingForm from "@/components/WebsiteComponents/listingforms/JobListingForm";
 
 export function toFieldName(label) {
   return label
@@ -183,12 +184,12 @@ const handleListingTypeSelect = (type) => {
           <div className="grid md:grid-cols-2 gap-8">
             
             <div
-              className="bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-blue-500 transition-all duration-300 cursor-pointer group"
+              className="bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-green-500 transition-all duration-300 cursor-pointer group"
               onClick={() => handleListingTypeSelect("general")}
             >
               <div className="text-center">
-                <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-200 transition-colors">
-                  <Package className="w-10 h-10 text-blue-600" />
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-200 transition-colors">
+                  <Package className="w-10 h-10 text-green-600" />
                 </div>
                 <h3 className="text-2xl font-semibold text-gray-900 mb-4">
                   General Item
@@ -247,6 +248,28 @@ const handleListingTypeSelect = (type) => {
                 </div>
               </div>
             </div>
+
+            {/* Job Option */}
+<div
+  className="bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-green-500 transition-all duration-300 cursor-pointer group"
+  onClick={() => handleListingTypeSelect("job")}
+>
+  <div className="text-center">
+    <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-200 transition-colors">
+      <Briefcase className="w-10 h-10 text-green-600" />
+    </div>
+    <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+      Jobs
+    </h3>
+    <p className="text-gray-600 mb-6">
+      Post full-time, part-time, freelance, or remote job listings
+    </p>
+    <div className="text-sm text-gray-500">
+      Ideal for employers, recruiters, and companies — add job title, salary range, work type, and qualifications to attract top talent.
+    </div>
+  </div>
+</div>
+
           </div>
 
           <div className="text-center mt-8">
@@ -295,6 +318,25 @@ const handleListingTypeSelect = (type) => {
           <Properties/>
 
           {/* <PropertyListingForm onSubmit={handleCreateListing} /> */}
+        </div>
+      </div>
+    );
+  }
+
+    if (listingType === "job") {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="mb-6">
+            <button
+              onClick={handleBackToListingType}
+              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+            >
+              <IoIosArrowForward className="w-4 h-4 rotate-180 mr-2" />
+              Back to listing type selection
+            </button>
+          </div>
+          <JobListingForm mode="create" />
         </div>
       </div>
     );

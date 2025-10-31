@@ -234,8 +234,8 @@ const Page = () => {
                   {t("Location")}:{" "}
                   {listing.creator?.regions?.name
                     ? `${
-                        listing.creator?.city_name
-                          ? `${listing.creator?.city_name}, `
+                        listing.creator?.address_1
+                          ? `${listing.creator?.address_1}, `
                           : ""
                       }${listing.creator?.governorates?.name}, ${
                         listing.creator?.regions?.name

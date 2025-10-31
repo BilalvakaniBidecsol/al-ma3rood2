@@ -536,8 +536,8 @@ const CoolAuctionPage = ({
                           <>
                             <div className="font-bold text-xs">
                               {`${
-                                item?.creator?.city_name
-                                  ? `${item?.creator?.city_name}, `
+                                item?.creator?.address_1
+                                  ? `${item?.creator?.address_1}, `
                                   : ""
                               } ${item?.creator?.governorates?.name}, ${
                                 item?.creator?.regions?.name

@@ -646,7 +646,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                     : `${t("Location")}: ${product?.creator?.billing_address}`} */}
                     {product.creator?.regions?.name ? (
                     <>
-                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
+                      {t("Location")}: {(`${product?.creator?.address_1 ? `${product?.creator?.address_1}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
                     </>
                   ) : (
                     <>
@@ -903,7 +903,7 @@ export default function ProductDetailsClient({ product: initialProduct }) {
                 <div className="text-xs text-gray-500 mt-0.5">
                   {product.creator?.regions?.name ? (
                     <>
-                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
+                      {t("Location")}: {(`${product?.creator?.address_1 ? `${product?.creator?.address_1}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
                     </>
                   ) : (
                     <>

@@ -456,8 +456,8 @@ const MarketplaceCard = ({
                           </div>
                           <div className="font-bold text-xs">
                             {`${
-                              card?.creator?.city_name
-                                ? `${card?.creator?.city_name}, `
+                              card?.creator?.address_1
+                                ? `${card?.creator?.address_1}, `
                                 : ""
                             } ${card?.creator?.governorates?.name}, ${
                               card?.creator?.regions?.name

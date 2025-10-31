@@ -654,7 +654,7 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                 <FaMapMarkerAlt className="text-green-600" />
                 <span>
                   {product?.creator?.regions?.name
-                    ? (`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`) : ""}
+                    ? (`${product?.creator?.address_1 ? `${product?.creator?.address_1}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`) : ""}
                 </span>
               </div>
             )}
@@ -914,9 +914,9 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                   100% {t("positive feedback")}
                 </div> */}
                 <div className="text-xs text-gray-500 mt-0.5">
-                 {product.creator?.regions?.name ? (
+                  {product.creator?.regions?.name ? (
                     <>
-                      {t("Location")}: {(`${product?.creator?.city_name ? `${product?.creator?.city_name}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
+                      {t("Location")}: {(`${product?.creator?.address_1 ? `${product?.creator?.address_1}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
                     </>
                   ) : (
                     <>

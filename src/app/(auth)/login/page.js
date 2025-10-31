@@ -127,13 +127,14 @@ import LoginForm from "@/components/auth/LoginForm";
 import LanguageSwitcher from "@/components/WebsiteComponents/LanguageSwitcher";
 import { useAuthStore } from "@/lib/stores/authStore";
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
 function LoginPageContent() {
   const { user, login, error, isLoading, resetError } = useAuthStore();
+  const [isForgotMode, setIsForgotMode] = useState(false);
   const router = useRouter();
   const { t } = useTranslation();
 
@@ -215,7 +216,7 @@ console.log('Res', res);
 
 
           <h2 className="text-2xl font-semibold text-gray-800 text-center mb-2">
-            {t("Login")}
+            {isForgotMode ? t("Forgot Password") : t("Login")}
           </h2>
 
           {error && (
@@ -231,8 +232,12 @@ console.log('Res', res);
             onSubmit={handleLogin}
             isLoading={isLoading}
             resetError={resetError}
+            isForgotMode={isForgotMode}
+            setIsForgotMode={setIsForgotMode}
           />
 
+{!isForgotMode && (
+  <>
           <p className="mt-4 text-center">
             {t("Don't have an account?")}{" "}
             <Link href="/register" className="text-green-600">
@@ -249,6 +254,8 @@ console.log('Res', res);
               {t("Privacy Policy")}
             </Link>
           </p>
+          </>
+)}
         </div>
       </div>
 

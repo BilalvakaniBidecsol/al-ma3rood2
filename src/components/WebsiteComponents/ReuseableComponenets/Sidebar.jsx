@@ -21,12 +21,17 @@ import {
   FaChevronDown,
   FaChevronUp,
 } from "react-icons/fa";
+import { LiaFileUploadSolid } from "react-icons/lia";
+import { IoIosDocument } from "react-icons/io";
 import { useTranslation } from "react-i18next";
+import { MdWorkHistory } from "react-icons/md";
 
 const Sidebar = () => {
   const [showSidebar, setShowSidebar] = useState(false);
   const [showSellingOptions, setShowSellingOptions] = useState(false);
   const [showBuyingOptions, setShowBuyingOptions] = useState(false);
+  const [showJobOptions, setShowJobOptions] = useState(false);
+
   const pathname = usePathname();
 
   const isActive = (href) => pathname.startsWith(href);
@@ -100,6 +105,43 @@ const Sidebar = () => {
             <FaStar />
             <span>{t("Favourites")}</span>
           </Link>
+
+ {/* Jobs Dropdown */}
+          <div>
+            <div
+              onClick={() => setShowJobOptions(!showBuyingOptions)}
+              className="flex items-center justify-between cursor-pointer text-green-500"
+            >
+              <div className="flex items-center gap-2">
+                <MdWorkHistory />
+                <span>{t("Jobs")}</span>
+              </div>
+              {showJobOptions ? <FaChevronUp /> : <FaChevronDown />}
+            </div>
+
+            {showJobOptions && (
+              <div className="ml-6 mt-2 space-y-2">
+                <Link
+                  href="/listing"
+                  className={subLinkClass("/listing")}
+                >
+                  <LiaFileUploadSolid />
+                  <span>{t("List a Job")}</span>
+                </Link>
+                <Link
+                  href="/account/listoffer"
+                  className={subLinkClass("/account/listoffer")}
+                >
+                  <FaClipboardList />
+                  <span>{t("List Jobs")}</span>
+                </Link>
+                 <Link href="/account/job-profile" className={subLinkClass("/job-profile")}>
+            <IoIosDocument />
+            <span>{t("Job Profile")}</span>
+          </Link>
+              </div>
+            )}
+          </div>
 
           {/* Buying Dropdown */}
           <div>
