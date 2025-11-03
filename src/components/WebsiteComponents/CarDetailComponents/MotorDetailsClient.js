@@ -144,10 +144,7 @@ function BuyNowModal({ isOpen, onClose, product, onBuyNow }) {
           </p>
           <p className="text-2xl sm:text-3xl font-bold text-green-600 mb-1">
             <span className="price">$</span>
-            {product.buy_now_price?.toLocaleString("en-US", {
-  style: "currency",
-  currency: "SAR",
-})}
+            {product.buy_now_price}
           </p>
           <p className="text-sm sm:text-base text-gray-500 truncate">
             {product.title}
@@ -753,11 +750,8 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                     <span className="block text-sm text-gray-600">Buy Now</span>
                     <span className="block text-4xl font-bold text-gray-900">
                       <span className="price">$</span>
-            {(Number(product.buy_now_price) || product.buy_now_price === 0)
-  ? Number(product.buy_now_price).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })
+            {(product.buy_now_price || product.buy_now_price === 0)
+  ? product.buy_now_price
   : "-"}
 
                     </span>

@@ -10,6 +10,7 @@ import Breadcrumbs from "@/components/WebsiteComponents/ReuseableComponenets/Bre
 import { useTranslation } from "react-i18next";
 
 const filters = [
+  { label: "All Time", value: "all" },
   { label: "Last 45 days", value: "45d" },
   { label: "Last 7 days", value: "7d" },
   { label: "Last 24 hours", value: "24h" },
@@ -56,7 +57,7 @@ export default function SellingClient() {
     { label: "See similar", onClick: () => alert("Selling similar...") },
   ];
 
-  const [filter, setFilter] = useState("45d");
+  const [filter, setFilter] = useState("all");
   const [allListings, setAllListings] = useState([]);
   const [filteredListings, setFilteredListings] = useState([]);
   const [loading, setLoading] = useState(true);

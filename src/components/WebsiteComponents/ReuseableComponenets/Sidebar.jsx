@@ -109,7 +109,7 @@ const Sidebar = () => {
  {/* Jobs Dropdown */}
           <div>
             <div
-              onClick={() => setShowJobOptions(!showBuyingOptions)}
+              onClick={() => setShowJobOptions(!showJobOptions)}
               className="flex items-center justify-between cursor-pointer text-green-500"
             >
               <div className="flex items-center gap-2">
@@ -129,8 +129,8 @@ const Sidebar = () => {
                   <span>{t("List a Job")}</span>
                 </Link>
                 <Link
-                  href="/account/listoffer"
-                  className={subLinkClass("/account/listoffer")}
+                  href="/account/jobs-list"
+                  className={subLinkClass("/account/jobs-list")}
                 >
                   <FaClipboardList />
                   <span>{t("List Jobs")}</span>

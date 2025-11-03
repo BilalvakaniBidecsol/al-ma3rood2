@@ -14,6 +14,7 @@ import CategoryModal from "./CategoryModal";
 import Select from "react-select";
 import { useLocationStore } from "@/lib/stores/locationStore";
 import { JobsApi } from "@/lib/api/job-listing";
+import { Image_URL } from "@/config/constants";
 
 // --- START: UPDATED JOB LISTING SCHEMA ---
 
@@ -130,13 +131,7 @@ const JobListingForm = ({initialValues, mode="create"}) => {
         short_summary: "",
         description: "",
         is_entry_level: 0,
-        
-        // New Step 2 fields
-        // required_skills: "",
-        // education_level: "",
-        // min_experience_years: "",
-
-        contact_name: "",
+          contact_name: "",
         contact_phone: "",
         contact_email: "",
         // reference: "",
@@ -212,6 +207,22 @@ if (Array.isArray(initialValues.key_points)) {
         copy.key_points = "";
     }
     if (copy.package_id) copy.package_id = Number(copy.package_id);
+
+    if (initialValues.logo) {
+        copy.logo = initialValues.logo;
+    }
+    if (initialValues.banner) {
+        copy.banner = initialValues.banner;
+    }
+
+    // ⭐ FILE FIX 2: Normalize Additional Media (API 'media_files' array -> form 'images' array)
+  if (initialValues.media_files && Array.isArray(initialValues.media_files)) {
+        copy.images = initialValues.media_files
+          .map(media => media.file_path) // <-- Map to extract file_path string
+          .filter(path => typeof path === 'string' && path.length > 0); // Ensure it's a valid string
+    } else {
+        copy.images = [];
+    }
 
     return copy;
   }, [initialValues]);
@@ -749,25 +760,80 @@ if (Array.isArray(initialValues.key_points)) {
   // --- STEP 4 (Index 3): Contact & Media ---
   const ContactMediaStep = ({ control, errors, setValue }) => {
     
-    const FileInput = ({ name, label }) => (
-        <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
-            <Controller
-                name={name}
-                control={control}
-                render={({ field: { onChange, value, ...rest } }) => (
-                    <input
-                        type="file"
-                        onChange={(e) => onChange(e.target.files?.[0])}
-                        className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
-                        {...rest}
-                    />
-                )}
-            />
-            {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name].message}</p>}
-        </div>
-    );
+    // const FileInput = ({ name, label }) => (
+    //     <div>
+    //         <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+    //         <Controller
+    //             name={name}
+    //             control={control}
+    //             render={({ field: { onChange, value, ...rest } }) => (
+    //                 <input
+    //                     type="file"
+    //                     onChange={(e) => onChange(e.target.files?.[0])}
+    //                     className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+    //                     {...rest}
+    //                 />
+    //             )}
+    //         />
+    //         {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name].message}</p>}
+    //     </div>
+    // );
+// Helper function to resolve image source (needs to be available for FileInput)
+    const getFilePreviewSrc = (fileValue) => {
+        if (!fileValue) return null;
 
+        if (fileValue instanceof File) {
+            // New file selected by the user
+            return URL.createObjectURL(fileValue);
+        }
+        if (typeof fileValue === "string") {
+            // Existing file path from the API
+            // Check if it's a full URL or needs the base Image_URL
+            return fileValue.startsWith("http") ? fileValue : `${Image_URL}${fileValue}`;
+        }
+        return null;
+    };
+
+
+    const FileInput = ({ name, label }) => {
+        // Watch the current value for preview display
+        const fileValue = watch(name);
+        const previewSrc = getFilePreviewSrc(fileValue);
+
+        return (
+            <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">{label}</label>
+                
+                {/* 🖼️ IMAGE PREVIEW BLOCK */}
+                {previewSrc && (
+                    <div className="mb-3 border border-gray-300 rounded-md overflow-hidden bg-gray-50 p-2">
+                        <img 
+                            src={previewSrc} 
+                            alt={`${label} Preview`} 
+                            className="w-full h-24 object-contain" // Use object-contain or object-cover as needed
+                        />
+                        <p className="text-xs text-gray-500 mt-1">Current file is set. Uploading a new file will replace it.</p>
+                    </div>
+                )}
+                {/* 🖼️ END IMAGE PREVIEW BLOCK */}
+
+                <Controller
+                    name={name}
+                    control={control}
+                    render={({ field: { onChange, value, ...rest } }) => (
+                        <input
+                            type="file"
+                            onChange={(e) => onChange(e.target.files?.[0])}
+                            // Ensure 'value' prop is NOT passed to type='file' input for uncontrolled behavior
+                            className="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                            {...rest}
+                        />
+                    )}
+                />
+                {errors[name] && <p className="text-red-500 text-sm mt-1">{errors[name].message}</p>}
+            </div>
+        );
+    };
     return (
       <div className="space-y-8">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">4. Contact & Media</h2>

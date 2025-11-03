@@ -139,19 +139,139 @@ const carPartsData = [
     make: "Toyota",
     parts: [
       {
-        name: "Headlight",
-        compatibleModels: ["Corolla", "Camry"],
-        years: [2019, 2020, 2021, 2022],
+        name: "Headlight Assembly",
+        compatibleModels: ["Corolla", "Camry", "Yaris", "Avalon"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
       },
       {
-        name: "Bumper",
-        compatibleModels: ["Corolla", "Hilux"],
-        years: [2018, 2019, 2020],
+        name: "Front Bumper",
+        compatibleModels: ["Land Cruiser", "Prado", "Hilux", "Fortuner"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
       },
       {
-        name: "Brake Pads",
-        compatibleModels: ["RAV4", "Fortuner"],
-        years: [2020, 2021, 2022],
+        name: "Brake Pads Set",
+        compatibleModels: ["RAV4", "Fortuner", "Camry", "Corolla"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Radiator",
+        compatibleModels: ["Land Cruiser", "Prado", "Hilux"],
+        years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Alternator",
+        compatibleModels: ["Camry", "Corolla", "Yaris", "Avalon"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Windshield",
+        compatibleModels: ["Land Cruiser", "Prado", "Hilux", "Fortuner"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "AC Compressor",
+        compatibleModels: ["Land Cruiser", "Camry", "Prado"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Nissan",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["Sunny", "Altima", "Maxima"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["Patrol", "X-Terra", "Navara"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["X-Trail", "Patrol", "Altima"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Radiator",
+        compatibleModels: ["Patrol", "X-Terra", "Navara"],
+        years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Alternator",
+        compatibleModels: ["Sunny", "Altima", "Maxima"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Mitsubishi",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["Lancer", "Outlander", "ASX"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["Pajero", "Montero Sport", "L200"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["Pajero", "Outlander", "Lancer"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Radiator",
+        compatibleModels: ["Pajero", "Montero Sport", "L200"],
+        years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Hyundai",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["Elantra", "Accent", "Sonata"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["Tucson", "Santa Fe", "Creta"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["Tucson", "Santa Fe", "Elantra"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "AC Compressor",
+        compatibleModels: ["Santa Fe", "Tucson", "Sonata"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Kia",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["Cerato", "Rio", "Optima"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["Sportage", "Sorento", "Carnival"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["Sportage", "Sorento", "Cerato"],
+        years: [2020, 2021, 2022, 2023, 2024],
       },
     ],
   },
@@ -159,19 +279,24 @@ const carPartsData = [
     make: "Honda",
     parts: [
       {
-        name: "Headlight",
-        compatibleModels: ["Civic", "Accord"],
-        years: [2019, 2020, 2021],
+        name: "Headlight Assembly",
+        compatibleModels: ["Civic", "Accord", "City"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
       },
       {
-        name: "Bumper",
-        compatibleModels: ["City", "CR-V"],
-        years: [2018, 2019, 2020],
+        name: "Front Bumper",
+        compatibleModels: ["CR-V", "Pilot", "HR-V"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
       },
       {
-        name: "Brake Pads",
-        compatibleModels: ["HR-V"],
-        years: [2020, 2021, 2022],
+        name: "Brake Pads Set",
+        compatibleModels: ["CR-V", "Accord", "Civic"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "AC Compressor",
+        compatibleModels: ["Accord", "CR-V", "Pilot"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
       },
     ],
   },
@@ -179,14 +304,189 @@ const carPartsData = [
     make: "Ford",
     parts: [
       {
-        name: "Headlight",
-        compatibleModels: ["F-150", "Mustang"],
-        years: [2019, 2020, 2021],
+        name: "Headlight Assembly",
+        compatibleModels: ["Explorer", "Escape", "Focus"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
       },
       {
-        name: "Bumper",
-        compatibleModels: ["Explorer", "Escape"],
-        years: [2018, 2019, 2020],
+        name: "Front Bumper",
+        compatibleModels: ["Explorer", "Edge", "F-150"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["Explorer", "Escape", "Focus"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Chevrolet",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["Malibu", "Captiva", "Lumina"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["Tahoe", "Traverse", "Captiva"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["Traverse", "Malibu", "Captiva"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "AC Compressor",
+        compatibleModels: ["Tahoe", "Traverse", "Malibu"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Mercedes-Benz",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["C-Class", "E-Class", "S-Class"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["GLE", "GLC", "G-Class"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["C-Class", "E-Class", "GLE"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "BMW",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["3 Series", "5 Series", "X5"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["X5", "X3", "X6"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["3 Series", "5 Series", "X5"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Lexus",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["ES", "RX", "IS"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["LX", "GX", "RX"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["RX", "ES", "NX"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "AC Compressor",
+        compatibleModels: ["LX", "RX", "GX"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Audi",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["A4", "A6", "Q5"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["Q7", "Q5", "A6"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["A4", "A6", "Q5"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Isuzu",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["D-Max", "MU-X"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["D-Max", "MU-X"],
+        years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Radiator",
+        compatibleModels: ["D-Max", "MU-X"],
+        years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Jeep",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["Grand Cherokee", "Wrangler"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["Grand Cherokee", "Wrangler", "Cherokee"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["Grand Cherokee", "Wrangler"],
+        years: [2020, 2021, 2022, 2023, 2024],
+      },
+    ],
+  },
+  {
+    make: "Dodge",
+    parts: [
+      {
+        name: "Headlight Assembly",
+        compatibleModels: ["Charger", "Challenger"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Front Bumper",
+        compatibleModels: ["Charger", "Challenger", "Durango"],
+        years: [2018, 2019, 2020, 2021, 2022, 2023, 2024],
+      },
+      {
+        name: "Brake Pads Set",
+        compatibleModels: ["Charger", "Challenger"],
+        years: [2020, 2021, 2022, 2023, 2024],
       },
     ],
   },

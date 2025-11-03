@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import { FaInfoCircle, FaEye, FaStar } from "react-icons/fa";
 import { FiClock } from "react-icons/fi";
 import Button from "@/components/WebsiteComponents/ReuseableComponenets/Button";
-import WithdrawDialog from "@/components/WebsiteComponents/ReuseableComponenets/WithdrawDialog";
+import WithdrawJobDialog from "@/components/WebsiteComponents/ReuseableComponenets/WithdrawJobDialog";
 import { useSearchParams } from "next/navigation";
 import { Image_URL } from "@/config/constants";
 import { useRouter } from "next/navigation";
@@ -106,7 +106,7 @@ const Page = () => {
   // NOTE: Withdraw functionality is maintained, but logic should be confirmed
   async function handleWithdraw(option) {
     try {
-      await JobsApi.withdrawListing(listing.slug); // Assuming a JobsApi.withdrawListing exists
+      await JobsApi.withdrawListing(listing.id); // Assuming a JobsApi.withdrawListing exists
       setOpenWithdrawDialog(false);
     } catch (error) {
       console.log("error", error);
@@ -352,7 +352,7 @@ const Page = () => {
         </div>
       </div>
 
-      <WithdrawDialog
+      <WithdrawJobDialog
         isOpen={openWithdrawDialog}
         onClose={() => setOpenWithdrawDialog(false)}
         onWithdraw={handleWithdraw}

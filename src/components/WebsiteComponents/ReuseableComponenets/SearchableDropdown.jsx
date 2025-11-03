@@ -146,7 +146,11 @@ const SearchableDropdown = ({
           </div>
 
           {/* Options List */}
-          <div className="max-h-48 overflow-y-auto">
+          <div className="max-h-48 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-gray-100 hover:scrollbar-thumb-gray-500"
+          style={{
+    scrollbarWidth: "thin", // Firefox
+    scrollbarColor: "#9ca3af #f3f4f6", // Firefox custom colors
+  }}>
             {filteredOptions.length > 0 ? (
               filteredOptions.map((option, index) => (
                 <button

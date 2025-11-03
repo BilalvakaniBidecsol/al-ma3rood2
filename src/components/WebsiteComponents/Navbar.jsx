@@ -39,6 +39,15 @@ const Navbar = () => {
     // { name: "Help Center", href: "/" },
     { name: "Contact Us", href: "/contact-us" },
   ];
+
+    const mobileNavLinks = [
+    { name: "Home", href: "/" },
+    { name: "About Us", href: "/about" },
+    { name: "How It Works", href: "/work" },
+    { name: "Contact Us", href: "/contact-us" },
+    { name: "Start Listing", href: isLoggedIn ? "/listing" : "/login" },
+    isLoggedIn ? { name: "Watch List", href: "/watchlist" } : null,
+  ];
   const { t, i18n } = useTranslation();
   const isRTL = i18n.language === "ar";
 
@@ -157,7 +166,7 @@ const Navbar = () => {
 
         {mobileMenuOpen && (
           <ul className="md:hidden flex flex-col gap-4 px-4 py-4  bg-opacity-70 text-white">
-            {navLinks.map((link, index) => (
+            {mobileNavLinks.filter(Boolean).map((link, index) => (
               <li
                 key={index}
                 className="hover:text-green-400 cursor-pointer border-b pb-2"

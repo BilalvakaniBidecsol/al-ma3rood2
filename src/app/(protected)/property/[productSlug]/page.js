@@ -14,7 +14,7 @@ const page = async ({ params }) => {
   const items = [
     { label: "Home", href: "/" },
     { label: "Property", href: "/property" },
-    { label: product.title || "Product" },
+    { label: product.title || "Property" },
   ];
 
   return (

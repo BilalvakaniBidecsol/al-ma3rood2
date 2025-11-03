@@ -18,16 +18,34 @@ const MotorListingCard = ({ listing, viewMode }) => {
   const vehicleType = getAttributeValue('vehicle_type');
   const bodyStyle = getAttributeValue('body_style');
 
+  // const formatPrice = (price) => {
+  //   if (!price) return 'Price on application';
+  //   const numPrice = parseFloat(price);
+  //   if (numPrice >= 1000000) {
+  //     return `${(numPrice / 1000000).toFixed(1)}M`;
+  //   } else if (numPrice >= 1000) {
+  //     return `${(numPrice / 1000).toFixed(0)}k`;
+  //   }
+  //   return `${numPrice.toLocaleString()}`;
+  // };
   const formatPrice = (price) => {
-    if (!price) return 'Price on application';
-    const numPrice = parseFloat(price);
-    if (numPrice >= 1000000) {
-      return `${(numPrice / 1000000).toFixed(1)}M`;
-    } else if (numPrice >= 1000) {
-      return `${(numPrice / 1000).toFixed(0)}k`;
-    }
-    return `${numPrice.toLocaleString()}`;
-  };
+  if (!price) return "Price on application";
+
+  // Remove commas and any extra spaces before converting
+  const numPrice = parseFloat(price.replace(/,/g, ""));
+
+  if (isNaN(numPrice)) return "Price on application";
+
+  if (numPrice >= 1000000) {
+    return `${(numPrice / 1000000).toFixed(1)}M`;
+  } else if (numPrice >= 1000) {
+    return `${(numPrice / 1000).toFixed(0)}k`;
+  }
+
+  // Add commas properly formatted
+  return numPrice.toLocaleString();
+};
+
 
   const formatOdometer = (km) => {
     if (!km) return null;
@@ -104,11 +122,20 @@ const MotorListingCard = ({ listing, viewMode }) => {
             )}
           </div>
           <div className="text-right ml-4">
+            {listing.bids_count === 0
+                      ? listing.buy_now_price && (
             <p className="text-xl font-bold text-green-600">
               <span className='price'>$</span>
               {formatPrice(listing.buy_now_price)}
               
             </p>
+                      ) : listing.bids_count &&
+                        listing.bids?.length > 0 & (
+            <p className="text-xl font-bold text-green-600">
+              <span className='price'>$</span>
+              {formatPrice(listing.bids?.[0]?.amount)}
+            </p>
+                      )}
             {listing.allow_offers && (
               <p className="text-xs text-gray-500">or best offer</p>
             )}

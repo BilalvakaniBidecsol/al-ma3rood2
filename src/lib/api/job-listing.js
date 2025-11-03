@@ -125,7 +125,7 @@ export const JobsApi = {
   getUserListings: async () => {
 
     const response = await axiosClient.get(
-      `/user/listings`
+      `/user/job-listing/myJobs`
     );
     return response.data;
   },
@@ -159,9 +159,9 @@ export const JobsApi = {
     const response = await axiosClient.get(`/user/auction-results/lost`);
     return response.data;
   },
-  withdrawListing: async (productSlug) => {
-    const response = await axiosClient.post(
-      `/user/listings/${productSlug}/withdraw`
+  withdrawListing: async (productId) => {
+    const response = await axiosClient.delete(
+      `/user/job-listing/${productId}/destroy`
     );
     return response.data;
   },
