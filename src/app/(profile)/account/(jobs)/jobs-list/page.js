@@ -1,4 +1,4 @@
-// import JobsListClient from './JobsListClient';
+import JobsListClient from './JobsListClient';
 
 export const metadata = {
   title: "Job List | Ma3rood",
@@ -8,6 +8,5 @@ export const metadata = {
 };
 
 export default function Page() {
-  return <></>
-  // <JobsListClient />;
+  return <JobsListClient />;
 }

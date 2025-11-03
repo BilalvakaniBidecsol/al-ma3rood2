@@ -36,6 +36,7 @@ login: async (email, password) => {
       const { data: user, token } = res;
       setAuthToken(token);
       set({ user, token });
+      
 
       // Fetch watchlist
       try {
