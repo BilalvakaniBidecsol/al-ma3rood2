@@ -25,6 +25,7 @@ import {
   isSupportedVehicleType,
 } from "@/lib/vehicles";
 import SearchableDropdown from "@/components/WebsiteComponents/ReuseableComponenets/SearchableDropdown";
+import DatePicker from "react-datepicker";
 
 const motorListingSchema = z
   .object({
@@ -492,6 +493,13 @@ const carPartsData = [
   },
 ];
 
+const getMaxDate = () => {
+  const today = new Date();
+ 
+  today.setDate(today.getDate() + 60);
+  return today;
+};
+
 const MotorListingForm = ({ initialValues, mode = "create" }) => {
   const methods = useForm({
     resolver: zodResolver(motorListingSchema),
@@ -844,9 +852,28 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
       }
       setIsSubmitting(false);
     } catch (error) {
-      console.error("Error creating motor listing:", error);
-      toast.error("Failed to create motor listing. Please try again.");
       setIsSubmitting(false);
+      console.error("Error creating motor listing:", error);
+       
+      // ✅ Handle Laravel 422 Validation Errors
+      
+    // if (error.response) {
+      const validationErrors = error.data.data;
+      if (validationErrors && typeof validationErrors === "object") {
+        Object.entries(validationErrors).forEach(([field, messages]) => {
+          messages.forEach((msg) => {
+            toast.error(`${msg}`);
+          });
+        });
+      }
+       else {
+        toast.error(error.response.data.message || "Validation failed");
+      }
+      
+    // } 
+    // else {
+    //   toast.error("Failed to create motor listing. Please try again.");
+    // }
     } 
     // finally {
     //   setIsSubmitting(false);
@@ -1702,30 +1729,45 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
 
           </div> */}
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+            {/* <div> */}
+              
+              <div className="mt-2">
+                     <label className="block text-sm font-medium text-gray-700 mb-2">
                 Expiry Date & Time
               </label>
-              <Controller
-                name="expire_at"
-                control={control}
-                render={({ field }) => (
-                  <input
-                    type="datetime-local"
-                    {...field}
-                    value={
-                      field.value ? field.value.toISOString().slice(0, 16) : ""
-                    }
-                    onChange={(e) =>
-                      field.onChange(
-                        e.target.value ? new Date(e.target.value) : null
-                      )
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                  />
-                )}
-              />
-            </div>
+                      <Controller
+                        control={control}
+                        name="expire_at"
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <DatePicker
+                            {...field}
+                            selected={field.value}
+                            onChange={(date) =>
+                              setValue("expire_at", date, { shouldValidate: true })
+                            }
+                            showTimeSelect
+                            timeFormat="hh:mm aa"
+                            dateFormat="yyyy-MM-dd h:mm aa"
+                            minDate={new Date()}
+                            maxDate={getMaxDate()}
+                            className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring
+                          [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
+                          ${errors.expire_at
+                                ? "border-red-500 focus:border-red-500"
+                                : "border-gray-300 focus:border-green-400"
+                              }`}
+                            placeholderText={t("Select date and time")}
+                          />
+                        )}
+                      />
+                      {errors.expire_at && (
+                        <p className="text-red-500 text-sm mt-1">
+                          {errors.expire_at.message}
+                        </p>
+                      )}
+                    </div>
+            {/* </div> */}
 
             {/* {watchedVehicleType !== "Car parts & accessories" && (
               <>

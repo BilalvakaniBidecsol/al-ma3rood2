@@ -385,8 +385,19 @@ const Properties = ({initialValues,
     setIsSubmitting(false);
     } catch (error) {
       console.error("Error creating property listing:", error);
-      toast.error("Failed to create property listing. Please try again.");
+      // toast.error("Failed to create property listing. Please try again.");
     setIsSubmitting(false);
+     const validationErrors = error.data.data;
+          if (validationErrors && typeof validationErrors === "object") {
+            Object.entries(validationErrors).forEach(([field, messages]) => {
+              messages.forEach((msg) => {
+                toast.error(`${msg}`);
+              });
+            });
+          }
+           else {
+            toast.error(error.response.data.message || "Validation failed");
+          }
     } 
   };
 
