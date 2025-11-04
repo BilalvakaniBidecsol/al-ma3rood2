@@ -298,7 +298,7 @@ const Properties = ({initialValues,
       }
 
       formData.append("payment_method_id", data.payment_method_id || "");
-      formData.append("pickup_option", "pickup_available");
+      formData.append("pickup_option", 1);
 
       // ✅ Property specific fields
       const propertyFields = [
