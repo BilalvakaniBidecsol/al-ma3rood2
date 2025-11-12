@@ -1,218 +1,315 @@
 "use client";
 
-import { useEffect } from "react";
-import { X } from "lucide-react";
+import { useState, useEffect } from "react";
+import { X, FileText, Upload, FileBadge } from "lucide-react";
+import { toast } from "react-toastify";
+import { getApi, postApi } from "@/lib/api/jobs-profile";
 
-const JobApplicationModal = ({ isOpen, onClose }) => {
+const JobApplicationModal = ({ isOpen, onClose, jobId }) => {
+  const [loading, setLoading] = useState(false);
+  const [cvs, setCvs] = useState([]);
+  const [coverFile, setCoverFile] = useState(null);
+  const [cvChoice, setCvChoice] = useState("existing");
+  const [newCvFile, setNewCvFile] = useState(null);
+  const [errors, setErrors] = useState({}); // ✅ Error state
+  const [formData, setFormData] = useState({
+    full_name: "",
+    email: "",
+    phone: "",
+    cv_id: "",
+  });
+
+  // ✅ Fetch CVs
   useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add("overflow-hidden");
-    } else {
-      document.body.classList.remove("overflow-hidden");
-    }
-
-    return () => document.body.classList.remove("overflow-hidden");
+    if (!isOpen) return;
+    const fetchJobProfile = async () => {
+      try {
+        const res = await getApi("user/job/profile");
+        setCvs(res?.cvs || []);
+      } catch (error) {
+        console.error("Failed to fetch CVs:", error);
+      }
+    };
+    fetchJobProfile();
   }, [isOpen]);
+
+  // ✅ File validation
+  const validateFile = (file) => {
+    const allowed = [
+      "application/pdf",
+      "application/msword",
+      "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    ];
+    return file && allowed.includes(file.type);
+  };
+
+  const handleChange = (e) => {
+    setErrors({});
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleCoverChange = (e) => {
+    setErrors({});
+    const file = e.target.files[0];
+    if (validateFile(file)) setCoverFile(file);
+    else {
+      toast.error("Please upload PDF, DOC, or DOCX only.");
+      e.target.value = "";
+    }
+  };
+
+  const handleNewCvUpload = (e) => {
+    setErrors({});
+    const file = e.target.files[0];
+    if (validateFile(file)) setNewCvFile(file);
+    else {
+      toast.error("Please upload PDF, DOC, or DOCX only.");
+      e.target.value = "";
+    }
+  };
+
+  // ✅ Submit handler
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setErrors({});
+
+    if (!coverFile) return toast.error("Please upload a cover letter file.");
+    if (cvChoice === "existing" && !formData.cv_id)
+      return toast.error("Please select a CV.");
+    if (cvChoice === "new" && !newCvFile)
+      return toast.error("Please upload a CV file.");
+
+    setLoading(true);
+    try {
+      const data = new FormData();
+      data.append("job_listing_id", jobId);
+      data.append("full_name", formData.full_name);
+      data.append("email", formData.email);
+      data.append("phone", formData.phone);
+      data.append("cover_letters", coverFile);
+
+      if (cvChoice === "new") data.append("cv", newCvFile);
+      else data.append("cv_id", formData.cv_id);
+
+      await postApi("user/job-applying/store", data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+
+      toast.success("Application submitted successfully!");
+      setFormData({ full_name: "", email: "", phone: "", cv_id: "" });
+      setCoverFile(null);
+      setNewCvFile(null);
+      setCvChoice("existing");
+      onClose();
+    } catch (error) {
+      console.error("Application Error:", error);
+        const msg = error.data.message || "Something went wrong.";
+        setErrors(msg);
+        // console.log("Validation Errors:", msg);
+        // // Show top-level error in toast too
+        // toast.error("Please fix the highlighted fields.");
+         // ✅ Extract error message safely
+  // const msg = error?.response?.data?.message || error?.message || "Something went wrong.";
+
+  // ✅ If it's an object of validation errors
+  if (typeof msg === "object") {
+    setErrors(msg);
+    toast.error("Please fix the highlighted fields.");
+  } else {
+    // ✅ If it's a single error message from backend
+    setErrors({ general: msg });
+    toast.error(msg);
+  }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/10 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-xl max-h-[80vh] overflow-y-auto scroll-smooth custom-scroll p-4 sm:p-6">
-        {/* Modal Header */}
-        <div className="flex justify-between items-center p-6">
-          <h2 className="text-xl font-semibold text-gray-900">
-            What is your ideal next role?
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 px-4">
+      <div className="bg-white rounded-2xl shadow-xl w-full max-w-2xl p-6 relative">
+        {/* Header */}
+        <div className="flex justify-between items-center border-b pb-3 mb-5">
+          <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-900">
+            <FileText className="w-5 h-5 text-[#175f48]" />
+            Apply for this Job
           </h2>
           <button
             onClick={onClose}
-            className="text-[#175f48] hover:text-green-600 p-1"
+            className="text-gray-500 hover:text-red-500 transition"
           >
-            <X className="w-5 h-5 " />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Modal Content */}
-        <div className="p-6">
-          {/* Progress Bar */}
-          <div className="mb-6">
-            <div className="bg-gray-200 rounded-full h-2 mb-2">
-              <div
-                className="bg-[#175f48] h-2 rounded-full"
-                style={{ width: "80%" }}
-              ></div>
-            </div>
-            <p className="text-sm text-gray-600">1 step remaining</p>
-          </div>
-
-          {/* Missing Details Notice */}
-          <div className="mb-6">
-            <p className="text-sm text-gray-600 mb-2">
-              You have missing details in your job profile
-            </p>
-            <p className="text-xs text-gray-500">
-              Fill in these missing details to ensure your job profile stands
-              out.
-            </p>
-          </div>
-
-          {/* Form Fields */}
-          <form className="space-y-6">
-            {/* Ideal Next Role */}
+        {/* Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Two-column layout */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Full Name */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                What's your ideal next role?
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Full Name
               </label>
-              <div className="flex items-center ">
+              <input
+                type="text"
+                name="full_name"
+                value={formData.full_name}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#175f48]"
+              />
+              {errors?.full_name && (
+                <p className="text-red-500 text-xs mt-1">{errors.full_name[0]}</p>
+              )}
+            </div>
+
+            {/* Email */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#175f48]"
+              />
+              {errors?.email && (
+                <p className="text-red-500 text-xs mt-1">{errors.email[0]}</p>
+              )}
+            </div>
+
+            {/* Phone */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Phone
+              </label>
+              <input
+                type="text"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:ring-2 focus:ring-[#175f48]"
+              />
+              {errors?.phone && (
+                <p className="text-red-500 text-xs mt-1">{errors.phone[0]}</p>
+              )}
+            </div>
+
+            {/* Cover Letter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center gap-1">
+                <Upload className="w-4 h-4" /> Cover Letter
+              </label>
+              <input
+                type="file"
+                accept=".pdf,.doc,.docx"
+                onChange={handleCoverChange}
+                required
+                className="w-full text-sm border border-gray-300 rounded-md px-2 py-2 cursor-pointer focus:ring-1 focus:ring-[#175f48]"
+              />
+              {coverFile && (
+                <p className="text-xs text-gray-500 mt-1 truncate">
+                  📄 {coverFile.name}
+                </p>
+              )}
+              {errors?.cover_letters && (
+                <p className="text-red-500 text-xs mt-1">{errors.cover_letters[0]}</p>
+              )}
+            </div>
+          </div>
+
+          {/* CV Section */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2 flex items-center gap-1">
+              <FileBadge className="w-4 h-4" /> CV Option
+            </label>
+
+            <div className="flex gap-6 mb-3">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
                 <input
                   type="radio"
-                  id="openToAll"
-                  name="rolePreference"
-                  className="mr-2 accent-[#175f48]"
-                  defaultChecked
+                  name="cvChoice"
+                  value="existing"
+                  checked={cvChoice === "existing"}
+                  onChange={() => setCvChoice("existing")}
                 />
-                <label htmlFor="openToAll" className="text-sm text-gray-700">
-                  I am open to all role titles
-                </label>
-              </div>
-              <p className="text-xs text-gray-500 mt-1">
-                We'll broaden your job recommendations
-              </p>
-            </div>
-
-            {/* Preferred Role Titles */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Preferred role titles
+                Use Existing CV
               </label>
-              <div className="flex gap-2">
+              <label className="flex items-center gap-2 text-sm text-gray-700">
                 <input
-                  type="text"
-                  placeholder="e.g Carpenter"
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 placeholder-gray-500"
+                  type="radio"
+                  name="cvChoice"
+                  value="new"
+                  checked={cvChoice === "new"}
+                  onChange={() => setCvChoice("new")}
                 />
-                <button
-                  type="button"
-                  className="bg-[#175f48] hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
-                >
-                  Add
-                </button>
-              </div>
+                Upload New CV
+              </label>
             </div>
 
-            {/* Preferred Industry */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Preferred industry
-              </label>
-              <div className="flex gap-2">
-                <select className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 transition duration-150 ease-in-out">
-                  <option value="">Select industry</option>
-                  <option value="construction">Construction</option>
-                  <option value="healthcare">Healthcare</option>
-                  <option value="technology">Technology</option>
-                  <option value="education">Education</option>
-                </select>
-                <button
-                  type="button"
-                  className="bg-[#175f48] hover:bg-blue-600 text-white px-4 py-2 rounded-md text-sm"
-                >
-                  +
-                </button>
-              </div>
-            </div>
-
-            {/* Preferred Locations */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Preferred locations
-              </label>
-              <div className="grid grid-cols-2 gap-2 mb-3">
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">
-                    Region
-                  </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 transition duration-150 ease-in-out">
-                    <option value="">Select region</option>
-                    <option value="auckland">Auckland</option>
-                    <option value="wellington">Wellington</option>
-                    <option value="christchurch">Christchurch</option>
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">
-                    District
-                  </label>
-                  <select className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 transition duration-150 ease-in-out">
-                    <option value="">Select district</option>
-                    <option value="central">Central</option>
-                    <option value="north">North</option>
-                    <option value="south">South</option>
-                  </select>
-                </div>
-              </div>
-
+            {cvChoice === "existing" ? (
               <div>
-                <p className="text-sm text-gray-700 mb-2">
-                  Select up to 3 preferred job locations
-                </p>
-                <input
-                  type="text"
-                  placeholder="Purangi"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm bg-gray-50 placeholder-gray-500"
-                />
-              </div>
-            </div>
-
-            {/* Work Eligibility */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                Are you eligible to work in New Zealand?
-              </label>
-              <p className="text-sm text-gray-600 mb-3">
-                I am a New Zealand citizen, resident or hold a valid work visa.
-              </p>
-              <div className="flex gap-3">
-                <button
-                  type="button"
-                  className="bg-[#175f48] hover:bg-green-500 text-white px-6 py-2 rounded-md text-sm"
-                  
+                <select
+                  name="cv_id"
+                  value={formData.cv_id}
+                  onChange={handleChange}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm bg-white focus:ring-1 focus:ring-[#175f48]"
                 >
-                  Yes
-                </button>
-                <button
-                  type="button"
-                  className="border border-gray-300 text-gray-700 hover:bg-gray-50 px-6 py-2 rounded-md text-sm"
-                >
-                  No
-                </button>
+                  <option value="">Select your CV</option>
+                  {cvs.length > 0 ? (
+                    cvs.map((cv, i) => (
+                      <option key={cv.id} value={cv.id}>
+                        {cv.file_name || `CV #${i + 1}`}
+                      </option>
+                    ))
+                  ) : (
+                    <option disabled>No CVs found</option>
+                  )}
+                </select>
+                {errors?.cv_id && (
+                  <p className="text-red-500 text-xs mt-1">{errors.cv_id[0]}</p>
+                )}
               </div>
-            </div>
-
-            <div className="flex items-center gap-2">
-              <label className="relative inline-flex items-center cursor-pointer">
+            ) : (
+              <div>
                 <input
-                  type="checkbox"
-                  defaultChecked
-                  className="sr-only peer"
-                  
+                  type="file"
+                  accept=".pdf,.doc,.docx"
+                  onChange={handleNewCvUpload}
+                  className="w-full text-sm border border-gray-300 rounded-md px-2 py-2 cursor-pointer focus:ring-1 focus:ring-[#175f48]"
                 />
-                <div className="w-7 h-4 bg-gray-200 rounded-full peer peer-checked:bg-[#175f48] transition-colors duration-200 ease-in-out"></div>
-                <div className="absolute left-[2px] top-[2px] w-3 h-3 bg-white rounded-full shadow-sm transform peer-checked:translate-x-3 transition-transform duration-200 ease-in-out"></div>
-              </label>
-              <span className="text-sm text-gray-700">
-                Notify me about new jobs like this
-              </span>
-            </div>
+                {newCvFile && (
+                  <p className="text-xs text-gray-500 mt-1 truncate">
+                    📄 {newCvFile.name}
+                  </p>
+                )}
+                {errors?.cv && (
+                  <p className="text-red-500 text-xs mt-1">{errors.cv[0]}</p>
+                )}
+              </div>
+            )}
+          </div>
 
-            {/* Apply Button */}
-            <button
-              type="submit"
-              className="w-full bg-[#175f48] hover:bg-green-450 text-white py-3 rounded-md font-medium"
-            >
-              Apply
-            </button>
-          </form>
-        </div>
+          {/* Submit */}
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-2.5 mt-3 rounded-lg text-white font-medium transition-all duration-150 ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-[#175f48] hover:bg-[#147c59]"
+            }`}
+          >
+            {loading ? "Submitting..." : "Submit Application"}
+          </button>
+        </form>
       </div>
     </div>
   );

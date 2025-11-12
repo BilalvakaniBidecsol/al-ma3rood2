@@ -69,7 +69,7 @@ export const metadata = {
 export default async function Home({ params, searchParams }) {
   // Fetch $1 reserve listings
   const reserveListings = await fetchListingsByReservePrice(1);
-  const reserveCards = reserveListings?.data?.data || [];
+  const reserveCards = reserveListings?.data || [];
     const { categoryId } = await searchParams;
   const categoryIdFilter = searchParams?.category_id || "";
   const search = searchParams?.search || "";
@@ -126,10 +126,6 @@ console.log('aaa reserveCards', reserveCards)
           <Watch />
           : ""
         }
-        {/* <MarketplaceCard
-          heading="Deals"
-          cards={listings?.data?.data.slice(0, 8) || []}
-        /> */}
         {reserveCards.length > 0 && (
           <AuctionGrid
 
@@ -140,7 +136,7 @@ console.log('aaa reserveCards', reserveCards)
         <div className="mt-5" id="marketplace-deals">
         <MarketplaceCard
           heading="Cool Auction"
-          cards={listings?.data?.data.slice(0, 6) || []}
+          cards={listings?.data?.slice(0, 6) || []}
         />
         </div>
         <LatestNews />

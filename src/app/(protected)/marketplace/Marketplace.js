@@ -40,12 +40,12 @@ export default async function Marketplace({ searchParams }) {
   const dealCards =
   Array.isArray(listings?.data)
     ? listings.data.slice(0, 8)
-    : Array.isArray(listings?.data?.data)
+    : Array.isArray(listings?.data)
     ? listings.data.data.slice(0, 8)
     : [];
 
 const popularCards =
-  Array.isArray(listings?.data?.data)
+  Array.isArray(listings?.data)
     ? listings.data.data.slice(0, 4)
     : [];
   
@@ -95,7 +95,7 @@ const popularCards =
       >
         <PopularProductCard
           categories={categories}
-          // cards={listings?.data?.data?.slice(0, 4)}
+          // cards={listings?.data?.slice(0, 4)}
           cards={popularCards}
         />
       </Suspense>

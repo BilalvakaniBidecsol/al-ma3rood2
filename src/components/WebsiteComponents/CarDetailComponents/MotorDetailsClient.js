@@ -3,7 +3,16 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslation } from "react-i18next";
 import Image from "next/image";
-import { FaRegHeart, FaHeart, FaMapMarkerAlt, FaPhoneAlt, FaEnvelope, FaBed, FaBath, FaRulerCombined } from "react-icons/fa";
+import {
+  FaRegHeart,
+  FaHeart,
+  FaMapMarkerAlt,
+  FaPhoneAlt,
+  FaEnvelope,
+  FaBed,
+  FaBath,
+  FaRulerCombined,
+} from "react-icons/fa";
 import { Image_URL } from "@/config/constants";
 import { Image_NotFound } from "@/config/constants";
 import { useWatchlistStore } from "@/lib/stores/watchlistStore";
@@ -72,9 +81,9 @@ function BidHistoryModal({ bids, open, onClose }) {
                       <td className="py-2 px-3 border whitespace-nowrap">
                         <span className="price">$</span>
                         {Number(bid.amount)?.toLocaleString("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})}
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </td>
                       <td className="py-2 px-3 border capitalize whitespace-nowrap">
                         {bid.type}
@@ -298,9 +307,9 @@ export default function MotorDetailsClient({ product: initialProduct }) {
   const isInWatchlist = watchlist?.some(
     (item) => item.listing?.slug === product.slug
   );
-  const currentUser = useAuthStore((state) => state.user); 
-    const [isOpen, setIsOpen] = useState(false);
-    const [isOpenContact, setIsOpenContact] = useState(false);
+  const currentUser = useAuthStore((state) => state.user);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isOpenContact, setIsOpenContact] = useState(false);
   const dealer = product?.creator;
   const images = product?.images?.length
     ? product.images.map((img) => `${Image_URL}${img.image_path}`)
@@ -309,7 +318,7 @@ export default function MotorDetailsClient({ product: initialProduct }) {
   // Seller check
   const isSeller = currentUser?.id === product?.seller_id;
 
-  console.log('product', product);
+  console.log("product", product);
 
   //   const handlePostQuestion = async () => {
   //   if (!newQuestion.trim()) {
@@ -386,7 +395,9 @@ export default function MotorDetailsClient({ product: initialProduct }) {
       await commentsApi.deleteComment(commentId);
 
       // local state se comment delete kar do
-      const updatedComments = product.comments.filter((c) => c.id !== commentId);
+      const updatedComments = product.comments.filter(
+        (c) => c.id !== commentId
+      );
       setProduct({ ...product, comments: updatedComments });
 
       toast.success("Comment deleted successfully! ✅");
@@ -421,11 +432,9 @@ export default function MotorDetailsClient({ product: initialProduct }) {
       setEditReplyId(null);
       setEditReplyText("");
       toast.success("Reply updated successfully! ✅");
-
     } catch (error) {
       console.error("Error updating reply:", error);
       toast.error("Failed to update reply ❌");
-
     }
   };
 
@@ -446,11 +455,9 @@ export default function MotorDetailsClient({ product: initialProduct }) {
       setEditCommentId(null); // edit mode se bahar
       setEditCommentText("");
       toast.success("Comment updated successfully!");
-
     } catch (error) {
       console.error("Error updating comment:", error);
       toast.error("Failed to update comment ❌");
-
     }
   };
   // ✅ Delete Reply Handler
@@ -477,7 +484,6 @@ export default function MotorDetailsClient({ product: initialProduct }) {
       toast.error("Failed to delete reply ❌");
     }
   };
-
 
   const [isImageModalOpen, setImageModalOpen] = useState(false);
   const [modalImageIndex, setModalImageIndex] = useState(0);
@@ -506,7 +512,6 @@ export default function MotorDetailsClient({ product: initialProduct }) {
     }
   };
 
-
   const items = [
     { label: "Home", href: "/" },
     { label: "Motors", href: "/motors" },
@@ -531,7 +536,7 @@ export default function MotorDetailsClient({ product: initialProduct }) {
 
       <section className="mx-auto px-4 py-2">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg p-4 w-full max-w-[700px] mx-auto">
+          <div className="bg-white rounded-lg p-4 w-full max-w-[700px] mx-auto">
             {/* Carousel */}
             <div className="relative w-full h-[400px] flex items-center justify-center">
               {/* Left Arrow (hide on mobile if only 1 image) */}
@@ -608,8 +613,9 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                   {images.map((_, idx) => (
                     <button
                       key={idx}
-                      className={`w-2.5 h-2.5 rounded-full ${carouselIndex === idx ? "bg-green-600" : "bg-gray-300"
-                        }`}
+                      className={`w-2.5 h-2.5 rounded-full ${
+                        carouselIndex === idx ? "bg-green-600" : "bg-gray-300"
+                      }`}
                       onClick={() => setCarouselIndex(idx)}
                       aria-label={`Go to image ${idx + 1}`}
                     />
@@ -623,10 +629,11 @@ export default function MotorDetailsClient({ product: initialProduct }) {
               {images.map((img, idx) => (
                 <div
                   key={idx}
-                  className={`relative w-24 mt-10 h-20 rounded-lg border cursor-pointer ${carouselIndex === idx
-                    ? "border-green-500"
-                    : "border-gray-300"
-                    }`}
+                  className={`relative w-24 mt-10 h-20 rounded-lg border cursor-pointer ${
+                    carouselIndex === idx
+                      ? "border-green-500"
+                      : "border-gray-300"
+                  }`}
                   onClick={() => setCarouselIndex(idx)}
                 >
                   <img
@@ -639,376 +646,406 @@ export default function MotorDetailsClient({ product: initialProduct }) {
             </div>
           </div>
 
-{   product.listing_type == 'motors' ?       <div className="space-y-6 mt-5">
-            <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
-              {product.title}
-            </h1>
-            {(product?.creator?.regions?.name || product?.creator?.address_1) && (
-              <div
-                className={`flex items-center gap-2 text-sm text-gray-500 mt-1 ${i18n.language === "ar" ? "right" : ""
+          {product.listing_type == "motors" ? (
+            <div className="space-y-6 mt-5">
+              <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">
+                {product.title}
+              </h1>
+              {(product?.creator?.regions?.name ||
+                product?.creator?.address_1) && (
+                <div
+                  className={`flex items-center gap-2 text-sm text-gray-500 mt-1 ${
+                    i18n.language === "ar" ? "right" : ""
                   }`}
-              >
-                <FaMapMarkerAlt className="text-green-600" />
-                <span>
-                  {product?.creator?.regions?.name
-                    ? (`${product?.creator?.address_1 ? `${product?.creator?.address_1}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`) : ""}
-                </span>
-              </div>
-            )}
-            {product?.expire_at && (
-              <div className="flex items-center space-x-2 text-sm text-gray-600 border border-gray-200 rounded-full px-4 py-2">
-                <span className="font-medium">{t("Closes")}:</span>
-                <span className="font-bold">
-                  {new Date(product.expire_at).toLocaleDateString("en-GB", {
-                    day: "numeric",
-                    month: "long",
-                    year: "numeric",
-                  })}
-                </span>
-                <span className="mx-2 text-gray-400">|</span>
-                <span className="font-medium">{t("Time remaining")}:</span>
-                <span className="font-bold">
-                 {(() => {
-    const now = new Date(
-      new Date().toLocaleString("en-US", { timeZone: "Asia/Riyadh" })
-    );
-
-    const expire = new Date(
-      new Date(product.expire_at).toLocaleString("en-US", { timeZone: "Asia/Riyadh" })
-    );
-
-    const diff = expire - now;
-    if (diff <= 0) return "Expired";
-
-    const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-    const minutes = Math.floor((diff / (1000 * 60)) % 60);
-
-    let str = "";
-    if (days > 0) str += `${days}d `;
-    if (hours > 0 || days > 0) str += `${hours}h `;
-    str += `${minutes}m`;
-    return str.trim();
-  })()}
-                </span>
-              </div>
-            )}
-            {(!isLister && product?.status == 1) && (
-              <div className="flex space-x-2">
-                <button
-                  className="flex-1 bg-black text-white py-3 rounded-full cursor-pointer hover:bg-gray-800"
-                  onClick={() => {
-                    if (!isLoggedIn) {
-                      setShowLoginModal(true);
-                      return;
-                    }
-
-                    if (isInWatchlist) {
-                      removeFromWatchlist(product.slug);
-                    } else {
-                      addToWatchlist(product.slug);
-                    }
-                  }}
                 >
-                  {isInWatchlist
-                    ? t("Remove from Watchlist")
-                    : t("Add to Watchlist")}
-                </button>
-
-                <button
-                  className="rounded-full"
-                  onClick={() => {
-                    if (!isLoggedIn) {
-                      setShowLoginModal(true);
-                      return;
-                    }
-
-                    if (isInWatchlist) {
-                      removeFromWatchlist(product.slug);
-                    } else {
-                      addToWatchlist(product.slug);
-                    }
-                  }}
-                  aria-label={
-                    isInWatchlist ? "Remove from Watchlist" : "Add to Watchlist"
-                  }
-                >
-                  {isInWatchlist ? (
-                    <FaHeart className="text-red-500 text-3xl cursor-pointer" />
-                  ) : (
-                    <FaRegHeart className="text-3xl cursor-pointer" />
-                  )}
-                </button>
-              </div>
-            )}
-            {/* Bid Section */}
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center space-y-4">
-              {/* Buy Now Section */}
-              {product.buy_now_price && product.bids.length == 0 && (
-                <>
-                  <div className="mb-2">
-                    <span className="block text-sm text-gray-600">Buy Now</span>
-                    <span className="block text-4xl font-bold text-gray-900">
-                      <span className="price">$</span>
-            {(product.buy_now_price || product.buy_now_price === 0)
-  ? product.buy_now_price
-  : "-"}
-
-                    </span>
-                  </div>
-                  {(!isLister && product?.status == 1) && (
-                    <button
-                      className="w-full py-3 text-lg font-semibold rounded-full transition-colors bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                      onClick={() => {
-                        // if (new Date() <= new Date(product.expire_at))
-                        // setBuyNowOpen(true);
-                        if (!isLoggedIn) return setShowLoginModal(true);
-                        setBuyNowOpen(true);
-                      }}
-                    // disabled={new Date() > new Date(product.expire_at)}
-                    >
-                      {t("Buy Now")}
-                    </button>
-                  )}
-                </>
-              )}
-              {/* Current Bid */}
-              {product.bids && product.bids.length > 0 ? (
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">
-                    {t("Current Bid")}
-                  </p>
-                  <p className="text-4xl font-bold text-gray-900">
-                    <span className="price">$</span>
-                    {product.bids[0]?.amount?.toLocaleString("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-}) || "0.00"}
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-sm text-gray-600 mb-1">
-                    {t("Starting From")}
-                  </p>
-                  <p className="text-4xl font-bold text-gray-900">
-                    <span className="price">$</span>
-                    {product.start_price?.toLocaleString("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-}) || "0.00"}
-                  </p>
-                </div>
-              )}
-              {(!isLister && product?.status == 1) && (
-                <button
-                  className={`w-full py-3 text-lg font-semibold rounded-full transition-colors ${new Date() > new Date(product.expire_at)
-                    ? "bg-gray-300 text-gray-400 cursor-not-allowed"
-                    : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
-                    }`}
-                  onClick={() => {
-                    if (!isLoggedIn) {
-                      setShowLoginModal(true);
-                      return;
-                    }
-                    if (new Date() <= new Date(product.expire_at))
-                      setModalOpen(true);
-                  }}
-                  disabled={new Date() > new Date(product.expire_at)}
-                >
-                  {t("Place bid")}
-                </button>
-              )}
-              <PlaceBidModal
-                product={product}
-                isOpen={isModalOpen}
-                onClose={() => {
-                  setModalOpen(false);
-                }}
-                onBidPlaced={refreshProduct}
-              />
-              <BuyNowModal
-                product={product}
-                isOpen={isBuyNowOpen}
-                onClose={() => setBuyNowOpen(false)}
-                onBuyNow={refreshProduct}
-              />
-              <p className="text-xs text-gray-500">
-                <span className="font-medium text-gray-700">
-                  {product.bids &&
-                    product.bids[0]?.amount > product?.reserve_price
-                    ? t("Reserve Met")
-                    : t("Reserve Not Met")}
-                </span>
-              </p>
-              <p className="text-xs text-gray-500">
-                <span className="text-green-600 font-medium">
-                  {" "}
-                  {product?.bids_count || 0} {t("bids so far")}
-                </span>{" "}
-                –{" "}
-                <span
-                  className="text-green-600 underline cursor-pointer hover:text-green-800"
-                  onClick={() => setBidHistoryOpen(true)}
-                >
-                  {t("view history")}
-                </span>
-              </p>
-              {product?.allow_offers && product.bids.length == 0 && (
-                <div className="flex items-center justify-between mt-4">
-                  <span className="text-sm text-gray-600">
-                    {t("The seller is open to offers on this listing")}
+                  <FaMapMarkerAlt className="text-green-600" />
+                  <span>
+                    {product?.creator?.regions?.name
+                      ? `${
+                          product?.creator?.address_1
+                            ? `${product?.creator?.address_1}, `
+                            : ""
+                        } ${product?.creator?.governorates?.name}, ${
+                          product?.creator?.regions?.name
+                        }`
+                      : ""}
                   </span>
-                  {(!isLister && product?.status == 1) && (
-                    <button
-                      className="bg-gray-100 text-green-600 border border-green-600 font-semibold px-4 py-2 rounded hover:bg-gray-200 transition"
-                      onClick={() => {
-                        if (!isLoggedIn) {
-                          setShowLoginModal(true);
-                          return;
-                        }
-                        setMakeOfferOpen(true);
-                      }}
-                    >
-                      {t("Make an Offer")}
-                    </button>
-                  )}
                 </div>
               )}
-            </div>
-            {/*User Details*/}
-            <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-4 mt-3 flex flex-col sm:flex-row sm:items-center sm:gap-4 relative shadow-sm">
-              {/* Avatar */}
-              <div className="flex items-center justify-center mb-3 sm:mb-0 sm:order-1">
-                <div className="w-14 h-14 bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
-                  {product?.creator?.profile_photo ? (
-                    <img
-                      src={`${Image_URL}${product.creator.profile_photo}`}
-                      alt={product?.creator?.username || "Seller Avatar"}
-                      className="w-full h-full object-cover rounded-md"
-                      loading="lazy"
-                    />
-                  ) : (
-                    <span className="text-lg font-bold text-gray-700">
-                      {product?.creator?.username?.charAt(0)?.toUpperCase()}
-                    </span>
-                  )}
-                </div>
-              </div>
+              {product?.expire_at && (
+                <div className="flex items-center space-x-2 text-sm text-gray-600 border border-gray-200 rounded-full px-4 py-2">
+                  <span className="font-medium">{t("Closes")}:</span>
+                  <span className="font-bold">
+                    {new Date(product.expire_at).toLocaleDateString("en-GB", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })}
+                  </span>
+                  <span className="mx-2 text-gray-400">|</span>
+                  <span className="font-medium">{t("Time remaining")}:</span>
+                  <span className="font-bold">
+                    {(() => {
+                      const now = new Date(
+                        new Date().toLocaleString("en-US", {
+                          timeZone: "Asia/Riyadh",
+                        })
+                      );
 
-              {/* Seller Info */}
-              <div
-                className={`flex-1 ${i18n.language === "ar" ? "text-right" : "text-left"
-                  } sm:order-2`}    
-              >
-                <div className="text-base font-semibold text-black break-words">
-                  {product.creator?.username || t("Seller")}
-                </div>
-                {/* <div className="text-sm text-green-600 font-medium mt-1">
-                  100% {t("positive feedback")}
-                </div> */}
-                <div className="text-xs text-gray-500 mt-0.5">
-                  {product.creator?.regions?.name ? (
-                    <>
-                      {t("Location")}: {(`${product?.creator?.address_1 ? `${product?.creator?.address_1}, ` : ""} ${product?.creator?.governorates?.name}, ${product?.creator?.regions?.name}`)}
-                    </>
-                  ) : (
-                    <>
-                      {/* {t("Location")}:{" "}
-                      {product.creator?.billing_address || "Unknown"} */}
-                    </>
-                  )}
-                </div>
-              </div>
+                      const expire = new Date(
+                        new Date(product.expire_at).toLocaleString("en-US", {
+                          timeZone: "Asia/Riyadh",
+                        })
+                      );
 
-              {/* Add to Favorite */}
-              <div
-                className={`mt-4 sm:mt-0 sm:absolute sm:top-1/2 sm:-translate-y-1/2 w-full sm:w-auto ${i18n.language === "ar" ? "sm:left-4" : "sm:right-4"
-                  } sm:order-3`}
-              >
-                {isLoggedIn && !isLister && (
+                      const diff = expire - now;
+                      if (diff <= 0) return "Expired";
+
+                      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+
+                      let str = "";
+                      if (days > 0) str += `${days}d `;
+                      if (hours > 0 || days > 0) str += `${hours}h `;
+                      str += `${minutes}m`;
+                      return str.trim();
+                    })()}
+                  </span>
+                </div>
+              )}
+              {!isLister && product?.status == 1 && (
+                <div className="flex space-x-2">
                   <button
-                    className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-semibold transition"
-                    onClick={async () => {
-                      try {
-                        await userApi.addAndDeleteSeller(product.creator?.id);
-                        toast.success("Seller added to favorites!");
-                      } catch (e) {
-                        toast.error("Failed to add seller to favorites");
+                    className="flex-1 bg-black text-white py-3 rounded-full cursor-pointer hover:bg-gray-800"
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        setShowLoginModal(true);
+                        return;
+                      }
+
+                      if (isInWatchlist) {
+                        removeFromWatchlist(product.slug);
+                      } else {
+                        addToWatchlist(product.slug);
                       }
                     }}
                   >
-                    {t("Add Seller to Favorites")}
+                    {isInWatchlist
+                      ? t("Remove from Watchlist")
+                      : t("Add to Watchlist")}
+                  </button>
+
+                  <button
+                    className="rounded-full"
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        setShowLoginModal(true);
+                        return;
+                      }
+
+                      if (isInWatchlist) {
+                        removeFromWatchlist(product.slug);
+                      } else {
+                        addToWatchlist(product.slug);
+                      }
+                    }}
+                    aria-label={
+                      isInWatchlist
+                        ? "Remove from Watchlist"
+                        : "Add to Watchlist"
+                    }
+                  >
+                    {isInWatchlist ? (
+                      <FaHeart className="text-red-500 text-3xl cursor-pointer" />
+                    ) : (
+                      <FaRegHeart className="text-3xl cursor-pointer" />
+                    )}
+                  </button>
+                </div>
+              )}
+              {/* Bid Section */}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 text-center space-y-4">
+                {/* Buy Now Section */}
+                {product.buy_now_price && product.bids.length == 0 && (
+                  <>
+                    <div className="mb-2">
+                      <span className="block text-sm text-gray-600">
+                        Buy Now
+                      </span>
+                      <span className="block text-4xl font-bold text-gray-900">
+                        <span className="price">$</span>
+                        {product.buy_now_price || product.buy_now_price === 0
+                          ? product.buy_now_price
+                          : "-"}
+                      </span>
+                    </div>
+                    {!isLister && product?.status == 1 && (
+                      <button
+                        className="w-full py-3 text-lg font-semibold rounded-full transition-colors bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                        onClick={() => {
+                          // if (new Date() <= new Date(product.expire_at))
+                          // setBuyNowOpen(true);
+                          if (!isLoggedIn) return setShowLoginModal(true);
+                          setBuyNowOpen(true);
+                        }}
+                        // disabled={new Date() > new Date(product.expire_at)}
+                      >
+                        {t("Buy Now")}
+                      </button>
+                    )}
+                  </>
+                )}
+                {/* Current Bid */}
+                {product.bids && product.bids.length > 0 ? (
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {t("Current Bid")}
+                    </p>
+                    <p className="text-4xl font-bold text-gray-900">
+                      <span className="price">$</span>
+                      {product.bids[0]?.amount?.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }) || "0.00"}
+                    </p>
+                  </div>
+                ) : (
+                  <div>
+                    <p className="text-sm text-gray-600 mb-1">
+                      {t("Starting From")}
+                    </p>
+                    <p className="text-4xl font-bold text-gray-900">
+                      <span className="price">$</span>
+                      {product.start_price?.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }) || "0.00"}
+                    </p>
+                  </div>
+                )}
+                {!isLister && product?.status == 1 && (
+                  <button
+                    className={`w-full py-3 text-lg font-semibold rounded-full transition-colors ${
+                      new Date() > new Date(product.expire_at)
+                        ? "bg-gray-300 text-gray-400 cursor-not-allowed"
+                        : "bg-green-500 hover:bg-green-600 text-white cursor-pointer"
+                    }`}
+                    onClick={() => {
+                      if (!isLoggedIn) {
+                        setShowLoginModal(true);
+                        return;
+                      }
+                      if (new Date() <= new Date(product.expire_at))
+                        setModalOpen(true);
+                    }}
+                    disabled={new Date() > new Date(product.expire_at)}
+                  >
+                    {t("Place bid")}
                   </button>
                 )}
-                {favoriteStatus && (
-                  <p className="text-green-600 text-xs mt-1 text-center sm:text-left">
-                    {favoriteStatus}
-                  </p>
+                <PlaceBidModal
+                  product={product}
+                  isOpen={isModalOpen}
+                  onClose={() => {
+                    setModalOpen(false);
+                  }}
+                  onBidPlaced={refreshProduct}
+                />
+                <BuyNowModal
+                  product={product}
+                  isOpen={isBuyNowOpen}
+                  onClose={() => setBuyNowOpen(false)}
+                  onBuyNow={refreshProduct}
+                />
+                <p className="text-xs text-gray-500">
+                  <span className="font-medium text-gray-700">
+                    {product.bids &&
+                    product.bids[0]?.amount > product?.reserve_price
+                      ? t("Reserve Met")
+                      : t("Reserve Not Met")}
+                  </span>
+                </p>
+                <p className="text-xs text-gray-500">
+                  <span className="text-green-600 font-medium">
+                    {" "}
+                    {product?.bids_count || 0} {t("bids so far")}
+                  </span>{" "}
+                  –{" "}
+                  <span
+                    className="text-green-600 underline cursor-pointer hover:text-green-800"
+                    onClick={() => setBidHistoryOpen(true)}
+                  >
+                    {t("view history")}
+                  </span>
+                </p>
+                {product?.allow_offers && product.bids.length == 0 && (
+                  <div className="flex items-center justify-between mt-4">
+                    <span className="text-sm text-gray-600">
+                      {t("The seller is open to offers on this listing")}
+                    </span>
+                    {!isLister && product?.status == 1 && (
+                      <button
+                        className="bg-gray-100 text-green-600 border border-green-600 font-semibold px-4 py-2 rounded hover:bg-gray-200 transition"
+                        onClick={() => {
+                          if (!isLoggedIn) {
+                            setShowLoginModal(true);
+                            return;
+                          }
+                          setMakeOfferOpen(true);
+                        }}
+                      >
+                        {t("Make an Offer")}
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
-            </div>
-          </div> :
-          <div>
-                    {/* Title */}
-                    <div className="flex justify-between items-start mb-2">
-                      <h1 className="text-2xl font-bold">{product?.title}</h1>
-                    </div>
-                    <p className="text-gray-500 text-sm mb-4">
-                     {product?.description}
-                     </p>
-          
-                    {/* Location & Specs */}
-                    <div className="flex flex-wrap gap-4 text-sm mb-3">
-                      <span className="flex items-center gap-1 text-green-500">
-                        <FaMapMarkerAlt /> {`${product?.creator?.city}, ${product?.creator?.country}` || "Unknown Location"}
+              {/*User Details*/}
+              <div className="bg-gray-50 border border-gray-200 rounded-lg px-4 py-4 mt-3 flex flex-col sm:flex-row sm:items-center sm:gap-4 relative shadow-sm">
+                {/* Avatar */}
+                <div className="flex items-center justify-center mb-3 sm:mb-0 sm:order-1">
+                  <div className="w-14 h-14 bg-gray-200 rounded-md flex items-center justify-center overflow-hidden">
+                    {product?.creator?.profile_photo ? (
+                      <img
+                        src={`${Image_URL}${product.creator.profile_photo}`}
+                        alt={product?.creator?.username || "Seller Avatar"}
+                        className="w-full h-full object-cover rounded-md"
+                        loading="lazy"
+                      />
+                    ) : (
+                      <span className="text-lg font-bold text-gray-700">
+                        {product?.creator?.username?.charAt(0)?.toUpperCase()}
                       </span>
-                      </div>
-                    <div className="flex flex-wrap gap-4 text-sm mb-3">
-                     
-                      {/* Bedrooms */}
-  {product?.bedrooms && (
-    <span className="flex items-center gap-1">
-      <FaBed /> {product.bedrooms}
-    </span>
-  )}
-
-  {/* Bathrooms */}
-  {product?.bathrooms && (
-    <span className="flex items-center gap-1">
-      <FaBath /> {product.bathrooms}
-    </span>
-  )}
-
-  {/* Plot Size */}
-  {product?.plot_size && (
-    <span className="flex items-center gap-1">
-      <FaRulerCombined /> {product.plot_size} sqft
-    </span>
-  )}
-
-                    </div>
-          
-                    {/* Price */}
-                    <div className="mb-6">
-                      <p className="text-gray-500 text-sm">Asking price:</p>
-                      <p className="text-3xl font-bold text-black">
-                        <span className="price">$</span>{Number(product?.buy_now_price)?.toLocaleString("en-US", {
-  minimumFractionDigits: 2,
-  maximumFractionDigits: 2,
-})}{" "}
-                      </p>
-                    </div>
-          
-                     <button
-                  onClick={() => setIsOpen(true)}
-                  className="w-full cursor-pointer bg-green-500 text-white py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
-                >
-                  <FaPhoneAlt /> Contact Seller
-                </button>
+                    )}
                   </div>
-          }
-      </div>
+                </div>
+
+                {/* Seller Info */}
+                <div
+                  className={`flex-1 ${
+                    i18n.language === "ar" ? "text-right" : "text-left"
+                  } sm:order-2`}
+                >
+                  <div className="text-base font-semibold text-black break-words">
+                    {product.creator?.username || t("Seller")}
+                  </div>
+                  {/* <div className="text-sm text-green-600 font-medium mt-1">
+                  100% {t("positive feedback")}
+                </div> */}
+                  <div className="text-xs text-gray-500 mt-0.5">
+                    {product.creator?.regions?.name ? (
+                      <>
+                        {t("Location")}:{" "}
+                        {`${
+                          product?.creator?.address_1
+                            ? `${product?.creator?.address_1}, `
+                            : ""
+                        } ${product?.creator?.governorates?.name}, ${
+                          product?.creator?.regions?.name
+                        }`}
+                      </>
+                    ) : (
+                      <>
+                        {/* {t("Location")}:{" "}
+                      {product.creator?.billing_address || "Unknown"} */}
+                      </>
+                    )}
+                  </div>
+                </div>
+
+                {/* Add to Favorite */}
+                <div
+                  className={`mt-4 sm:mt-0 sm:absolute sm:top-1/2 sm:-translate-y-1/2 w-full sm:w-auto ${
+                    i18n.language === "ar" ? "sm:left-4" : "sm:right-4"
+                  } sm:order-3`}
+                >
+                  {isLoggedIn && !isLister && (
+                    <button
+                      className="w-full sm:w-auto bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded text-sm font-semibold transition"
+                      onClick={async () => {
+                        try {
+                          await userApi.addAndDeleteSeller(product.creator?.id);
+                          toast.success("Seller added to favorites!");
+                        } catch (e) {
+                          toast.error("Failed to add seller to favorites");
+                        }
+                      }}
+                    >
+                      {t("Add Seller to Favorites")}
+                    </button>
+                  )}
+                  {favoriteStatus && (
+                    <p className="text-green-600 text-xs mt-1 text-center sm:text-left">
+                      {favoriteStatus}
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div>
+              {/* Title */}
+              <div className="flex justify-between items-start mb-2">
+                <h1 className="text-2xl font-bold">{product?.title}</h1>
+              </div>
+              <div
+                className="text-gray-500 text-sm mb-4"
+                dangerouslySetInnerHTML={{ __html: product?.description || "" }}
+              />
+
+              {/* Location & Specs */}
+              <div className="flex flex-wrap gap-4 text-sm mb-3">
+                <span className="flex items-center gap-1 text-green-500">
+                  <FaMapMarkerAlt />{" "}
+                  {`${product?.creator?.city}, ${product?.creator?.country}` ||
+                    "Unknown Location"}
+                </span>
+              </div>
+              <div className="flex flex-wrap gap-4 text-sm mb-3">
+                {/* Bedrooms */}
+                {product?.bedrooms && (
+                  <span className="flex items-center gap-1">
+                    <FaBed /> {product.bedrooms}
+                  </span>
+                )}
+
+                {/* Bathrooms */}
+                {product?.bathrooms && (
+                  <span className="flex items-center gap-1">
+                    <FaBath /> {product.bathrooms}
+                  </span>
+                )}
+
+                {/* Plot Size */}
+                {product?.plot_size && (
+                  <span className="flex items-center gap-1">
+                    <FaRulerCombined /> {product.plot_size} sqft
+                  </span>
+                )}
+              </div>
+
+              {/* Price */}
+              <div className="mb-6">
+                <p className="text-gray-500 text-sm">Asking price:</p>
+                <p className="text-3xl font-bold text-black">
+                  <span className="price">$</span>
+                  {Number(product?.buy_now_price)?.toLocaleString("en-US", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}{" "}
+                </p>
+              </div>
+
+              <button
+                onClick={() => setIsOpen(true)}
+                className="w-full cursor-pointer bg-green-500 text-white py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+              >
+                <FaPhoneAlt /> Contact Seller
+              </button>
+            </div>
+          )}
+        </div>
       </section>
       {/* ======= PRODUCT DETAILS ======= */}
       <div className="max-w-7xl mx-auto bg-white rounded-lg px-6 md:px-20 py-10">
@@ -1027,7 +1064,9 @@ export default function MotorDetailsClient({ product: initialProduct }) {
             )
             .map(([key, value]) => (
               <div key={key}>
-                <div className="font-bold uppercase">{t(key.toLocaleUpperCase())}</div>
+                <div className="font-bold uppercase">
+                  {t(key.toLocaleUpperCase())}
+                </div>
                 <div className="text-gray-700 uppercase">{value}</div>
               </div>
             ))}
@@ -1035,7 +1074,7 @@ export default function MotorDetailsClient({ product: initialProduct }) {
       </div>
 
       {/* ======= PROPERTY MAP SECTION ======= */}
-      {product.listing_type === 'property' && (
+      {product.listing_type === "property" && (
         <PropertyMapSection property={product} />
       )}
 
@@ -1111,10 +1150,15 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                         </>
                       ) : (
                         <>
-                          <p className="font-medium text-gray-800">Q: {c.comment_text}</p>
+                          <p className="font-medium text-gray-800">
+                            Q: {c.comment_text}
+                          </p>
                           <p className="text-gray-600 text-sm mt-1">
-                            {t("Asked by")} <span className="font-medium">{c.user?.username}</span> –{" "}
-                            {new Date(c.created_at).toLocaleDateString()}{" "}
+                            {t("Asked by")}{" "}
+                            <span className="font-medium">
+                              {c.user?.username}
+                            </span>{" "}
+                            – {new Date(c.created_at).toLocaleDateString()}{" "}
                             {new Date(c.created_at).toLocaleTimeString([], {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -1141,14 +1185,16 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                               </button> */}
                               <button
                                 onClick={() => {
-                                  setDeleteTarget({ type: "comment", commentId: c.id });
+                                  setDeleteTarget({
+                                    type: "comment",
+                                    commentId: c.id,
+                                  });
                                   setIsDeleteModalOpen(true);
                                 }}
                                 className="text-red-600 text-sm hover:underline cursor-pointer"
                               >
                                 {t("Delete")}
                               </button>
-
                             </div>
                           )}
                         </>
@@ -1160,13 +1206,17 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                   {c.replies?.length > 0 &&
                     c.replies.map((r, index) => {
                       const borderColor =
-                        index % 2 === 0 ? "border-yellow-500" : "border-green-500";
+                        index % 2 === 0
+                          ? "border-yellow-500"
+                          : "border-green-500";
 
                       return (
                         <div
                           key={r.id}
-                          className={`ml-12 mt-4 ${isRTL ? "border-r-2 pr-4" : "border-l-2 pl-4"
-                            } ${borderColor}`}                        >
+                          className={`ml-12 mt-4 ${
+                            isRTL ? "border-r-2 pr-4" : "border-l-2 pl-4"
+                          } ${borderColor}`}
+                        >
                           <div className="flex items-start gap-5">
                             <div className="w-10 h-10 bg-gray-200 flex items-center justify-center rounded-full shadow text-base font-bold text-gray-800 uppercase">
                               {r.user?.username?.charAt(0) || "U"}
@@ -1179,10 +1229,14 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                                     className="w-full border rounded-lg p-2 text-sm"
                                     rows="2"
                                     value={editReplyText}
-                                    onChange={(e) => setEditReplyText(e.target.value)}
+                                    onChange={(e) =>
+                                      setEditReplyText(e.target.value)
+                                    }
                                   />
                                   <button
-                                    onClick={() => handleUpdateReply(c.id, r.id)}
+                                    onClick={() =>
+                                      handleUpdateReply(c.id, r.id)
+                                    }
                                     className="mt-2 px-3 py-1 bg-green-600 text-white cursor-pointer text-sm rounded-lg hover:bg-green-700"
                                   >
                                     {t("Save")}
@@ -1198,17 +1252,24 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                                 <>
                                   <p className="font-medium text-gray-800">
                                     {r.user?.username}{" "}
-                                    <span className="text-gray-500">{t("replied:")}</span>
+                                    <span className="text-gray-500">
+                                      {t("replied:")}
+                                    </span>
                                   </p>
                                   <p className="text-gray-700 text-sm mt-1">
                                     {r.comment_text}
                                   </p>
                                   <p className="text-gray-500 text-xs mt-1">
-                                    {new Date(r.created_at).toLocaleDateString()}{" "}
-                                    {new Date(r.created_at).toLocaleTimeString([], {
-                                      hour: "2-digit",
-                                      minute: "2-digit",
-                                    })}
+                                    {new Date(
+                                      r.created_at
+                                    ).toLocaleDateString()}{" "}
+                                    {new Date(r.created_at).toLocaleTimeString(
+                                      [],
+                                      {
+                                        hour: "2-digit",
+                                        minute: "2-digit",
+                                      }
+                                    )}
                                   </p>
 
                                   {/* Reply edit/delete only for reply owner */}
@@ -1231,14 +1292,17 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                                       </button> */}
                                       <button
                                         onClick={() => {
-                                          setDeleteTarget({ type: "reply", commentId: c.id, replyId: r.id });
+                                          setDeleteTarget({
+                                            type: "reply",
+                                            commentId: c.id,
+                                            replyId: r.id,
+                                          });
                                           setIsDeleteModalOpen(true);
                                         }}
                                         className="text-red-600 text-sm hover:underline cursor-pointer"
                                       >
                                         {t("Delete")}
                                       </button>
-
                                     </div>
                                   )}
                                 </>
@@ -1267,7 +1331,6 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                       </button>
                     </div>
                   )}
-
                 </div>
               ))
             ) : (
@@ -1275,7 +1338,6 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                 {t("No questions yet. Be the first to ask!")}
               </p>
             )}
-
           </div>
           {/* {isDeleteModalOpen && (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm px-4">
@@ -1346,7 +1408,10 @@ export default function MotorDetailsClient({ product: initialProduct }) {
                         if (deleteTarget?.type === "comment") {
                           await handleDeleteComment(deleteTarget.commentId);
                         } else if (deleteTarget?.type === "reply") {
-                          await handleDeleteReply(deleteTarget.commentId, deleteTarget.replyId);
+                          await handleDeleteReply(
+                            deleteTarget.commentId,
+                            deleteTarget.replyId
+                          );
                         }
                         setIsDeleteModalOpen(false);
                         setDeleteTarget(null);
@@ -1369,84 +1434,85 @@ export default function MotorDetailsClient({ product: initialProduct }) {
               </div>
             </div>
           )}
-    {/* Modal */}
-{isOpenContact && (
-  <div className="fixed inset-0 flex items-center justify-center z-50">
-    {/* Background Overlay */}
-    <div
-      className="absolute inset-0 bg-black opacity-50"
-      onClick={() => setIsOpen(false)}
-    ></div>
+          {/* Modal */}
+          {isOpenContact && (
+            <div className="fixed inset-0 flex items-center justify-center z-50">
+              {/* Background Overlay */}
+              <div
+                className="absolute inset-0 bg-black opacity-50"
+                onClick={() => setIsOpen(false)}
+              ></div>
 
-    {/* Modal Content */}
-    <div className="relative bg-white rounded-lg shadow-lg max-w-lg w-full p-6 z-10">
-      {/* Close Button */}
-      <button
-        onClick={() => setIsOpen(false)}
-        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-      >
-        ✕
-      </button>
+              {/* Modal Content */}
+              <div className="relative bg-white rounded-lg shadow-lg max-w-lg w-full p-6 z-10">
+                {/* Close Button */}
+                <button
+                  onClick={() => setIsOpen(false)}
+                  className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
 
-      {/* Dealer Info */}
-      <h2 className="text-xl font-semibold mb-4">Seller Information</h2>
+                {/* Dealer Info */}
+                <h2 className="text-xl font-semibold mb-4">
+                  Seller Information
+                </h2>
 
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-        {/* Left Side - Profile Photo */}
-        <div className="bg-[#113f2e] w-36 h-36 rounded-full overflow-hidden border border-gray-300 flex justify-center items-center">
-           {dealer?.profile_photo ? (
-    <img
-      src={`${Image_URL}${dealer.profile_photo}`}
-      alt={dealer?.name}
-      className="w-full h-full object-cover"
-    />
-  ) : (
-    <span className="text-white text-5xl">{dealer?.name?.charAt(0)?.toUpperCase()}</span>
-  )}
+                <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+                  {/* Left Side - Profile Photo */}
+                  <div className="bg-[#113f2e] w-36 h-36 rounded-full overflow-hidden border border-gray-300 flex justify-center items-center">
+                    {dealer?.profile_photo ? (
+                      <img
+                        src={`${Image_URL}${dealer.profile_photo}`}
+                        alt={dealer?.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <span className="text-white text-5xl">
+                        {dealer?.name?.charAt(0)?.toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Right Side - Details */}
+                  <div className="flex-1 space-y-2 text-gray-700 text-md md:text-md">
+                    <p>
+                      <strong>Name:</strong> {dealer?.name}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {dealer?.email}
+                    </p>
+                    <p>
+                      <strong>Phone:</strong> {dealer?.phone}
+                    </p>
+                    <p>
+                      <strong>City:</strong> {dealer?.city}
+                    </p>
+                    <p>
+                      <strong>Country:</strong> {dealer?.country}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 mt-6">
+                  <a
+                    href={`mailto:${dealer?.email}`}
+                    className="flex-1 bg-gray-200 text-gray-900 py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+                  >
+                    <FaEnvelope /> Email
+                  </a>
+                  <a
+                    href={`tel:${dealer?.phone}`}
+                    className="flex-1 bg-green-500 text-white py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+                  >
+                    <FaPhoneAlt /> Call
+                  </a>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
-
-        {/* Right Side - Details */}
-        <div className="flex-1 space-y-2 text-gray-700 text-md md:text-md">
-          <p>
-            <strong>Name:</strong> {dealer?.name}
-          </p>
-          <p>
-            <strong>Email:</strong> {dealer?.email}
-          </p>
-          <p>
-            <strong>Phone:</strong> {dealer?.phone}
-          </p>
-          <p>
-            <strong>City:</strong> {dealer?.city}
-          </p>
-          <p>
-            <strong>Country:</strong> {dealer?.country}
-          </p>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex gap-3 mt-6">
-        <a
-          href={`mailto:${dealer?.email}`}
-          className="flex-1 bg-gray-200 text-gray-900 py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
-        >
-          <FaEnvelope /> Email
-        </a>
-        <a
-          href={`tel:${dealer?.phone}`}
-          className="flex-1 bg-green-500 text-white py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
-        >
-          <FaPhoneAlt /> Call
-        </a>
-      </div>
-    </div>
-  </div>
-)}
-
-        </div>
-
-
       </div>
       <BidHistoryModal
         bids={product.bids || []}
@@ -1510,80 +1576,82 @@ export default function MotorDetailsClient({ product: initialProduct }) {
         </div>
       )}
 
-        {/* Modal */}
-{isOpen && (
-  <div className="fixed inset-0 flex items-center justify-center z-50">
-    {/* Background Overlay */}
-    <div
-      className="absolute inset-0 bg-black opacity-50"
-      onClick={() => setIsOpen(false)}
-    ></div>
+      {/* Modal */}
+      {isOpen && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          {/* Background Overlay */}
+          <div
+            className="absolute inset-0 bg-black opacity-50"
+            onClick={() => setIsOpen(false)}
+          ></div>
 
-    {/* Modal Content */}
-    <div className="relative bg-white rounded-lg shadow-lg max-w-lg w-full p-6 z-10">
-      {/* Close Button */}
-      <button
-        onClick={() => setIsOpen(false)}
-        className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-      >
-        ✕
-      </button>
+          {/* Modal Content */}
+          <div className="relative bg-white rounded-lg shadow-lg max-w-lg w-full p-6 z-10">
+            {/* Close Button */}
+            <button
+              onClick={() => setIsOpen(false)}
+              className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            >
+              ✕
+            </button>
 
-      {/* Dealer Info */}
-      <h2 className="text-xl font-semibold mb-4">Seller Information</h2>
+            {/* Dealer Info */}
+            <h2 className="text-xl font-semibold mb-4">Seller Information</h2>
 
-      <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-        {/* Left Side - Profile Photo */}
-        <div className="bg-[#113f2e] w-36 h-36 rounded-full overflow-hidden border border-gray-300 flex justify-center items-center">
-           {dealer?.profile_photo ? (
-    <img
-      src={`${Image_URL}${dealer.profile_photo}`}
-      alt={dealer?.name}
-      className="w-full h-full object-cover"
-    />
-  ) : (
-    <span className="text-white text-5xl">{dealer?.name?.charAt(0)?.toUpperCase()}</span>
-  )}
+            <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
+              {/* Left Side - Profile Photo */}
+              <div className="bg-[#113f2e] w-36 h-36 rounded-full overflow-hidden border border-gray-300 flex justify-center items-center">
+                {dealer?.profile_photo ? (
+                  <img
+                    src={`${Image_URL}${dealer.profile_photo}`}
+                    alt={dealer?.name}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <span className="text-white text-5xl">
+                    {dealer?.name?.charAt(0)?.toUpperCase()}
+                  </span>
+                )}
+              </div>
+
+              {/* Right Side - Details */}
+              <div className="flex-1 space-y-2 text-gray-700 text-md md:text-md">
+                <p>
+                  <strong>Name:</strong> {dealer?.name}
+                </p>
+                <p>
+                  <strong>Email:</strong> {dealer?.email}
+                </p>
+                <p>
+                  <strong>Phone:</strong> {dealer?.phone}
+                </p>
+                <p>
+                  <strong>City:</strong> {dealer?.city}
+                </p>
+                <p>
+                  <strong>Country:</strong> {dealer?.country}
+                </p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex gap-3 mt-6">
+              <a
+                href={`mailto:${dealer?.email}`}
+                className="flex-1 bg-gray-200 text-gray-900 py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+              >
+                <FaEnvelope /> Email
+              </a>
+              <a
+                href={`tel:${dealer?.phone}`}
+                className="flex-1 bg-green-500 text-white py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
+              >
+                <FaPhoneAlt /> Call
+              </a>
+            </div>
+          </div>
         </div>
-
-        {/* Right Side - Details */}
-        <div className="flex-1 space-y-2 text-gray-700 text-md md:text-md">
-          <p>
-            <strong>Name:</strong> {dealer?.name}
-          </p>
-          <p>
-            <strong>Email:</strong> {dealer?.email}
-          </p>
-          <p>
-            <strong>Phone:</strong> {dealer?.phone}
-          </p>
-          <p>
-            <strong>City:</strong> {dealer?.city}
-          </p>
-          <p>
-            <strong>Country:</strong> {dealer?.country}
-          </p>
-        </div>
-      </div>
-
-      {/* Action Buttons */}
-      <div className="flex gap-3 mt-6">
-        <a
-          href={`mailto:${dealer?.email}`}
-          className="flex-1 bg-gray-200 text-gray-900 py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
-        >
-          <FaEnvelope /> Email
-        </a>
-        <a
-          href={`tel:${dealer?.phone}`}
-          className="flex-1 bg-green-500 text-white py-2 rounded-3xl font-medium flex items-center justify-center gap-2"
-        >
-          <FaPhoneAlt /> Call
-        </a>
-      </div>
-    </div>
-  </div>
-)}
+      )}
     </div>
   );
 }

@@ -385,6 +385,7 @@
   "Sold Now": "تم البيع الآن",
   "UNSOLD": "غير مَبِيع",
   "listings": "القوائم",
+ "Loading Listings...": "جاري تحميل القوائم...",
  "loadingListings...": "جاري تحميل القوائم...",
   "No listings found.": "لم يتم العثور على أي قوائم.",
     "Relist this listing": "أعد إدراج هذه القائمة",

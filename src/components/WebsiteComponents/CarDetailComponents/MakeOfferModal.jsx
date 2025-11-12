@@ -75,17 +75,23 @@ function MakeOfferModal({ isOpen, onClose, product, onOfferMade }) {
         )}
         <form onSubmit={handleSubmit} className="mb-6">
           <label className="block mb-2 font-medium text-gray-700 text-left">{t("Your offer")}</label>
-          <input
-            type="number"
-            min="0"
-            step="0.01"
-            value={amount}
-            onChange={e => setAmount(e.target.value)}
-            placeholder="$0.00"
-            className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-2 text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition"
-            required
-            disabled={loading || isMaxedOut}
-          />
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-500 price">$</span>
+            </div>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={amount}
+              onChange={e => setAmount(e.target.value)}
+              placeholder="0.00"
+              className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-8 pr-4 py-2 text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition
+[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+              required
+              disabled={loading || isMaxedOut}
+            />
+          </div>
           {error && <div className="text-red-500 text-xs mt-2 text-left pl-2">{error}</div>}
           {success && <div className="text-green-600 text-xs mt-2">{success}</div>}
           <label className="block mb-2 font-medium text-gray-700 text-left mt-4">{t("Message (optional)")}</label>

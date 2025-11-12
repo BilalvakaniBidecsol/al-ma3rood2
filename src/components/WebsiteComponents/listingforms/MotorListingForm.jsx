@@ -25,7 +25,16 @@ import {
   isSupportedVehicleType,
 } from "@/lib/vehicles";
 import SearchableDropdown from "@/components/WebsiteComponents/ReuseableComponenets/SearchableDropdown";
+import SearchableDropdownWithCustom from "@/components/WebsiteComponents/ReuseableComponenets/SearchableDropdownWithCustom";
 import DatePicker from "react-datepicker";
+import dynamic from "next/dynamic";
+
+const QuillEditor = dynamic(() => import("@/components/ui/QuillEditor"), {
+  ssr: false,
+  loading: () => (
+    <div className="h-32 bg-gray-100 animate-pulse rounded-md"></div>
+  ),
+});
 
 const motorListingSchema = z
   .object({
@@ -529,8 +538,9 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
   const [currentCategories, setCurrentCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const vehicle_type =
-    categoryStack.length > 0 ? categoryStack?.[0]?.name : selectedCategory?.name;
+  const [vehicle_type, setVehicleType] = useState(categoryStack.length > 0 ? categoryStack?.[0]?.name : selectedCategory?.name);
+  // const vehicle_type =
+  //   categoryStack.length > 0 ? categoryStack?.[0]?.name : selectedCategory?.name;
 
   // Vehicle data state
   const [vehicleData, setVehicleData] = useState([]);
@@ -561,22 +571,32 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
     loadVehicleData();
   }, [vehicle_type]);
 
-  useEffect(() => {
-    // console.log("aaaa vehicle_type", vehicle_type);
-    // console.log("aaaa categoryStack", categoryStack);
-    // console.log("aaaa vehicleData", vehicleData);
-    console.log("aaaa selectedCategory", selectedCategory);
-  }, [selectedCategory]);
+  function parseCurrencyString(value) {
+    if (typeof value !== "string") return value;
+    // Remove commas, keep only digits and dots
+    const parsed = value.replace(/,/g, "");
+    if (parsed === "" || isNaN(parsed)) return "";
+    // Preserve as string for the controlled input field
+    return parsed;
+  }
 
   const normalizedInitialValues = useMemo(() => {
     if (!initialValues) return {};
 
-    // **Start with a deep copy of the raw data**
     const copy = { ...initialValues };
 
     Object.keys(copy).forEach((key) => {
       if (copy[key] === null) copy[key] = "";
     });
+
+    // Convert currency fields to plain string suitable for number inputs
+    ["winning_bid", "start_price", "reserve_price", "buy_now_price"].forEach(
+      (key) => {
+        if (copy[key] !== undefined && copy[key] !== null && copy[key] !== "") {
+          copy[key] = parseCurrencyString(String(copy[key]));
+        }
+      }
+    );
 
     // 1. Convert expire_at string to Date object
     if (copy.expire_at && typeof copy.expire_at === "string") {
@@ -592,35 +612,37 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
       copy.allow_offers = false;
     }
 
-    // ✅ Vehicle data normalization using dynamic data
-    if (vehicleData.length > 0) {
-      const selectedMake =
-        vehicleData.find(
-          (brand) =>
-            brand.make.toLowerCase().trim() ===
-            (copy.make || "").toLowerCase().trim()
-        ) || vehicleData[0];
+    // ✅ Vehicle data normalization – only adjust when incoming values exist in dataset
+    if (vehicleData.length > 0 && copy.make) {
+      const matchedMake = vehicleData.find(
+        (brand) =>
+          brand.make.toLowerCase().trim() === copy.make.toLowerCase().trim()
+      );
 
-      if (selectedMake && selectedMake.models.length > 0) {
-        const selectedModel =
-          selectedMake.models.find(
-            (m) =>
-              m.name.toLowerCase().trim() ===
-              (copy.model || "").toLowerCase().trim()
-          ) || selectedMake.models[0];
+      if (matchedMake) {
+        copy.make = matchedMake.make;
 
-        // Make sure year exists in the model years array
-        const selectedYear = selectedModel.years.includes(Number(copy.year))
-          ? Number(copy.year)
-          : selectedModel.years[selectedModel.years.length - 1];
+        if (copy.model && matchedMake.models.length > 0) {
+          const matchedModel = matchedMake.models.find(
+            (m) => m.name.toLowerCase().trim() === copy.model.toLowerCase().trim()
+          );
 
-        return {
-          ...copy,
-          make: selectedMake.make,
-          model: selectedModel.name,
-          year: String(selectedYear),
-        };
+          if (matchedModel) {
+            copy.model = matchedModel.name;
+
+            if (copy.year) {
+              const numericYear = Number(copy.year);
+              if (matchedModel.years.includes(numericYear)) {
+                copy.year = String(numericYear);
+              }
+            }
+          }
+        }
       }
+    }
+
+    if (copy.year !== "" && copy.year !== null && copy.year !== undefined) {
+      copy.year = String(copy.year);
     }
 
     return copy;
@@ -659,6 +681,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
         console.log(initialValues);
         if (found) {
           setSelectedCategory(found);
+          setVehicleType(found?.name);
           setCategoryStack([found?.parent, found]);
         }
       }
@@ -723,6 +746,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
       } else {
         setValue("category_id", cat.id);
         setSelectedCategory(cat);
+        setVehicleType(cat.name);
         setIsModalOpen(false);
       }
     } finally {
@@ -895,19 +919,13 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
   const renderStepContent = () => {
     switch (activeStep) {
       case 0:
-        return (
-          <VehicleTypeStep
-            setIsModalOpen={setIsModalOpen}
-            selectedCategory={selectedCategory}
-            watch={watch}
-          />
-        );
+        return renderVehicleTypeStep();
       case 1:
-        return <VehicleDetailsStep vehicle_type={vehicle_type} />;
+        return renderVehicleDetailsStep();
       case 2:
-        return <PhotosStep />;
+        return renderPhotosStep();
       case 3:
-        return <PricePaymentStep />;
+        return renderPricePaymentStep();
       default:
         return null;
     }
@@ -923,7 +941,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
     },
   ];
 
-  const VehicleTypeStep = ({ setIsModalOpen, selectedCategory, watch }) => {
+  const renderVehicleTypeStep = () => {
     const category_id = watch("category_id");
     // Modal open handler
     const openCategoryModal = () => setIsModalOpen(true);
@@ -989,14 +1007,14 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
     );
   };
 
-  const VehicleDetailsStep = ({ vehicle_type }) => (
+  const renderVehicleDetailsStep = () => (
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           Vehicle Details
         </h2>
         <p className="text-lg text-gray-600">
-          Tell us about your {vehicle_type}
+          Tell us about your vehicle
         </p>
       </div>
 
@@ -1032,14 +1050,17 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="make"
                 control={control}
+                defaultValue=""
                 render={({ field }) => (
-                  <SearchableDropdown
+                  <SearchableDropdownWithCustom
                     options={carPartsData.map((brand) => brand.make)}
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={field.onChange}
-                    placeholder="Select Brand"
+                    placeholder="Select or type brand"
                     searchPlaceholder="Search brands..."
                     emptyMessage="No brands found"
+                    customLabel="Brand not in list? Type it yourself"
+                    customPlaceholder="Enter brand name"
                   />
                 )}
               />
@@ -1052,20 +1073,23 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="part"
                 control={control}
+                defaultValue=""
                 render={({ field }) => {
                   const selectedBrand = watch("make");
                   const parts =
                     carPartsData.find((b) => b.make === selectedBrand)?.parts ||
                     [];
                   return (
-                    <SearchableDropdown
+                    <SearchableDropdownWithCustom
                       options={parts.map((part) => part.name)}
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
-                      placeholder="Select Part"
+                      placeholder="Select or type part"
                       disabled={!selectedBrand}
                       searchPlaceholder="Search parts..."
                       emptyMessage="No parts found"
+                      customLabel="Part not in list? Type it yourself"
+                      customPlaceholder="Enter part name"
                     />
                   );
                 }}
@@ -1079,6 +1103,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="model"
                 control={control}
+                defaultValue=""
                 render={({ field }) => {
                   const selectedBrand = watch("make");
                   const selectedPart = watch("part");
@@ -1088,14 +1113,16 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
                       ?.parts.find((p) => p.name === selectedPart)
                       ?.compatibleModels || [];
                   return (
-                    <SearchableDropdown
+                    <SearchableDropdownWithCustom
                       options={models}
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
-                      placeholder="Select Model"
+                      placeholder="Select or type model"
                       disabled={!selectedPart}
                       searchPlaceholder="Search models..."
                       emptyMessage="No models found"
+                      customLabel="Model not in list? Type it yourself"
+                      customPlaceholder="Enter model name"
                     />
                   );
                 }}
@@ -1109,6 +1136,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="year"
                 control={control}
+                defaultValue=""
                 render={({ field }) => {
                   const selectedBrand = watch("make");
                   const selectedPart = watch("part");
@@ -1118,14 +1146,16 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
                       .find((b) => b.make === selectedBrand)
                       ?.parts.find((p) => p.name === selectedPart)?.years || [];
                   return (
-                    <SearchableDropdown
+                    <SearchableDropdownWithCustom
                       options={years.map((year) => year.toString())}
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
-                      placeholder="Select Year"
+                      placeholder="Select or type year"
                       disabled={!selectedModel}
                       searchPlaceholder="Search years..."
                       emptyMessage="No years found"
+                      customLabel="Year not in list? Type it yourself"
+                      customPlaceholder="Enter year (e.g., 2024)"
                     />
                   );
                 }}
@@ -1202,13 +1232,16 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="description"
                 control={control}
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    rows={6}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="Describe the part in detail..."
-                  />
+                rules={{ required: "Description is required" }}
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <div className="rounded-md">
+                    <QuillEditor
+                      value={value}
+                      onChange={onChange}
+                      error={error?.message}
+                      placeholder="Enter Description"
+                    />
+                  </div>
                 )}
               />
             </div>
@@ -1230,9 +1263,11 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="title"
                 control={control}
+                defaultValue=""
                 render={({ field }) => (
                   <input
                     {...field}
+                    value={field.value ?? ""}
                     type="text"
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
                     placeholder="e.g., 2020 Toyota Corolla Hybrid"
@@ -1253,16 +1288,19 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="make"
                 control={control}
+                defaultValue=""
                 render={({ field }) => (
-                  <SearchableDropdown
+                  <SearchableDropdownWithCustom
                     options={vehicleData.map((vehicle) => vehicle.make)}
-                    value={field.value}
+                    value={field.value || ""}
                     onChange={field.onChange}
-                    placeholder="Select Brand"
+                    placeholder="Select or type brand"
                     disabled={loadingVehicleData}
                     loading={loadingVehicleData}
                     searchPlaceholder="Search brands..."
                     emptyMessage="No brands found"
+                    customLabel="Brand not in list? Type it yourself"
+                    customPlaceholder="Enter brand name"
                   />
                 )}
               />
@@ -1280,6 +1318,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="model"
                 control={control}
+                defaultValue=""
                 render={({ field }) => {
                   const selectedBrand = watch("make");
                   const models =
@@ -1288,15 +1327,17 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
                     )?.models || [];
 
                   return (
-                    <SearchableDropdown
+                    <SearchableDropdownWithCustom
                       options={models.map((model) => model.name)}
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
-                      placeholder="Select Model"
+                      placeholder="Select or type model"
                       disabled={!selectedBrand || loadingVehicleData}
                       loading={loadingVehicleData}
                       searchPlaceholder="Search models..."
                       emptyMessage="No models found"
+                      customLabel="Model not in list? Type it yourself"
+                      customPlaceholder="Enter model name"
                     />
                   );
                 }}
@@ -1315,6 +1356,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="year"
                 control={control}
+                defaultValue=""
                 render={({ field }) => {
                   const selectedBrand = watch("make");
                   const selectedModel = watch("model");
@@ -1328,15 +1370,17 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
                     .sort((a, b) => b - a);
 
                   return (
-                    <SearchableDropdown
+                    <SearchableDropdownWithCustom
                       options={years.map((year) => year.toString())}
-                      value={field.value}
+                      value={field.value || ""}
                       onChange={field.onChange}
-                      placeholder="Select Year"
+                      placeholder="Select or type year"
                       disabled={!selectedModel || loadingVehicleData}
                       loading={loadingVehicleData}
                       searchPlaceholder="Search years..."
                       emptyMessage="No years found"
+                      customLabel="Year not in list? Type it yourself"
+                      customPlaceholder="Enter year (e.g., 2024)"
                     />
                   );
                 }}
@@ -1522,13 +1566,15 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="description"
                 control={control}
-                render={({ field }) => (
-                  <textarea
-                    {...field}
-                    rows={4}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
-                    placeholder="Describe your vehicle in detail..."
-                  />
+                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                  <div className="rounded-md">
+                    <QuillEditor
+                      value={value}
+                      onChange={onChange}
+                      error={error?.message}
+                      placeholder="Enter Description"
+                    />
+                  </div>
                 )}
               />
               {errors.description && (
@@ -1565,7 +1611,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
     </div>
   );
 
-  const PhotosStep = () => (
+  const renderPhotosStep = () => (
     <div className="space-y-8">
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-4">Upload Photos</h2>
@@ -1600,7 +1646,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
     </div>
   );
 
-  const PricePaymentStep = () => {
+  const renderPricePaymentStep = () => {
     const categoryId = watch("category_id");
     return (
       <div className="space-y-8">
@@ -1619,19 +1665,24 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Buy Now Price (<span className="price">$</span>)
+                Buy Now Price 
               </label>
               <Controller
                 name="buy_now_price"
                 control={control}
                 render={({ field }) => (
-                  <input
-                    {...field}
-                    type="number"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 
+                  <div className="relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span className="text-gray-500 price">$</span>
+                    </div>
+                    <input
+                      {...field}
+                      type="number"
+                      className="w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 pl-8 pr-3 py-2
       [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    placeholder="Enter price"
-                  />
+                      placeholder="Enter price"
+                    />
+                  </div>
                 )}
               />
             </div>
@@ -1662,39 +1713,49 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Start Price (<span className="price">$</span>)
+                  Start Price 
                 </label>
                 <Controller
                   name="start_price"
                   control={control}
                   render={({ field }) => (
-                    <input
-                      {...field}
-                      type="number"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md 
-      focus:outline-none focus:ring-2 focus:ring-green-500 
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500 price">$</span>
+                      </div>
+                      <input
+                        {...field}
+                        type="number"
+                        className="w-full border border-gray-300 rounded-md 
+      focus:outline-none focus:ring-2 focus:ring-green-500 pl-8 pr-3 py-2
       [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      placeholder="Enter start price"
-                    />
+                        placeholder="Enter start price"
+                      />
+                    </div>
                   )}
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  o Reserve Price (<span className="price">$</span>)
+                  o Reserve Price 
                 </label>
                 <Controller
                   name="reserve_price"
                   control={control}
                   render={({ field }) => (
-                    <input
-                      {...field}
-                      type="number"
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md 
-      focus:outline-none focus:ring-2 focus:ring-green-500 
+                    <div className="relative">
+                      <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <span className="text-gray-500 price">$</span>
+                      </div>
+                      <input
+                        {...field}
+                        type="number"
+                        className="w-full border border-gray-300 rounded-md 
+      focus:outline-none focus:ring-2 focus:ring-green-500 pl-8 pr-3 py-2
       [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                      placeholder="Enter reserve price"
-                    />
+                        placeholder="Enter reserve price"
+                      />
+                    </div>
                   )}
                 />
               </div>

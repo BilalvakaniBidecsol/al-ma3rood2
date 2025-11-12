@@ -45,6 +45,8 @@ export const userApi = {
   updateProfile: (formData) =>
     axiosClient.post("/user/profile-update", formData),
 
+  getProfile: () => axiosClient.get("/user/profile"),
+
   categoryFavorites: () => axiosClient.get("/user/favorites/categories"),
 
   sellerFavorites: () => axiosClient.get("/user/favorites/sellers"),

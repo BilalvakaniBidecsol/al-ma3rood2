@@ -156,7 +156,7 @@ export default function Page() {
 
       {/* Listings */}
       {loading ? (
-        <p className="text-sm text-gray-500">{t("loadingListings...")}</p>
+        <p className="text-sm text-gray-500">{t("Loading Listings...")}</p>
       ) : filteredListings.length === 0 ? (
         <p className="text-sm text-gray-500">{t("No listings found.")}</p>
       ) : (

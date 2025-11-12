@@ -15,6 +15,9 @@ import CvView from "./components/CvView";
 import SkillsForm from "./components/SkillsForm";
 import SkillsView from "./components/SkillsView";
 import { deleteApi, getApi } from "@/lib/api/jobs-profile";
+import PersonalDetailsForm from "./components/PersonalDetailsForm";
+import PersonalDetailsView from "./components/PersonalDetailsView";
+
 
 const items = [
   { label: "Home", href: "/" },
@@ -27,6 +30,7 @@ const tabs = ["Personal_Details", "Professional_Details", "Experience", "Educati
 const ProfileClient = () => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("Personal_Details");
+  const [userDetail, setUserDetail] = useState(null);
   const [jobProfile, setJobProfile] = useState(null);
   const [education, setEducation] = useState([]);
   const [experience, setExperience] = useState([]);
@@ -48,12 +52,13 @@ const ProfileClient = () => {
     const fetchJobProfile = async () => {
       try {
         const res = await getApi("user/job/profile");
-        setJobProfile(res.job_profile);
-        setEducation(res.educations || []);
-        setExperience(res.experiences || []);
-        setCertifications(res.certificates || []);
-        setCvs(res.cvs || []);
-        setSkills(res.skills || []);
+        setUserDetail(res?.user);
+        setJobProfile(res?.job_profile);
+        setEducation(res?.educations || []);
+        setExperience(res?.experiences || []);
+        setCertifications(res?.certificates || []);
+        setCvs(res?.cvs || []);
+        setSkills(res?.skills || []);
       } catch (error) {
         console.error("Failed to fetch job profile:", error);
       } finally {
@@ -79,6 +84,23 @@ const ProfileClient = () => {
         ) : (
           <DetailsView data={jobProfile} onEdit={() => setEditingSection("Professional_Details")} />
         );
+case "Personal_Details":
+  return editingSection === "Personal_Details" ? (
+    <PersonalDetailsForm
+      defaultData={userDetail}
+      onCancel={() => setEditingSection(null)}
+      onSuccess={async () => {
+        const res = await getApi("user/job/profile");
+        setUserDetail(res?.user);
+        setEditingSection(null);
+      }}
+    />
+  ) : (
+    <PersonalDetailsView
+      data={userDetail}
+      onEdit={() => setEditingSection("Personal_Details")}
+    />
+  );
 
       case "Experience":
         if (editingExperience) {

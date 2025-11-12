@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 
 const getMaxDate = () => {
   const today = new Date();
- 
+
   today.setDate(today.getDate() + 60);
   return today;
 };
@@ -26,7 +26,6 @@ const PriceAndPayment = () => {
   const start_price = watch("start_price");
   const reserve_price = watch("reserve_price");
   const expire_at = watch("expire_at");
-
 
   const handleQuantityChange = (delta) => {
     setValue("quantity", Math.max(1, Number(quantity) + delta), {
@@ -233,10 +232,11 @@ const PriceAndPayment = () => {
           {...register("buy_now_price")}
           className={`w-full border pl-8 pr-4 py-2 rounded focus:outline-none focus:ring appearance-none
         [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
-        ${errors.buy_now_price
-              ? "border-red-500 focus:border-red-500"
-              : "border-gray-300 focus:border-green-400"
-            }`}
+        ${
+          errors.buy_now_price
+            ? "border-red-500 focus:border-red-500"
+            : "border-gray-300 focus:border-green-400"
+        }`}
         />
         {errors.buy_now_price && (
           <p className="text-red-500 text-sm mt-1">
@@ -268,32 +268,29 @@ const PriceAndPayment = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Start price")} <span className="text-red-500">*</span>
           </label>
-          {/* <input
-            type="number"
-            {...register("start_price", { required: true })}
-            placeholder="$"
-            className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring price ${
-              errors.start_price
-                ? "border-red-500 focus:border-red-500"
-                : "border-gray-300 focus:border-green-400"
-            }`}
-          /> */}
-          <input
-            type="number"
-            {...register("start_price", {
-              validate: (value) =>
-                !buy_now_price || value ? true : "Start price is required if Buy Now price is not provided",
-            })}
-            placeholder="$"
-            className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring 
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-500 price">$</span>
+            </div>
+            <input
+              type="number"
+              {...register("start_price", {
+                validate: (value) =>
+                  !buy_now_price || value
+                    ? true
+                    : "Start price is required if Buy Now price is not provided",
+              })}
+              className={`w-full border pl-8 pr-4 py-2 rounded focus:outline-none focus:ring 
     [&::-webkit-inner-spin-button]:appearance-none 
     [&::-webkit-outer-spin-button]:appearance-none 
     [appearance:textfield]
-    ${errors.start_price
-                ? "border-red-500 focus:border-red-500"
-                : "border-gray-300 focus:border-green-400"
-              } placeholder-price`}
-          />
+    ${
+      errors.start_price
+        ? "border-red-500 focus:border-red-500"
+        : "border-gray-300 focus:border-green-400"
+    } placeholder-price`}
+            />
+          </div>
           {errors.start_price && (
             <p className="text-red-500 text-sm mt-1">
               {errors.start_price.message}
@@ -304,22 +301,29 @@ const PriceAndPayment = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">
             {t("Reserve price")} <span className="text-red-500">*</span>
           </label>
-          <input
-            type="number"
-            {...register("reserve_price", {
-              validate: (value) =>
-                !buy_now_price || value ? true : "Reserve price is required if Buy Now price is not provided",
-            })}
-            placeholder="$"
-            className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring
+          <div className="relative">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-gray-500 price">$</span>
+            </div>
+            <input
+              type="number"
+              {...register("reserve_price", {
+                validate: (value) =>
+                  !buy_now_price || value
+                    ? true
+                    : "Reserve price is required if Buy Now price is not provided",
+              })}
+              className={`w-full border pl-8 pr-4 py-2 rounded focus:outline-none focus:ring
     [&::-webkit-inner-spin-button]:appearance-none 
     [&::-webkit-outer-spin-button]:appearance-none 
     [appearance:textfield] 
-    ${errors.reserve_price
-                ? "border-red-500 focus:border-red-500"
-                : "border-gray-300 focus:border-green-400"
-              } placeholder-price`}
-          />
+    ${
+      errors.reserve_price
+        ? "border-red-500 focus:border-red-500"
+        : "border-gray-300 focus:border-green-400"
+    } placeholder-price`}
+            />
+          </div>
           {errors.reserve_price && (
             <p className="text-red-500 text-sm mt-1">
               {errors.reserve_price.message}
@@ -352,10 +356,11 @@ const PriceAndPayment = () => {
               maxDate={getMaxDate()}
               className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring
             [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
-            ${errors.expire_at
-                  ? "border-red-500 focus:border-red-500"
-                  : "border-gray-300 focus:border-green-400"
-                }`}
+            ${
+              errors.expire_at
+                ? "border-red-500 focus:border-red-500"
+                : "border-gray-300 focus:border-green-400"
+            }`}
               placeholderText={t("Select date and time")}
             />
           )}

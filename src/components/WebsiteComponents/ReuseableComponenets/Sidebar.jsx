@@ -133,7 +133,11 @@ const Sidebar = () => {
                   className={subLinkClass("/account/jobs-list")}
                 >
                   <FaClipboardList />
-                  <span>{t("List Jobs")}</span>
+                  <span>{t("Jobs List")}</span>
+                </Link>
+                 <Link href="/account/applied-jobs" className={subLinkClass("/applied-jobs")}>
+ <FaClipboardList />
+                  <span>{t("Applied Jobs")}</span>
                 </Link>
                  <Link href="/account/job-profile" className={subLinkClass("/job-profile")}>
             <IoIosDocument />

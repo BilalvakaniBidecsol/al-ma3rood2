@@ -167,7 +167,7 @@ function AcceptBidModal({
   );
 }
 
-export default function ListingCard({ listing, actions }) {
+export default function JobListCard({ listing, actions }) {
   const [offersOpen, setOffersOpen] = useState(false);
   const [acceptBidOpen, setAcceptBidOpen] = useState(false);
   const offers = listing.offers || [];
@@ -211,7 +211,7 @@ export default function ListingCard({ listing, actions }) {
   return (
     <div className="bg-white rounded w-full max-w-[300px] sm:max-w-full shadow mb-6 mx-auto">
       <Link href={listing.link} className="block cursor-pointer">
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center px-4">
           {/* Image */}
           <div className="w-full sm:w-28 h-40 relative">
             <Image
@@ -226,11 +226,18 @@ export default function ListingCard({ listing, actions }) {
 
           {/* Info */}
           <div className="flex-1">
-            <p className="text-xs text-gray-500 mb-1">
-             {t("Closing:")} {new Date(listing.closingDate).toDateString()}
-            </p>
             <p className="text-md font-semibold text-gray-800 mb-1">
               {listing.title}
+            </p>
+            <p className="text-xs text-gray-500 mb-1">
+             {t("Company:")} {listing.company}
+            </p>
+            <p className="text-xs text-gray-500 mb-1">
+             {t("Description:")}  {listing.short_summary
+    ? listing.short_summary.length > 250
+      ? `${listing.short_summary.slice(0, 250)}...`
+      : listing.short_summary
+    : ""}
             </p>
           </div>
         </div>
@@ -241,32 +248,14 @@ export default function ListingCard({ listing, actions }) {
         <div className="flex gap-6 mt-2 items-center">
           {/* <span>👁️‍🗨️ {listing.watchers} {t("watchers")}</span> */}
           <span>👁️ {listing.views} {t("views")}</span>
-          {offers.length > 0 && (
-            <span
-              className="bg-green-100 text-green-700 px-2 py-1 rounded cursor-pointer hover:bg-green-200 ml-2 text-xs font-semibold"
-              onClick={() => setOffersOpen(true)}
-              title="View offers"
-            >
-              {offers.length} {t("Offer")}{offers.length !== 1 ? "s" : ""}
-            </span>
-          )}
-          {/* Accept Bid Tag */}
-          {isExpired && highestBid && belowReserve && listing.status == 5 && (
-            <span
-              className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded cursor-pointer hover:bg-yellow-200 ml-2 text-xs font-semibold"
-              onClick={() => setAcceptBidOpen(true)}
-              title="Highest Bid"
-            >
-{t("Show Highest Bid")}</span>
-          )}
         </div>
-        <div className="text-right sm:text-left mt-2 sm:mt-0">
-          <span className="text-xs text-gray-500 block">{t("Buy Now")}</span>
+        {/* <div className="text-right sm:text-left mt-2 sm:mt-0">
+          <span className="text-xs text-gray-500 block">{t("Minimum Pay Amount")}</span>
           <span className="font-semibold text-gray-800 text-base">
             <span className="price">$</span>
             <span className="ml-1">{listing.price}</span>
           </span>
-        </div>
+        </div> */}
       </div>
 
       {/* Actions */}
@@ -287,7 +276,6 @@ export default function ListingCard({ listing, actions }) {
           )
         )}
       </div>
-      
       <OffersModal
         offers={offers}
         open={offersOpen}

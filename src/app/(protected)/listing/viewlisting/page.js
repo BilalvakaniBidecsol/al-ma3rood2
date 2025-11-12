@@ -1,12 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { FaInfoCircle, FaEye, FaStar } from "react-icons/fa";
 import {
-  FiClock,
-  FiChevronRight,
-  FiTruck,
-  FiInfo,
-  FiUser,
+  FiClock
 } from "react-icons/fi";
 import Button from "@/components/WebsiteComponents/ReuseableComponenets/Button";
 import WithdrawDialog from "@/components/WebsiteComponents/ReuseableComponenets/WithdrawDialog";
@@ -95,7 +90,6 @@ const Page = () => {
         })()
       : "-",
   };
-
   // Example shipping (customize as needed)
   // const shipping = {
   //   destinationTitle: "Destination & description",
@@ -185,7 +179,8 @@ const Page = () => {
           <div className="order-3 mt-6 px-4">
             <h3 className="text-sm font-semibold mb-4">{t("Details")}</h3>
             {details.map((item, idx) => {
-              return (
+              { console.log("aaaa item", item.label);
+                return (
                 <div className="flex mb-4 flex-wrap" key={idx}>
                   <div className="w-48 font-semibold text-gray-600 text-sm">
                     {t(item.label)}
@@ -200,7 +195,8 @@ const Page = () => {
                     )}
                   </div>
                 </div>
-              );
+              )
+            }
             })}
           </div>
 

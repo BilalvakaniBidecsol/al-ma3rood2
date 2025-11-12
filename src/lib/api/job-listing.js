@@ -33,69 +33,49 @@ export const JobsApi = {
     return response.data;
   },
   // Listing Filter
-  getListingsByFilter: async (payload, search) => {
- const formattedPayload = {
-      listing_type: "marketplace",
-      pagination: {
-        page: payload?.pagination?.page || 1,
-        per_page: payload?.pagination?.per_page || 30,
-      },
-    };
+getListingsByFilter: async (payload) => {
+  // Destructure all the potential filter and pagination values from payload
+  const {
+    category_id,
+    region_id,
+    governorate_id,
+    work_type,
+    minimum_pay_type,
+    min_amount,
+    max_amount,
+    search,
+    status,
+    limit = 10, // Set a default limit for pagination
+    offset = 0, // Set a default offset for pagination
+  } = payload;
 
-      // ✅ add category_id conditionally
-    if (payload?.category_id !== undefined && payload?.category_id !== null) {
-      const categoryId = parseInt(payload.category_id, 10);
-      if (!Number.isNaN(categoryId)) {
-        formattedPayload.category_id = categoryId;
-      }
-    }
-     // ✅ add city if present
-    if (payload?.city) {
-      formattedPayload.city = payload.city;
-    }
-    if (payload?.region_id) {
-      formattedPayload.regions_id = payload.region_id;
-    }
-    if (payload?.governorate_id) {
-      formattedPayload.governorates_id = payload.governorate_id;
-    }
+  // Create a URLSearchParams object to easily build the query string
+  const params = new URLSearchParams();
 
-    // ✅ add condition if present
-    if (payload?.condition) {
-      formattedPayload.condition = payload.condition;
-    }
+  // Conditionally append parameters only if they have a value (e.g., not null, undefined, or empty string)
+  if (search) params.append('keyword', search);
+  if (category_id) params.append('category_id', category_id);
+  if (region_id) params.append('region_id', region_id);
+  if (governorate_id) params.append('governorate_id', governorate_id);
+  if (work_type) params.append('work_type', work_type);
+  if (minimum_pay_type) params.append('minimum_pay_type', minimum_pay_type);
+  if (min_amount) params.append('min_amount', min_amount);
+  if (max_amount) params.append('max_amount', max_amount);
+  if (status) params.append('status', status);
 
-    // ✅ add search if present
-    if (payload?.search) {
-      formattedPayload.search = payload.search;
-    }
-    // ✅ add search if present
-    if (search) {
-      formattedPayload.search = search;
-    }
+  // Always include limit and offset for pagination
+  params.append('limit', limit);
+  params.append('offset', offset);
 
-    // ✅ add min_price if present
-    if (payload?.min_price !== undefined && payload?.min_price !== null) {
-      formattedPayload.min_price = payload.min_price;
-    }
+  // Construct the final URL with the query string
+  const queryString = params.toString();
+  const url = `/job-listing?${queryString}`;
 
-    // ✅ add max_price if present
-    if (payload?.max_price !== undefined && payload?.max_price !== null) {
-      formattedPayload.max_price = payload.max_price;
-    }
+  console.log("Check Listing URL:", url);
 
-    // ✅ add filters if present
-    if (payload?.filters && Object.keys(payload.filters).length > 0) {
-      formattedPayload.filters = { ...payload.filters };
-    }
-
-    console.log("Check Listing:", formattedPayload)
-    const response = await axiosClient.post(
-      `/listings/filters`,
-      formattedPayload
-    );
-    return response.data;
-  },
+  const response = await axiosClient.get(url);
+  return response.data;
+},
   // Listing Filter By All Categories
   getListingsFilterByAllCategories: async (params = {}) => {
         const filteredParams = Object.fromEntries(
@@ -115,7 +95,26 @@ export const JobsApi = {
   listingsSearchHistory(params) {
   return axiosClient.get("listings/search", { params });
 },
+updateJobApplicationStatus: async ({ job_application_id, job_status }) => {
+  try {
+    const formData = new FormData();
+    formData.append("job_application_id", job_application_id);
+    formData.append("job_status", job_status);
 
+    const response = await axiosClient.post(
+      `/user/job-applying/statusupdate`,
+      formData,
+      {
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+
+    return response.data;
+  } catch (error) {
+    console.error("Error updating job application status:", error);
+    throw error;
+  }
+},
 
   getListingBySlug: async (productSlug) => {
     const response = await axiosClient.get(`/user/job-listing/${productSlug}/show`);
@@ -130,19 +129,13 @@ export const JobsApi = {
     return response.data;
   },
 
-  getUserListingsOffer: async (params = {}) => {
-    const response = await axiosClient.get(`/user/listings/offers`);
+  getUserListingsApplied: async () => {
+    const response = await axiosClient.get(`/user/job-applying/myApplication`);
     return response;
   },
-  makeOffer: async (productId, formData) => {
-    const response = await axiosClient.post(
-      `/user/listings/offers/${productId}/store`,
-      formData,
-      {
-        headers: { "Content-Type": "multipart/form-data" },
-      }
-    );
-    return response.data;
+  getUserJobApplicants: async ({ id }) => {
+    const response = await axiosClient.get(`/user/job-applying/${id}/applicantsForMyJob`);
+    return response;
   },
   buyNow: async (productSlug) => {
     const response = await axiosClient.post(

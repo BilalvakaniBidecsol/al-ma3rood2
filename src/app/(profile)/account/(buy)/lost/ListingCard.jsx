@@ -8,15 +8,15 @@ export default function ListingCard({ listing, actions = [] }) {
   const { t } = useTranslation();
 
   return (
-    <div className="bg-white rounded shadow-sm mb-4 sm:w-[700px] w-full">
+    <div className="bg-white rounded w-full max-w-[300px] sm:max-w-full shadow mb-6 mx-auto">
       <Link href={listing.link} className="block cursor-pointer">
-        <div className="flex flex-col xs:flex-row sm:flex-row p-4 gap-4">
-          <div className="relative w-16 h-16 shrink-0 rounded overflow-hidden mx-auto sm:mx-0">
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center p-4">
+          <div className="w-full sm:w-28 h-40 relative">
             <Image
               src={listing.image}
               alt={listing.title}
               fill
-              className="object-cover"
+              className="object-contain rounded"
             />
           </div>
 
@@ -29,7 +29,7 @@ export default function ListingCard({ listing, actions = [] }) {
                 month: "short",
               })}
             </p>
-            <p className="font-medium text-gray-800">{listing.title}</p>
+            <p className="text-md font-semibold text-gray-800 mb-1">{listing.title}</p>
 
             {/* <div className="flex sm:flex-col items-end  w-full sm:w-auto mt-2 sm:mt-0 sm:ml-auto text-sm text-gray-600">
             <span className="text-xs text-gray-500">Offer price</span>

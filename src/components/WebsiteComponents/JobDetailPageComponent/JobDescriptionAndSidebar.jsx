@@ -1,147 +1,139 @@
 "use client";
 
 import { useState } from "react";
-import JobApplicationModal from "./modals/job-application-modal";
-import ShareListingModal from "./modals/share-listing-modal"; // ✅ make sure this path is correct
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+import "swiper/css/navigation";
+import { Navigation, Autoplay } from "swiper/modules";
+import ShareListingModal from "./modals/share-listing-modal";
+import { Image_URL } from "@/config/constants";
+import { MapPin, Mail, Phone, Eye } from "lucide-react";
+import { CiUser } from "react-icons/ci";
 
-export default function JobDescriptionAndSidebar() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [showShareModal, setShowShareModal] = useState(false); // ✅ new state
+export default function JobDescriptionAndSidebar({ product }) {
+  const [showShareModal, setShowShareModal] = useState(false);
 
-  const handleOpenModal = () => setIsModalOpen(true);
-  const handleCloseModal = () => setIsModalOpen(false);
-
-  const listingId = "5332893850";
-  const views = 100;
-
-  const descriptionItems = [
-    "Permanent, full–time position",
-    "Excellent staff benefits",
-    "Flexible work environment",
-    "Work from home options available",
-  ];
-
-  const otherDuties = [
-    "Lead various internal audits in FBNZ including audits around our Information Security Management System (ISMS) in alignment with ISO27001",
-    "Provide support in risk management processes across all departments",
-    "Develop internal control frameworks aligned with business objectives",
-    "Assist with vendor and third-party security risk assessments",
-    "Coordinate with external auditors and regulatory bodies",
-    "Report audit findings and suggest actionable improvements",
-  ];
-
-  const applicationButtons = [
-    { text: "Apply Now", color: "bg-[#175f48] hover:bg-green-600" },
-    { text: "Remove", color: "bg-orange-500 hover:bg-orange-600" },
-    { text: "Already applied?", color: "bg-gray-600 hover:bg-gray-700" },
-  ];
+  const {
+    id,
+    title,
+    company_name,
+    description,
+    key_points = [],
+    view_count,
+    contact_name,
+    contact_email,
+    contact_phone,
+    region,
+    governorate,
+    media_files = [],
+  } = product || {};
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 text-gray-800">
-      {/* Top Section: Description + Sidebar */}
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-10 text-gray-800">
+      {/* Layout */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+        {/* LEFT: Description */}
         <div className="md:col-span-2">
-          <h3 className="text-xl font-semibold mb-4">Description</h3>
-          <ul className="space-y-3">
-            {descriptionItems.map((item, index) => (
-              <li key={index} className="flex items-start text-gray-700">
-                <span className="w-2 h-2 mt-2 mr-3 bg-gray-500 rounded-full"></span>
-                <span>{item}</span>
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-2xl font-semibold mb-3">{title}</h2>
+          <p className="text-gray-600 leading-relaxed mb-5">{description}</p>
+
+          {key_points?.length > 0 && (
+            <ul className="space-y-3">
+              {key_points.map((point, index) => (
+                <li key={index} className="flex items-start">
+                  <span className="w-2 h-2 mt-2 mr-3 bg-[#175f48] rounded-full"></span>
+                  <span className="text-gray-700">{point}</span>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
-        {/* Sidebar */}
-        <div className="bg-gray-100 rounded-xl p-5 relative flex flex-col justify-between min-h-[220px]">
-          <div>
-            <p className="text-sm text-gray-400 mb-1">Advertisement</p>
-            <button
-              onClick={() => setShowShareModal(true)} // ✅ open modal
-              className="hover:text-gray-700 text-sm font-semibold border-b pb-1 mb-3 text-gray-900"
-            >
-              Share this listing
-            </button>
-            <p className="text-sm text-gray-700 mb-1">
-              <span className="text-gray-500">Listing #{listingId}</span> •{" "}
-              {views} Views
-            </p>
-            <p className="text-sm text-gray-600 flex items-center">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="#facc15"
-                className="w-5 h-5 mr-1"
+        {/* RIGHT: Sidebar */}
+        <div className="bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-all duration-300">
+          {/* Image Carousel */}
+          <div className="relative rounded-t-2xl overflow-hidden">
+            {media_files?.length > 0 ? (
+              <Swiper
+                modules={[Navigation, Autoplay]}
+                navigation
+                autoplay={{ delay: 3500 }}
+                loop
+                className="w-full h-56"
               >
-                <path
-                  fillRule="evenodd"
-                  d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.006 5.404.434c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.434 2.082-5.005Z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              Community Watch
-            </p>
+                {media_files.map((file, index) => (
+                  <SwiperSlide key={index}>
+                    <img
+                      src={`${Image_URL}${file.file_path}`}
+                      alt={`Job Image ${index + 1}`}
+                      className="w-full h-auto "
+                    />
+                  </SwiperSlide>
+                ))}
+              </Swiper>
+            ) : (
+              <div className="h-56 bg-gray-100 flex items-center justify-center">
+                <p className="text-gray-400 text-sm">No Images Available</p>
+              </div>
+            )}
           </div>
-          <div className="self-end mt-4">
-            <button className="bg-red-500 hover:bg-red-600 text-white text-sm px-4 py-2 rounded-md flex items-center space-x-1">
-              <span>Report this listing</span>
-            </button>
-          </div>
-        </div>
-      </div>
 
-      {/* Middle Text and Duties */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10">
-        <div className="p-4 text-gray-700">
-          <p>
-            At FUJIFILM Business Innovation New Zealand (FBNZ), helping Kiwis
-            work smarter isn’t just what we do—it’s who we are...
-          </p>
-          <h5 className="mt-5 text-lg font-medium">About the role</h5>
-          <p className="mt-4">
-            We are seeking a proactive and detail-oriented Internal Audit and
-            Risk Specialist...
-          </p>
-          <ul className="list-disc pl-5 space-y-2 mt-6">
-            {otherDuties.map((duty, index) => (
-              <li key={index} className="text-sm">
-                {duty}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+          {/* Content */}
+          <div className="p-5 space-y-4">
+            {/* Company Info */}
+            {company_name && (
+              <div className="text-center border-b border-gray-100 pb-3">
+                <h3 className="text-lg font-semibold text-[#175f48]">
+                  {company_name}
+                </h3>
+                <p className="text-xs text-gray-500 mt-1">
+                  Listing #{id} • <Eye className="inline w-4 h-4" />{" "}
+                  {view_count || 0} views
+                </p>
+              </div>
+            )}
 
-      {/* Application Details at Bottom */}
-      <div className="mt-12 bg-white p-6">
-        <h2 className="text-2xl font-bold text-gray-900 mb-4">
-          Application details
-        </h2>
-        <p className="text-lg text-gray-700 mb-6">
-          Apply online for this role or contact Mohammed Zoaheb for more info
-        </p>
-        <div className="flex flex-wrap gap-4 mb-4">
-          {applicationButtons.slice(0, 2).map((btn, idx) => (
+            {/* Contact Info */}
+            <div className="space-y-2 text-sm text-gray-700">
+              {governorate?.name && region?.name && (
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-[#175f48]" />
+                  <span>
+                    {governorate.name}, {region.name}
+                  </span>
+                </div>
+              )}
+              {contact_name && (
+                <div className="flex items-center gap-2">
+                    <CiUser className="text-[#175f48] w-5 h-5" /> <span>{contact_name}</span>
+                </div>
+              )}
+              {contact_email && (
+                <div className="flex items-center gap-2 break-all">
+                  <Mail className="w-4 h-4 text-[#175f48]" />
+                  <span>{contact_email}</span>
+                </div>
+              )}
+              {contact_phone && (
+                <div className="flex items-center gap-2">
+                  <Phone className="w-4 h-4 text-[#175f48]" />
+                  <span>{contact_phone}</span>
+                </div>
+              )}
+            </div>
+
+            {/* Share Button */}
             <button
-              key={idx}
-              onClick={btn.text === "Apply Now" ? handleOpenModal : () => {}}
-              className={`${btn.color} text-white font-medium py-2 px-4 rounded-md shadow-sm`}
+              onClick={() => setShowShareModal(true)}
+              className="w-full bg-[#175f48] hover:bg-[#0f3c2e] text-white text-sm font-medium rounded-xl py-2 mt-4 transition-colors"
             >
-              {btn.text}
+              Share this Listing
             </button>
-          ))}
-        </div>
-        <div>
-          <button
-            className={`${applicationButtons[2].color} text-white font-medium py-2 px-4 rounded-md shadow-sm`}
-          >
-            {applicationButtons[2].text}
-          </button>
+          </div>
         </div>
       </div>
 
-      {/* ✅ Modals at bottom */}
-      <JobApplicationModal isOpen={isModalOpen} onClose={handleCloseModal} />
+      {/* Share Modal */}
       <ShareListingModal
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}

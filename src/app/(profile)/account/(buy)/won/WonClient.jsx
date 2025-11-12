@@ -305,7 +305,7 @@ const WonClient = () => {
         {/* Listings */}
         <div className="grid gap-4">
           {loading ? (
-            <p className="text-sm text-gray-500">{t("loadingListings")}</p>
+            <p className="text-sm text-gray-500">{t("Loading Listings")}</p>
           ) : filteredListings.length === 0 ? (
             <p className="text-sm text-gray-500">{t("noListingsFound")}</p>
           ) : (

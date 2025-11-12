@@ -1,16 +1,34 @@
-// components/JobCard.jsx
-export default function JobCard({ title, company, location, date, description }) {
+import { Image_URL } from "@/config/constants";
+import Image from "next/image";
+import Link from "next/link";
+import { FaBriefcase } from "react-icons/fa";
+
+export default function JobCard({ title, company, location, date, description, logo, banner, slug }) {
+    // Function to get "Listed X hours/days ago"
+  const getRelativeTime = (createdAt) => {
+    const now = new Date();
+    const posted = new Date(createdAt);
+    const diffMs = now - posted;
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+    if (diffHours < 1) return "Listed just now";
+    if (diffHours < 24) return `Listed ${diffHours} hour${diffHours > 1 ? "s" : ""} ago`;
+
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays === 1) return "Listed 1 day ago";
+    return `Listed ${diffDays} days ago`;
+  };
   return (
-    <div className="bg-[#F8F8F8] border border-gray-200 rounded-lg p-6 min-w-[350px]  hover:shadow-md transition-shadow">
+    <Link href={`/jobs/${slug}`} className="cursor-pointer bg-[#F8F8F8] border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow flex flex-col">
+
+
       <div className="flex justify-between items-start mb-4">
         <h3 className="text-lg font-semibold text-gray-900">{title}</h3>
-        <span className="text-[#175f48] text-sm">{date}</span>
       </div>
 
       <div className="flex items-center text-gray-600 text-sm mb-4">
-        <span className="font-medium">{company}</span>
-        <span className="mx-2">|</span>
-        <div className="flex items-center">
+        
+        <div className="flex items-center text-xs w-fit">
           <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
             <path
               fillRule="evenodd"
@@ -20,15 +38,43 @@ export default function JobCard({ title, company, location, date, description })
           </svg>
           {location}
         </div>
+        <span className="mx-2">|</span>
+        <span className="text-[#175f48] text-sm">{getRelativeTime(date)}</span>
+        
       </div>
 
-      <p className="text-gray-600 text-sm mb-6 leading-relaxed">
-        {description}
+      <p className="text-gray-600 text-sm mb-6 leading-relaxed flex-grow">
+         {description
+    ? description.length > 250
+      ? `${description.slice(0, 250)}...`
+      : description
+    : "No description available..."}
       </p>
 
-      <button className="w-full bg-[#175f48] hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors">
+      <div className="flex justify-between">
+        <div></div>
+              {/* Company Logo */}
+      <div className="flex flex-col justify-center items-center">
+          {logo ? (
+            <Image
+              src={`${Image_URL}${logo}`}
+              alt={company}
+              width={60}
+              height={60}
+              className="object-contain rounded-md"
+            />
+          ) : (
+            <div className="bg-gray-200 p-2 rounded-md">
+              <FaBriefcase className="text-gray-600 text-xl" />
+            </div>
+          )}
+          <span className="font-medium mt-2 text-sm text-gray-800">{company}</span>
+        </div>
+      </div>
+
+      {/* <button className="w-full bg-[#175f48] hover:bg-blue-600 text-white py-2 px-4 rounded-md transition-colors">
         Apply Now
-      </button>
-    </div>
+      </button> */}
+    </Link>
   );
 }

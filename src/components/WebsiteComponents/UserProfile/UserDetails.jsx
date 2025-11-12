@@ -319,9 +319,9 @@ const UserDetails = ({ profile }) => {
     try {
       const res = await userApi.uploadProfileImage(formData);
       updateUser({ profile_photo: res.data.profile_photo });
-      toast.success("Profile uploaded successfully!");
+      toast.success(res?.data?.message || "Profile uploaded successfully!");
     } catch (err) {
-      toast.error("Profile upload failed!");
+      toast.error(err?.data?.message || "Profile upload failed!");
       console.error("Profile upload failed:", err.message);
     }
   };

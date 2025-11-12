@@ -70,7 +70,7 @@
 //       <div className="md:px-20" id="marketplace-deals">
 //         <MarketplaceCard
 //           heading="Deals"
-//           cards={listings?.data?.data.slice(0, 8) || []}
+//           cards={listings?.data?.slice(0, 8) || []}
 //           seeMoreLink="/hotDeals"
 //         />
 //       </div>
@@ -81,7 +81,7 @@
 //       >
 //         <PopularProductCard
 //           categories={categories}
-//           cards={listings?.data?.data?.slice(0, 4)}
+//           cards={listings?.data?.slice(0, 4)}
 //         />
 //       </Suspense>
 //       <div className="md:px-10 px-3 mt-10">
