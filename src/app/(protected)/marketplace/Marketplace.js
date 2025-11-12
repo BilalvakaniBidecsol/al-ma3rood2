@@ -41,12 +41,12 @@ export default async function Marketplace({ searchParams }) {
   Array.isArray(listings?.data)
     ? listings.data.slice(0, 8)
     : Array.isArray(listings?.data)
-    ? listings.data.data.slice(0, 8)
+    ? listings?.data?.slice(0, 8)
     : [];
 
 const popularCards =
   Array.isArray(listings?.data)
-    ? listings.data.data.slice(0, 4)
+    ? listings?.data?.slice(0, 4)
     : [];
   
 
