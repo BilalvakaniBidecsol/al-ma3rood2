@@ -25,7 +25,10 @@ const jobListingSchema = z
     // Step 0: Basic Info & Pay
     title: z.string().min(3, "Job Title is required (min 3 charcters)"),
     listing_type: z.literal("job"), // Fixed to 'job'
-    category_id: z.number().int().min(1, "Job Category is required").nullable(),
+    category_id: z
+  .number({ invalid_type_error: "Job Category is required" })
+  .nullable()
+  .refine((val) => val !== null && val > 0, "Job Category is required"),
     subcategory_id: z.number().int().optional().nullable(),
 region_id: z.string({ required_error: "Region is required" }).nullable(),
 governorate_id: z.string({ required_error: "Governorate is required" }).nullable(),
@@ -447,8 +450,25 @@ if (Array.isArray(initialValues.key_points)) {
       }
       
     } catch (error) {
-      console.error("Error creating job listing:", error);
-      toast.error("Failed to create job listing. Please try again.");
+      console.error("Error creating job listing:", error); // Laravel validation errors (422)
+  if (error?.data?.errors) {
+    const errors = error.data.errors;
+
+    // Show each error as toast
+    Object.keys(errors).forEach((key) => {
+      errors[key].forEach((msg) => {
+        toast.error(`${msg}`);
+      });
+    });
+
+    return; // stop further toasts
+  }
+
+  // Other backend messages
+  if (error?.data?.message) {
+    toast.error(error.data.message);
+    return;
+  }
     } finally {
       setIsSubmitting(false);
     }
@@ -667,7 +687,8 @@ if (Array.isArray(initialValues.key_points)) {
               <label className="block text-sm font-medium text-gray-700 mb-2">Key Points (Optional)</label>
               <p className="text-xs text-gray-500 mb-1">Enter key responsibilities or requirements, one point per line.</p>
               <Controller name="key_points" control={control} render={({ field }) => (
-                  <textarea {...field} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="Line 1: Must know React...\nLine 2: 3+ years experience..." />
+                  <textarea {...field} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder={`Line 1: Must know React...
+Line 2: 3+ years experience...`} />
               )} />
             </div>
 

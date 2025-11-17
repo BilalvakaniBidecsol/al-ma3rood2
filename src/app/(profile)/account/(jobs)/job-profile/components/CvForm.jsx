@@ -3,7 +3,8 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { postApi } from "@/lib/api/jobs-profile";
+import { profilePostApi } from "@/lib/api/jobs-profile";
+import { toast } from "react-toastify";
 
 // ✅ Zod Schema for CV upload
 const cvSchema = z.object({
@@ -31,11 +32,12 @@ const CvForm = ({ onCancel, onSuccess }) => {
       const formData = new FormData();
       formData.append("cv_file", data.cv_file[0]);
 
-      await postApi("user/job-cv/store", formData);
-
+      const res = await profilePostApi("user/job-cv/store", formData);
+toast.success(res.message || "CV uploaded successfully!");
       reset();
       onSuccess?.();
     } catch (err) {
+      toast.error(err?.message || "Something went wrong!");
       console.error("CV upload failed:", err);
     }
   };

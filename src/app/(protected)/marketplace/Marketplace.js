@@ -39,7 +39,7 @@ export default async function Marketplace({ searchParams }) {
 
   const dealCards =
   Array.isArray(listings?.data)
-    ? listings.data.slice(0, 8)
+    ? listings?.data?.slice(0, 8)
     : Array.isArray(listings?.data)
     ? listings?.data?.slice(0, 8)
     : [];

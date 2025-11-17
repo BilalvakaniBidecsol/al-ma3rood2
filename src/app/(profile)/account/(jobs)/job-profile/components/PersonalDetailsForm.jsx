@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Select from "react-select";
-import { postApi } from "@/lib/api/jobs-profile";
+import { profilePostApi } from "@/lib/api/jobs-profile";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import { useAuthStore } from "@/lib/stores/authStore";
@@ -46,8 +46,9 @@ const PersonalDetailsForm = ({ onCancel, defaultData, onSuccess }) => {
   const onSubmit = async (data) => {
     setLoading(true);
     try {
-      const res = await postApi(`user/${user?.id}/edit-contact-details`, data);
-      toast.success(res.message || "Personal details updated successfully!");
+      const res = await profilePostApi(`user/${user?.id}/edit-contact-details`, data);
+      console.log(res);
+      toast.success(res?.message || "Personal details updated successfully!");
       updateUser({
         name: res.data?.name || "",
         job_profile_visibility: res.data?.job_profile_visibility || "",

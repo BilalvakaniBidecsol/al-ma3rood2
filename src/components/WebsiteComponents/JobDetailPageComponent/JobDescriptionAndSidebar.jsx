@@ -7,11 +7,12 @@ import "swiper/css/navigation";
 import { Navigation, Autoplay } from "swiper/modules";
 import ShareListingModal from "./modals/share-listing-modal";
 import { Image_URL } from "@/config/constants";
-import { MapPin, Mail, Phone, Eye } from "lucide-react";
+import { MapPin, Mail, Phone, Eye, X } from "lucide-react";
 import { CiUser } from "react-icons/ci";
 
 export default function JobDescriptionAndSidebar({ product }) {
   const [showShareModal, setShowShareModal] = useState(false);
+  const [fullscreenImage, setFullscreenImage] = useState(null); // <-- NEW
 
   const {
     id,
@@ -66,7 +67,9 @@ export default function JobDescriptionAndSidebar({ product }) {
                     <img
                       src={`${Image_URL}${file.file_path}`}
                       alt={`Job Image ${index + 1}`}
-                      className="w-full h-auto "
+                      className="w-full h-56 object-cover cursor-pointer"
+                      onClick={() => setFullscreenImage(index)}
+
                     />
                   </SwiperSlide>
                 ))}
@@ -80,7 +83,6 @@ export default function JobDescriptionAndSidebar({ product }) {
 
           {/* Content */}
           <div className="p-5 space-y-4">
-            {/* Company Info */}
             {company_name && (
               <div className="text-center border-b border-gray-100 pb-3">
                 <h3 className="text-lg font-semibold text-[#175f48]">
@@ -103,17 +105,21 @@ export default function JobDescriptionAndSidebar({ product }) {
                   </span>
                 </div>
               )}
+
               {contact_name && (
                 <div className="flex items-center gap-2">
-                    <CiUser className="text-[#175f48] w-5 h-5" /> <span>{contact_name}</span>
+                  <CiUser className="text-[#175f48] w-5 h-5" />{" "}
+                  <span>{contact_name}</span>
                 </div>
               )}
+
               {contact_email && (
                 <div className="flex items-center gap-2 break-all">
                   <Mail className="w-4 h-4 text-[#175f48]" />
                   <span>{contact_email}</span>
                 </div>
               )}
+
               {contact_phone && (
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-[#175f48]" />
@@ -122,7 +128,6 @@ export default function JobDescriptionAndSidebar({ product }) {
               )}
             </div>
 
-            {/* Share Button */}
             <button
               onClick={() => setShowShareModal(true)}
               className="w-full bg-[#175f48] hover:bg-[#0f3c2e] text-white text-sm font-medium rounded-xl py-2 mt-4 transition-colors"
@@ -138,6 +143,41 @@ export default function JobDescriptionAndSidebar({ product }) {
         isOpen={showShareModal}
         onClose={() => setShowShareModal(false)}
       />
+
+      {/* FULLSCREEN SLIDER MODAL */}
+{fullscreenImage !== null && (
+  <div className="fixed inset-0 bg-black bg-opacity-90 flex items-center justify-center z-[9999]">
+    
+    {/* Close Button */}
+    <button
+      className="absolute top-6 right-6 text-white bg-black bg-opacity-50 p-2 rounded-full z-[10000]"
+      onClick={() => setFullscreenImage(null)}
+    >
+      <X className="w-6 h-6" />
+    </button>
+
+    {/* Slider */}
+    <Swiper
+      modules={[Navigation]}
+      navigation
+      initialSlide={fullscreenImage} // index number
+      loop={true}
+      className="w-full max-w-4xl"
+    >
+      {media_files.map((file, index) => (
+        <SwiperSlide key={index}>
+          <div className="flex items-center justify-center w-full h-full">
+            <img
+              src={`${Image_URL}${file.file_path}`}
+              className="max-h-[90vh] max-w-[90vw] object-contain rounded-lg"
+            />
+          </div>
+        </SwiperSlide>
+      ))}
+    </Swiper>
+  </div>
+)}
+
     </div>
   );
 }

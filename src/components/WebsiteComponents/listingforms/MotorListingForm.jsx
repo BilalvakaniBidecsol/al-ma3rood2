@@ -522,6 +522,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
     watch,
     register,
     reset,
+    trigger,
     formState: { errors },
     control,
   } = methods;
@@ -545,6 +546,14 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
   // Vehicle data state
   const [vehicleData, setVehicleData] = useState([]);
   const [loadingVehicleData, setLoadingVehicleData] = useState(false);
+
+
+  const stepFields = [
+  ["category_id"], // Step 0
+  ["title", "description", "condition", "make", "model", "year"], // Step 1
+  ["images"], // Step 2
+  ["buy_now_price", "start_price", "reserve_price"], // Step 3
+];
 
   // Load vehicle data based on vehicle type
   useEffect(() => {
@@ -904,9 +913,25 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
     // }
   };
 
-  const nextStep = () => {
-    if (activeStep < steps.length - 1) {
+  // const nextStep = () => {
+  //   if (activeStep < steps.length - 1) {
+  //     setActiveStep(activeStep + 1);
+  //   }
+  // };
+   const nextStep = async () => {
+    if (activeStep >= steps.length - 1) return; 
+
+    // Get the fields specific to the current step
+    const fieldsToValidate = stepFields[activeStep];
+    
+    // Use r-h-f's trigger to validate only the necessary fields
+    const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
+
+    if (isValid) {
       setActiveStep(activeStep + 1);
+    } else {
+      // The Zod resolver automatically sets errors, and r-h-f should focus on the first error.
+      toast.error("Please fill out all required fields before continuing.");
     }
   };
 

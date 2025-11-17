@@ -38,6 +38,7 @@ const staticCategories = [
     rowSpan: "md:row-span-1",
     height: "h-[200px]",
     rounded: "rounded-3xl",
+    route: "/jobs",
   },
   {
     title: "Property",

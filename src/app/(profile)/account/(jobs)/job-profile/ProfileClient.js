@@ -14,10 +14,10 @@ import CvForm from "./components/CvForm";
 import CvView from "./components/CvView";
 import SkillsForm from "./components/SkillsForm";
 import SkillsView from "./components/SkillsView";
-import { deleteApi, getApi } from "@/lib/api/jobs-profile";
+import { profileDeleteApi, deleteApi, getApi } from "@/lib/api/jobs-profile";
 import PersonalDetailsForm from "./components/PersonalDetailsForm";
 import PersonalDetailsView from "./components/PersonalDetailsView";
-
+import { toast } from "react-toastify";
 
 const items = [
   { label: "Home", href: "/" },
@@ -25,7 +25,15 @@ const items = [
   { label: "Job Profile" },
 ];
 
-const tabs = ["Personal_Details", "Professional_Details", "Experience", "Education", "CV", "Certifications", "Skills"];
+const tabs = [
+  "Personal_Details",
+  "Professional_Details",
+  "Experience",
+  "Education",
+  "CV",
+  "Certifications",
+  "Skills",
+];
 
 const ProfileClient = () => {
   const { t } = useTranslation();
@@ -76,31 +84,36 @@ const ProfileClient = () => {
             defaultData={jobProfile}
             onCancel={() => setEditingSection(null)}
             onSuccess={async () => {
-                const res = await getApi("user/job/profile");
-                setJobProfile(res.job_profile);
+              const res = await getApi("user/job/profile");
+              setJobProfile(res.job_profile);
               setEditingSection(null);
             }}
           />
         ) : (
-          <DetailsView data={jobProfile} onEdit={() => setEditingSection("Professional_Details")} />
+          <DetailsView
+            data={jobProfile}
+            onAdd={() => setEditingSection("Professional_Details")}
+            onEdit={() => setEditingSection("Professional_Details")}
+          />
         );
-case "Personal_Details":
-  return editingSection === "Personal_Details" ? (
-    <PersonalDetailsForm
-      defaultData={userDetail}
-      onCancel={() => setEditingSection(null)}
-      onSuccess={async () => {
-        const res = await getApi("user/job/profile");
-        setUserDetail(res?.user);
-        setEditingSection(null);
-      }}
-    />
-  ) : (
-    <PersonalDetailsView
-      data={userDetail}
-      onEdit={() => setEditingSection("Personal_Details")}
-    />
-  );
+      case "Personal_Details":
+        return editingSection === "Personal_Details" ? (
+          <PersonalDetailsForm
+            defaultData={userDetail}
+            onCancel={() => setEditingSection(null)}
+            onSuccess={async () => {
+              const res = await getApi("user/job/profile");
+              setUserDetail(res?.user);
+              setEditingSection(null);
+            }}
+          />
+        ) : (
+          <PersonalDetailsView
+            data={userDetail}
+            onEdit={() => setEditingSection("Personal_Details")}
+            onAdd={() => setEditingSection("Personal_Details")}
+          />
+        );
 
       case "Experience":
         if (editingExperience) {
@@ -109,7 +122,7 @@ case "Personal_Details":
               defaultData={editingExperience}
               onCancel={() => setEditingExperience(null)}
               onSuccess={async () => {
-                 const res = await getApi("user/job/profile");
+                const res = await getApi("user/job/profile");
                 setExperience(res.experiences || []);
                 setEditingExperience(null);
               }}
@@ -121,10 +134,14 @@ case "Personal_Details":
             data={experience}
             onDelete={async (id) => {
               try {
-                await deleteApi(`user/job-experience/${id}/destroy`);
+                await profileDeleteApi(`user/job-experience/${id}/destroy`);
+                toast.success("Experience deleted successfully!")
                 const res = await getApi("user/job/profile");
                 setExperience(res.experiences || []);
               } catch (err) {
+                toast.error(
+                  err?.message || "Failed to delete experience!"
+                );
                 console.error("Delete failed:", err);
               }
             }}
@@ -140,16 +157,20 @@ case "Personal_Details":
               defaultData={editingEducation}
               onCancel={() => setEditingEducation(null)}
               onDelete={async (id) => {
-              try {
-                await deleteApi(`user/education/${id}/destroy`);
-                const res = await getApi("user/job/profile");
-                setEducation(res.educations || []);
-              } catch (err) {
-                console.error("Delete failed:", err);
-              }
-            }}
+                try {
+                  await profileDeleteApi(`user/education/${id}800/destroy`);
+                  toast.success("Experience deleted successfully!")
+                  const res = await getApi("user/job/profile");
+                  setEducation(res.educations || []);
+                } catch (err) {
+                 toast.error(
+        err?.response?.message || "Failed to delete experience!"
+      );
+                  console.error("Delete failed:", err);
+                }
+              }}
               onSuccess={async () => {
-                 const res = await getApi("user/job/profile");
+                const res = await getApi("user/job/profile");
                 setEducation(res.educations || []);
                 setEditingEducation(null);
               }}
@@ -162,14 +183,18 @@ case "Personal_Details":
             onEdit={(edu) => setEditingEducation(edu)}
             onAdd={() => setEditingEducation({})}
             onDelete={async (id) => {
-              try {
-                await deleteApi(`user/education/${id}/destroy`); // Check Route
-                const res = await getApi("user/job/profile");
-                setEducation(res.educations || []);
-              } catch (err) {
-                console.error("Delete failed:", err);
-              }
-            }}
+                try {
+                  await profileDeleteApi(`user/education/${id}/destroy`);
+                  toast.success("Experience deleted successfully!")
+                  const res = await getApi("user/job/profile");
+                  setEducation(res.educations || []);
+                } catch (err) {
+                 toast.error(
+        err?.message || "Failed to delete experience!"
+      );
+                  console.error("Delete failed:", err);
+                }
+              }}
           />
         );
 
@@ -180,7 +205,7 @@ case "Personal_Details":
               defaultData={editingCertification}
               onCancel={() => setEditingCertification(null)}
               onSuccess={async () => {
-                  const res = await getApi("user/job/profile");
+                const res = await getApi("user/job/profile");
                 setCertifications(res.certificates || []);
                 setEditingCertification(null);
               }}
@@ -194,10 +219,14 @@ case "Personal_Details":
             onAdd={() => setEditingCertification({})}
             onDelete={async (id) => {
               try {
-                await deleteApi(`user/job-experience/${id}/destroy`);
+                await profileDeleteApi(`user/job-certificate/${id}/destroy`);
+                toast.success("Certificate deleted successfully!")
                 const res = await getApi("user/job/profile");
-                 setCertifications(res.certificates || []);
+                setCertifications(res.certificates || []);
               } catch (err) {
+                toast.error(
+                  err?.message || "Failed to delete certificate!"
+                );
                 console.error("Delete failed:", err);
               }
             }}
@@ -223,10 +252,14 @@ case "Personal_Details":
             onAdd={() => setEditingSection("cv")}
             onDelete={async (id) => {
               try {
-                await deleteApi(`user/job-cv/${id}/destroy`);
+                await profileDeleteApi(`user/job-cv/${id}/destroy`);
+                toast.success("CV deleted successfully!")
                 const res = await getApi("user/job/profile");
                 setCvs(res.cvs || []);
               } catch (err) {
+                toast.error(
+                  err?.message || "Failed to delete CV!"
+                );
                 console.error("Delete failed:", err);
               }
             }}
@@ -247,7 +280,9 @@ case "Personal_Details":
             />
           );
         }
-        return <SkillsView data={skills} onEdit={() => setEditingSkills(true)} />;
+        return (
+          <SkillsView data={skills} onEdit={() => setEditingSkills(true)} />
+        );
 
       default:
         return null;
@@ -269,31 +304,30 @@ case "Personal_Details":
         </h1>
 
         {/* Tabs */}
-      <div className="flex overflow-x-auto whitespace-nowrap border-b border-gray-200 mb-6 scrollbar-hide">
-  <div className="flex space-x-4 px-1">
-    {tabs.map((tab) => (
-      <button
-        key={tab}
-        onClick={() => {
-          setActiveTab(tab);
-          setEditingSection(null);
-          setEditingExperience(null);
-          setEditingEducation(null);
-          setEditingCertification(null);
-          setEditingSkills(false);
-        }}
-        className={`px-4 py-2 text-sm font-semibold flex-shrink-0 ${
-          activeTab === tab
-            ? "text-green-600 border-b-2 border-green-600"
-            : "text-gray-600 hover:text-green-600"
-        }`}
-      >
-        {t(tab.replace(/_/g, " "))}
-      </button>
-    ))}
-  </div>
-</div>
-
+        <div className="flex overflow-x-auto whitespace-nowrap border-b border-gray-200 mb-6 scrollbar-hide">
+          <div className="flex space-x-4 px-1">
+            {tabs.map((tab) => (
+              <button
+                key={tab}
+                onClick={() => {
+                  setActiveTab(tab);
+                  setEditingSection(null);
+                  setEditingExperience(null);
+                  setEditingEducation(null);
+                  setEditingCertification(null);
+                  setEditingSkills(false);
+                }}
+                className={`px-4 py-2 text-sm font-semibold flex-shrink-0 ${
+                  activeTab === tab
+                    ? "text-green-600 border-b-2 border-green-600"
+                    : "text-gray-600 hover:text-green-600"
+                }`}
+              >
+                {t(tab.replace(/_/g, " "))}
+              </button>
+            ))}
+          </div>
+        </div>
 
         {/* Render Section */}
         <div className="bg-white shadow p-6 rounded-lg">{renderForm()}</div>

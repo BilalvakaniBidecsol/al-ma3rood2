@@ -45,7 +45,7 @@ export default function UnsoldClient() {
       const response = await listingsApi.getUserListings({
         status: [4, 5],
       });
-      const listData = response?.data || [];
+      const listData = response || [];
       setAllListings(listData);
     } catch (error) {
       console.error("Failed to fetch listings:", error);

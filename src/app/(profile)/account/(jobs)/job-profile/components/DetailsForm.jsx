@@ -4,7 +4,7 @@ import { useForm, Controller, useFieldArray } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Select from "react-select";
-import { postApi } from "@/lib/api/jobs-profile";
+import { profilePostApi } from "@/lib/api/jobs-profile";
 import { useTranslation } from "react-i18next";
 import { categoriesApi } from "@/lib/api/category";
 import { toast } from "react-toastify";
@@ -126,7 +126,7 @@ useEffect(() => {
     };
 
     try {
-      const res = await postApi("user/job/profile/store", payload);
+      const res = await profilePostApi("user/job/profile/store", payload);
       toast.success(res.message || "Details saved successfully!");
       onSuccess();
     } catch (err) {
@@ -137,8 +137,8 @@ useEffect(() => {
           toast.error(`${key.replace(/_/g, " ")}: ${msgs.join(", ")}`);
         });
       } else {
-        toast.error(errorResponse?.message || "Failed to save details.");
-      }
+        toast.error(errorResponse?.message || err?.message || "Failed to save details.");
+      } 
     } finally {
       setLoading(false);
     }

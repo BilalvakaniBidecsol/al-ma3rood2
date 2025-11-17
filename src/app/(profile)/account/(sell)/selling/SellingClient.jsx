@@ -78,6 +78,8 @@ export default function SellingClient() {
       const response = await listingsApi.getUserListings({});
       const listData = response?.data || [];
       setAllListings(listData);
+
+      console.log('RES', listData)
     } catch (error) {
       console.error("Failed to fetch listings:", error);
     } finally {
@@ -86,6 +88,7 @@ export default function SellingClient() {
   };
 
   const applyFilter = () => {
+
     const now = new Date();
     let threshold;
 
@@ -125,10 +128,10 @@ export default function SellingClient() {
         }}
       />
 
-      <h1 className="text-2xl font-bold text-green-600 uppercase mb-1 mt-5">
+      {/* <h1 className="text-2xl font-bold text-green-600 uppercase mb-1 mt-5">
         {t("Selling")}
-      </h1>
-      <p className="text-sm mb-4 mt-3">{filteredListings.length} {"- "} {t("Listings")}</p>
+      </h1> */}
+      <p className="text-sm mb-4 mt-3">{allListings.length} {"- "} {t("Listings")}</p>
 
       <div className="mb-4">
         <select

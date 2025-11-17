@@ -46,7 +46,7 @@ const loginUserId = user?.id;
     try {
       setLoading(true);
       const response = await listingsApi.getUserListings({ status: 3 });
-      const listData = response?.data || [];
+      const listData = response || [];
       setAllListings(listData);
     } catch (error) {
       console.error("Failed to fetch listings:", error);

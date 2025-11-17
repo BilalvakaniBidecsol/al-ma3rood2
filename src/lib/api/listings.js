@@ -94,6 +94,7 @@ export const listingsApi = {
       `/listings/filters`,
       formattedPayload
     );
+    console.log("aaaaa Check Listing Response:", response)
     return response.data;
   },
   // Listing Filter By All Categories

@@ -1,10 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { postApi, putApi } from "@/lib/api/jobs-profile";
+import { profilePostApi, profilePutApi } from "@/lib/api/jobs-profile";
 import { toast } from "react-toastify";
 
 const certificationSchema = z.object({
@@ -24,10 +24,17 @@ const CertificationForm = ({ defaultData, onSuccess, onCancel }) => {
     register,
     handleSubmit,
     watch,
+    reset,
     formState: { errors },
   } = useForm({
     resolver: zodResolver(certificationSchema),
-    defaultValues: defaultData || {
+    defaultValues:  defaultData
+  ? {
+      ...defaultData,
+      no_expiry: String(defaultData.no_expiry ?? "0"),
+      document_path: null,
+    }
+  :  {
       certificate_name: "",
       issuer: "",
       issue_date: "",
@@ -39,31 +46,59 @@ const CertificationForm = ({ defaultData, onSuccess, onCancel }) => {
 
   const noExpiry = watch("no_expiry");
 
+  useEffect(() => {
+  if (defaultData) {
+    reset({
+      certificate_name: defaultData.certificate_name || "",
+      issuer: defaultData.issuer || "",
+      issue_date: defaultData.issue_date || "",
+      expiry_date: defaultData.expiry_date || "",
+      no_expiry: String(defaultData.no_expiry ?? "0"), // FIXED
+      document: null, // IMPORTANT FIX
+    });
+  }
+}, [defaultData, reset]);
+
   const onSubmit = async (data) => {
     setLoading(true);
     try {
       const formData = new FormData();
-      Object.entries(data).forEach(([key, value]) => {
-        if (key === "document" && value && value[0]) {
-          formData.append("document", value[0]);
-        } else if (key === "expiry_date" && data.no_expiry === "1") {
-          // skip expiry_date if no_expiry is true
-        } else {
-          formData.append(key, value);
-        }
-      });
+      // Object.entries(data).forEach(([key, value]) => {
+      //   if (key === "document" && value !== null && value && value[0]) {
+      //     formData.append("document", value[0]);
+      //   } else if (key === "expiry_date" && data.no_expiry === "1") {
+      //     // skip expiry_date if no_expiry is true
+      //   } else {
+      //     formData.append(key, value);
+      //   }
+      // });
+      for (const [key, value] of Object.entries(data)) {
+  if (key === "document") {
+    // ONLY append if user selected a new file
+    if (value && value[0] instanceof File) {
+      formData.append("document", value[0]);
+    }
+    continue; // skip default append
+  }
+
+  if (key === "expiry_date" && data.no_expiry === "1") {
+    continue; // skip expiry_date if no expiry
+  }
+
+  formData.append(key, value ?? "");
+}
 
       let res;
       if (defaultData?.id) {
-        res = await putApi(`user/job-certificate/${defaultData.id}/update`, formData);
+        res = await profilePutApi(`user/job-certificate/${defaultData.id}/update`, formData);
       } else {
-        res = await postApi("user/job-certificate/store", formData);
+        res = await profilePostApi("user/job-certificate/store", formData);
       }
 
       toast.success(res.message || "Certificate saved successfully!");
       onSuccess?.(res.data || {});
     } catch (err) {
-      toast.error(err?.response?.data?.message || "Something went wrong!");
+      toast.error(err?.message || err?.response?.data?.message || "Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -128,7 +163,7 @@ const CertificationForm = ({ defaultData, onSuccess, onCancel }) => {
             )}
           </div>
 
-          {noExpiry === "0" && (
+          {noExpiry == "0" && (
             <div>
               <label className="block text-sm mb-1">{t("Expiry Date")}</label>
               <input

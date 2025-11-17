@@ -78,7 +78,7 @@ export default function Page() {
     try {
       setLoading(true);
       const response = await listingsApi.getUserListings({});
-      const listData = response?.data || [];
+      const listData = response || [];
       setAllListings(listData);
     } catch (error) {
       console.error("Failed to fetch listings:", error);

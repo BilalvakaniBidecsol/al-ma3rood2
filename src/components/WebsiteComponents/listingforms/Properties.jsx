@@ -103,6 +103,12 @@ const steps = [
   { title: "Price & Payment", key: "price-payment" },
 ];
 
+const stepFields = {
+    0: ["category_id", "title", "address", "floor_area", "condition", "property_type_field", "business_type", "land_area", "parking", "bedrooms", "bathrooms", "description"], // Property Details
+    1: ["images"], // Photos
+    2: ["buy_now_price", "start_price", "reserve_price"], // Price & Payment (The Refine takes care of the OR logic on final submit)
+};
+
 // Helper: find type object by name
 // const findPropertyTypeByName = (name) => propertyTypes.find((p) => p.name === name);
 
@@ -126,6 +132,7 @@ const Properties = ({ initialValues, mode = "create" }) => {
     formState: { errors },
     control,
     reset,
+    trigger,
   } = methods;
 
   const watchedPropertyType = watch("property_type");
@@ -432,6 +439,20 @@ const Properties = ({ initialValues, mode = "create" }) => {
       }
     }
   };
+
+  const handleNextStep = async () => {
+        const fieldsToValidate = stepFields[activeStep];
+
+        // Trigger validation for the current step's fields
+        const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
+
+        if (isValid) {
+            nextStep();
+        } else {
+            // Show a general error if any field in the current step failed validation
+            toast.error("Please fill out all required fields for this step.");
+        }
+    };
 
   const nextStep = () => {
     if (activeStep < steps.length - 1) setActiveStep((s) => s + 1);
@@ -1093,7 +1114,7 @@ const Properties = ({ initialValues, mode = "create" }) => {
             <IoIosArrowBack className="mr-2" />
             Back
           </Button> */}
-          <Button onClick={nextStep} className="px-6 py-2 flex items-center">
+          <Button onClick={handleNextStep} className="px-6 py-2 flex items-center">
             Continue
             <IoIosArrowForward className="ml-2" />
           </Button>
@@ -1130,7 +1151,7 @@ const Properties = ({ initialValues, mode = "create" }) => {
           <IoIosArrowBack className="mr-2" />
           Back
         </Button>
-        <Button onClick={nextStep} className="px-6 py-2 flex items-center">
+        <Button onClick={handleNextStep} className="px-6 py-2 flex items-center">
           Continue
           <IoIosArrowForward className="ml-2" />
         </Button>

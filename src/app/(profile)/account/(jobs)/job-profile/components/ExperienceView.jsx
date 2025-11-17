@@ -50,7 +50,7 @@ const ExperienceView = ({ data = [], onEdit, onAdd, onDelete }) => {
             </p>
             <p className="text-gray-500 text-xs mt-1">
               {exp.start_date} —{" "}
-              {exp.currently_working === "1" ? t("Present") : exp.end_date}
+              {exp.currently_working == "1" ? t("Present") : exp.end_date}
             </p>
             {exp.description && (
               <p className="text-gray-500 text-xs mt-1">{exp.description}</p>

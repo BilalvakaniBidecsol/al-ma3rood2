@@ -47,6 +47,9 @@ export const userApi = {
 
   getProfile: () => axiosClient.get("/user/profile"),
 
+  getJobProfile: (id) => axiosClient.get(`user/job-applying/${id}/getApplierProfile`),
+
+
   categoryFavorites: () => axiosClient.get("/user/favorites/categories"),
 
   sellerFavorites: () => axiosClient.get("/user/favorites/sellers"),

@@ -49,7 +49,7 @@ const EducationView = ({ data = [], onEdit, onAdd, onDelete }) => {
             </p>
             <p className="text-gray-500 text-xs mt-1">
               {edu.start_date} —{" "}
-              {edu.currently_studying === "1" ? t("Present") : edu.end_date}
+              {edu.currently_studying == "1" ? t("Present") : edu.end_date}
             </p>
           </div>
 <div className="flex justify-center gap-1">

@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
-import { postApi } from "@/lib/api/jobs-profile";
+import { profilePostApi } from "@/lib/api/jobs-profile";
+import { toast } from "react-toastify";
 
 const SkillsForm = ({ defaultData = [], onCancel, onSuccess }) => {
   // Safely extract skill names (handles array of strings or array of objects)
@@ -33,10 +34,12 @@ const SkillsForm = ({ defaultData = [], onCancel, onSuccess }) => {
       const formData = new FormData();
       skills.forEach((skill, i) => formData.append(`skills[${i}]`, skill));
 
-      await postApi("user/job-skills/store", formData);
+      const res= await profilePostApi("user/job-skills/store", formData);
+       toast.success(res?.message || "Skills updated successfully!");
       onSuccess?.();
     } catch (err) {
       console.error("Error saving skills:", err);
+      toast.error(err?.message || "Failed to save skills.");
     } finally {
       setLoading(false);
     }

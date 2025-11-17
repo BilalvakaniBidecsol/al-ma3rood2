@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { X, FileText, Upload, FileBadge } from "lucide-react";
 import { toast } from "react-toastify";
-import { getApi, postApi } from "@/lib/api/jobs-profile";
+import { getApi, profilePostApi } from "@/lib/api/jobs-profile";
 
 const JobApplicationModal = ({ isOpen, onClose, jobId }) => {
   const [loading, setLoading] = useState(false);
@@ -91,11 +91,11 @@ const JobApplicationModal = ({ isOpen, onClose, jobId }) => {
       if (cvChoice === "new") data.append("cv", newCvFile);
       else data.append("cv_id", formData.cv_id);
 
-      await postApi("user/job-applying/store", data, {
+      const res= await profilePostApi("user/job-applying/store", data, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      toast.success("Application submitted successfully!");
+      toast.success(res?.message || "Application submitted successfully!");
       setFormData({ full_name: "", email: "", phone: "", cv_id: "" });
       setCoverFile(null);
       setNewCvFile(null);

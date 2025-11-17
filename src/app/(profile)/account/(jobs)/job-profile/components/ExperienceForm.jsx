@@ -30,7 +30,12 @@ const ExperienceForm = ({ defaultData, onSuccess, onCancel }) => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(experienceSchema),
-    defaultValues: defaultData || {
+    defaultValues: defaultData
+  ? {
+      ...defaultData,
+      currently_working: String(defaultData.currently_working ?? "0"),
+    }
+  : {
       job_title: "",
       company: "",
       country: "",
@@ -39,6 +44,7 @@ const ExperienceForm = ({ defaultData, onSuccess, onCancel }) => {
       end_date: "",
       description: "",
     },
+
   });
 
   const currentlyWorking = watch("currently_working");
@@ -51,7 +57,7 @@ const ExperienceForm = ({ defaultData, onSuccess, onCancel }) => {
         job_title: defaultData.job_title || "",
         company: defaultData.company || "",
         country: defaultData.country || "",
-        currently_working: defaultData.currently_working || "0",
+        currently_working: String(defaultData.currently_working ?? "0"),
         start_date: defaultData.start_date || "",
         end_date: defaultData.end_date || "",
         description: defaultData.description || "",

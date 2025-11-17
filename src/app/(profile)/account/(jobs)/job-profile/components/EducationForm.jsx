@@ -4,7 +4,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useTranslation } from "react-i18next";
-import { postApi, putApi } from "@/lib/api/jobs-profile";
+import { profilePostApi, profilePutApi } from "@/lib/api/jobs-profile";
 import { toast } from "react-toastify";
 
 const educationSchema = z.object({
@@ -26,7 +26,13 @@ const EducationForm = ({ defaultData, onSuccess, onCancel }) => {
     formState: { errors },
   } = useForm({
     resolver: zodResolver(educationSchema),
-    defaultValues: defaultData || {
+    defaultValues: defaultData
+  ? {
+      ...defaultData,
+      currently_studying: String(defaultData.currently_studying ?? "0"),
+      end_date: ""
+    }
+  :  {
       education_provider: "",
       qualification: "",
       currently_studying: "0",
@@ -42,9 +48,9 @@ const EducationForm = ({ defaultData, onSuccess, onCancel }) => {
     try {
       let res;
       if (defaultData?.id) {
-        res = await putApi(`user/education/${defaultData?.id}/update`, data);
+        res = await profilePutApi(`user/education/${defaultData?.id}/update`, data);
       } else {
-        res = await postApi("user/education/store", data);
+        res = await profilePostApi("user/education/store", data);
       }
 
       toast.success(res.message || "Education saved successfully!");

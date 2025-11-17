@@ -3,13 +3,19 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { MdModeEdit } from "react-icons/md";
 
-const PersonalDetailsView = ({ data, onEdit }) => {
+const PersonalDetailsView = ({ data, onEdit, onAdd }) => {
   const { t } = useTranslation();
 
   if (!data) {
     return (
       <div className="text-center py-10 text-gray-500">
         {t("No personal details found.")}
+        <button
+          onClick={onAdd}
+          className="text-green-600 underline hover:text-green-700 ml-1"
+        >
+          {t("Add now")}
+        </button>
       </div>
     );
   }

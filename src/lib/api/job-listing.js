@@ -137,6 +137,10 @@ updateJobApplicationStatus: async ({ job_application_id, job_status }) => {
     const response = await axiosClient.get(`/user/job-applying/${id}/applicantsForMyJob`);
     return response;
   },
+  getApplicantProfile: async ({ applicationId }) => {
+    const response = await axiosClient.get(`/user/job-applying/${applicationId}/getApplierProfile`);
+    return response;
+  },
   buyNow: async (productSlug) => {
     const response = await axiosClient.post(
       `/user/listings/${productSlug}/buy-now`
