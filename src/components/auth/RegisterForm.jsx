@@ -129,41 +129,41 @@ console.log('res', formData.region)
     }
   }, 500);
 
-  const handleChange = (e) => {
+  // const handleChange = (e) => {
 
-    const { name, value } = e.target;
-    setFormData((prev) => {
-      const updated = { ...prev, [name]: value };
+  //   const { name, value } = e.target;
+  //   setFormData((prev) => {
+  //     const updated = { ...prev, [name]: value };
 
-      // After updating formData, revalidate current field
-      validateField(name, value, updated); // pass updated formData
-      // if (name === "username") {
-      //   checkUsernameUnique(value); // 🔑 call username check here
-      // }
-      if (name === "username") {
-        setErrors((prev) => ({ ...prev, username: "" })); // 🟢 clear old error
-        setUsernameSuggestions([]); // 🟢 clear old suggestions
-        checkUsernameUnique(value); // 🔑 naya API call
-      }
-      if (name === "password" || name === "confirmPassword") {
-        validateField("confirmPassword", updated.confirmPassword, updated);
-      }
-      // If password becomes empty, reset confirmPassword too
-      if (name === "password" && value === "") {
-        updated.confirmPassword = "";
-      }
+  //     // After updating formData, revalidate current field
+  //     validateField(name, value, updated); // pass updated formData
+  //     // if (name === "username") {
+  //     //   checkUsernameUnique(value); // 🔑 call username check here
+  //     // }
+  //     if (name === "username") {
+  //       setErrors((prev) => ({ ...prev, username: "" })); // 🟢 clear old error
+  //       setUsernameSuggestions([]); // 🟢 clear old suggestions
+  //       checkUsernameUnique(value); // 🔑 naya API call
+  //     }
+  //     if (name === "password" || name === "confirmPassword") {
+  //       validateField("confirmPassword", updated.confirmPassword, updated);
+  //     }
+  //     // If password becomes empty, reset confirmPassword too
+  //     if (name === "password" && value === "") {
+  //       updated.confirmPassword = "";
+  //     }
 
-      return updated;
-    });
-    validateField(name, value);
-    if (name === "password" && formData.password.length < 1) {
-      setFormData({ ...prev, confirmPassword: "" });
-    }
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
+  //     return updated;
+  //   });
+  //   validateField(name, value);
+  //   if (name === "password" && formData.password.length < 1) {
+  //     setFormData({ ...prev, confirmPassword: "" });
+  //   }
+  //   // Clear error when user types
+  //   if (errors[name]) {
+  //     setErrors((prev) => ({ ...prev, [name]: "" }));
+  //   }
+  // };
 
   //   const handleChange = (e) => {
   //   const { name, value } = e.target;
@@ -191,6 +191,33 @@ console.log('res', formData.region)
   //     setErrors((prev) => ({ ...prev, [name]: "" }));
   //   }
   // };
+const handleChange = (e) => {
+  const { name, value } = e.target;
+
+  setFormData((prev) => {
+    const updated = { ...prev, [name]: value };
+
+    // If user edits password after confirmPassword was already filled
+    if (name === "password") {
+      updated.confirmPassword = ""; // reset confirm password
+      setErrors((prev) => ({ ...prev, confirmPassword: "" })); // clear error
+    }
+
+    // Live validation
+    validateField(name, value, updated);
+    if (name === "confirmPassword") {
+      validateField("confirmPassword", updated.confirmPassword, updated);
+    }
+
+    return updated;
+  });
+
+  // Clear error for current field
+  if (errors[name]) {
+    setErrors((prev) => ({ ...prev, [name]: "" }));
+  }
+};
+
 
   const handleStateChange = (e) => {
     const selectedState = e.target.value;
@@ -328,11 +355,19 @@ console.log('res', formData.region)
           error = "Password must be at least 6 characters";
         }
         break;
+      // case "confirmPassword":
+      //   if (value !== formData.password) {
+      //     error = "Passwords do not match";
+      //   }
+      //   break;
       case "confirmPassword":
-        if (value !== formData.password) {
-          error = "Passwords do not match";
-        }
-        break;
+  if (value && value !== formData.password) {
+    error = "Passwords do not match";
+  } else {
+    error = "";
+  }
+  break;
+
       default:
         break;
     }
@@ -686,6 +721,7 @@ console.log('res', formData.region)
           <label className="block mb-1 text-sm font-medium">
             {t("Password")}
           </label>
+            <div className="relative">
           <input
             type={showPassword ? "text" : "password"}
             name="password"
@@ -696,7 +732,7 @@ console.log('res', formData.region)
             className={`w-full p-2 ${isArabic ? "pl-10" : "pr-10"} border rounded-md ${errors.password ? "border-red-500" : "border-gray-300"
               }`}
           />
-          <button
+          {/* <button
             type="button"
             className={`absolute inset-y-0 top-6 flex items-center text-gray-500 hover:text-gray-700 ${isArabic ? "left-3" : "right-3"
               }`}
@@ -708,51 +744,55 @@ console.log('res', formData.region)
             ) : (
               <BsFillEyeSlashFill className="w-5 h-5" />
             )}
-          </button>
+          </button> */}
+           <span
+      className={`absolute inset-y-0 top-0.5 flex items-center text-gray-500 hover:text-gray-700 ${isArabic ? "left-3" : "right-3"
+              }`}
+      onClick={() => setShowPassword(!showPassword)}
+    >
+      {showPassword ? <BsFillEyeSlashFill /> : <IoEyeSharp />}
+    </span>
+          </div>
+      {errors.password && (
+        <p className="mt-1 text-sm text-red-600">{errors.password}</p>
+      )}
         </div>
 
         {/* Confirm Password Field */}
-        <div className="w-1/2 relative">
-          <label className="block mb-1 text-sm font-medium">
-            {t("Confirm Password")}
-          </label>
-          <input
-            type={showConfirmPassword ? "text" : "password"}
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            required
-            disabled={!formData.password}
-            className={`w-full p-2 ${isArabic ? "pl-10" : "pr-10"} border rounded-md ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
-              }`}
-          />
-          <button
-            type="button"
-            className={`absolute inset-y-0 top-6 flex items-center text-gray-500 hover:text-gray-700 ${isArabic ? "left-3" : "right-3"
-              }`}
-            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-            aria-label={
-              showConfirmPassword
-                ? "Hide confirm password"
-                : "Show confirm password"
-            }
-          >
-            {showConfirmPassword ? (
-              <IoEyeSharp className="w-5 h-5" />
-            ) : (
-              <BsFillEyeSlashFill className="w-5 h-5" />
-            )}
-          </button>
-        </div>
+        <div className="relative w-1/2">
+  <label className="block mb-1 text-sm font-medium">
+    {t("Confirm Password")}
+  </label>
+
+  <div className="relative">
+    <input
+      type={showConfirmPassword ? "text" : "password"}
+      name="confirmPassword"
+      value={formData.confirmPassword}
+      onChange={handleChange}
+      className={`w-full p-2 border rounded-md ${
+        errors.confirmPassword ? "border-red-500" : "border-gray-300"
+      }`}
+    />
+
+    <span
+      className="absolute right-3 top-3 cursor-pointer text-gray-500 hover:text-gray-700"
+      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+    >
+      {showConfirmPassword ? <BsFillEyeSlashFill /> : <IoEyeSharp />}
+    </span>
+  </div>
+
+  {errors.confirmPassword && (
+    <p className="mt-1 text-sm text-red-600">
+      {errors.confirmPassword}
+    </p>
+  )}
+</div>
+
       </div>
 
-      {/* Error Messages */}
-      {errors.password && (
-        <p className="text-sm text-red-600">{errors.password}</p>
-      )}
-      {!errors.password && errors.confirmPassword && (
-        <p className="text-sm text-red-600">{errors.confirmPassword}</p>
-      )}
+
 
 
       <button

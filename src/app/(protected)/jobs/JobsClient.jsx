@@ -8,6 +8,7 @@ import { useTranslation } from "react-i18next";
 import {
   JobsApi,
 } from "@/lib/api/job-listing.js";
+import Breadcrumbs from "@/components/WebsiteComponents/ReuseableComponenets/Breadcrumbs";
 
 // --- CONSTANTS ---
 const JOBS_PER_PAGE = 10; 
@@ -136,10 +137,18 @@ const JobsClient = ({ category, initialProducts }) => {
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
       <div
-        className="w-full h-64 sm:h-72 lg:h-80 rounded-b-[60px] text-white px-4 sm:px-8 py-10 sm:py-12 relative"
+        className="w-full h-64 sm:h-72 lg:h-80 rounded-b-[60px] text-white px-4 sm:px-8 py-4 sm:py-12 relative flex flex-col items-start justify-start"
         style={{ background: "rgb(23, 95, 72)" }}
       >
-        <div className="max-w-6xl mx-auto">
+        <div>
+        <Breadcrumbs
+        items={[{ label: "Home", href: "/" }, { label: "Jobs" }]}
+        styles={{
+          nav: "flex justify-start px-2 md:px-10 pt4 pb-6 text-sm font-medium",
+        }}
+      />
+      </div>
+        <div className="max-w-6xl mx-auto w-full">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug mb-6 sm:mb-8">
             FIND YOUR NEXT JOB IN <br className="hidden sm:block" /> SAUDI ARABIA
           </h1>

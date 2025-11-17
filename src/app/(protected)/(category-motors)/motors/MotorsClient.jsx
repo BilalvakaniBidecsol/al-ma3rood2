@@ -15,6 +15,7 @@ import {
   loadVehiclesData,
 } from "@/lib/vehicles";
 import { useLocationStore } from "@/lib/stores/locationStore";
+import Breadcrumbs from "@/components/WebsiteComponents/ReuseableComponenets/Breadcrumbs";
 
 const allowedTabs = [
   { key: "Cars", name: "Cars", icon: "./car.png" },
@@ -451,9 +452,17 @@ const MotorsClient = ({ category, initialProducts, pagination }) => {
     <div className="bg-white min-h-screen">
       {/* Hero Section */}
       <div
-        className="w-full h-64 sm:h-72 lg:h-80 rounded-b-[60px] text-white px-4 sm:px-8 py-10 sm:py-12 relative flex items-center"
+        className="w-full h-64 sm:h-72 lg:h-80 rounded-b-[60px] text-white px-4 sm:px-8 py-4 sm:py-12 relative flex flex-col"
         style={{ background: "rgb(23, 95, 72)" }}
       >
+        <div>
+        <Breadcrumbs
+        items={[{ label: "Home", href: "/" }, { label: "Motors" }]}
+        styles={{
+          nav: "flex justify-start px-2 md:px-10 pt4 pb-6 text-sm font-medium",
+        }}
+      />
+      </div>
         <div className="max-w-6xl mx-auto w-full">
           <h1
             className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug mb-6 sm:mb-8"

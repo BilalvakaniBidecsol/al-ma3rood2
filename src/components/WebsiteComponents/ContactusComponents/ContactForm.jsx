@@ -50,11 +50,22 @@ const ContactForm = () => {
     subject: yup.string().required("Subject is required"),
     message: yup.string().required("Message is required"),
     region: yup
-.object()
-.required("Region is required"),
+.mixed()
+    .test("region-type", "Region is required", function (value) {
+      // allow string or object but not null/undefined
+      if (!value) return false;
+      if (typeof value === "string" && value.trim() !== "") return true;
+      if (typeof value === "object" && Object.keys(value).length > 0) return true;
+      return false;
+    }),
 governorate: yup
-.object()
-.required("Governorate is required"),
+    .mixed()
+    .test("governorate-type", "Governorate is required", function (value) {
+      if (!value) return false;
+      if (typeof value === "string" && value.trim() !== "") return true;
+      if (typeof value === "object" && Object.keys(value).length > 0) return true;
+      return false;
+    }),
 });
 
   const {

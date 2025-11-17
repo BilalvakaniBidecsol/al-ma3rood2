@@ -7,10 +7,6 @@ export const categoriesApi = {
           `/category?status=1&category_type=${listing_type ? listing_type : 'marketplace'}&parent_id=${categoryId}`
         )
       : axiosClient.get(`/category?status=1&category_type=${listing_type ? listing_type : 'marketplace'}`),
-      
-      
-      // getCategoryTree: () =>
-      //   axiosClient.get(
-      //     "https://ma3rood.datainovate.com/backend/api/category/tree"
-      //   ),
+  getCategoryTree: (listing_type = "marketplace") =>
+    axiosClient.get(`/category/tree?status=1&category_type=${listing_type}`),
 };

@@ -6,67 +6,60 @@ import { useWatchlistStore } from "./watchlistStore";
 
 export const useAuthStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       token: null,
       isLoading: false,
       error: null,
 
-       // ✅ Reset everything
-       clearAuth: () => {
-  removeAuthToken();
-  useWatchlistStore.getState().clearWatchlist();
-  localStorage.removeItem("token");
-  localStorage.removeItem("auth-storage");
-  set({ user: null, token: null, error: null });
-},
+      // ✅ Reset everything
+      clearAuth: () => {
+        removeAuthToken();
+        useWatchlistStore.getState().clearWatchlist();
+        localStorage.removeItem("token");
+        localStorage.removeItem("auth-storage");
+        set({ user: null, token: null, error: null });
+      },
 
       // Reset errors
       resetError: () => set({ error: null }),
 
-      
-login: async (email, password) => {
-  set({ isLoading: true, error: null });
+      login: async (email, password) => {
+        set({ isLoading: true, error: null });
 
-  try {
-    const res = await authApi.login({ email, password });
+        try {
+          const res = await authApi.login({ email, password });
 
-    // ✅ If success
-    if (res?.token) {
-      const { data: user, token } = res;
-      setAuthToken(token);
-      set({ user, token });
-      
+          // ✅ If success
+          if (res?.token) {
+            const { data: user, token } = res;
+            setAuthToken(token);
+            set({ user, token });
 
-      // Fetch watchlist
-      try {
-        const { data } = await watchlistApi.getWatchlist();
-        useWatchlistStore.getState().setWatchlist(data?.data || []);
-      } catch {
-        useWatchlistStore.getState().setWatchlist([]);
-      }
-set({ isLoading: false, error: null });
-      return { success: true, user };
-    }
+            // Fetch watchlist
+            try {
+              const { data } = await watchlistApi.getWatchlist();
+              useWatchlistStore.getState().setWatchlist(data?.data || []);
+            } catch {
+              useWatchlistStore.getState().setWatchlist([]);
+            }
+            set({ isLoading: false, error: null });
+            return { success: true, user };
+          }
 
-    throw new Error(res?.message || "Login failed");
-  } catch (error) {
-    
-    set({ error: error.data?.message, isLoading: false });
-    return {
-      success: false,
-      email: error?.data?.email || null,
-      error: error?.message || "Login Failed",
-    };
-
-  } finally {
-    // ✅ Always stop loader
-    set({ isLoading: false });
-  }
-},
-
-
-
+          throw new Error(res?.message || "Login failed");
+        } catch (error) {
+          set({ error: error.data?.message, isLoading: false });
+          return {
+            success: false,
+            email: error?.data?.email || null,
+            error: error?.message || "Login Failed",
+          };
+        } finally {
+          // ✅ Always stop loader
+          set({ isLoading: false });
+        }
+      },
 
       register: async (userData) => {
         set({ isLoading: true, error: null });
@@ -89,10 +82,10 @@ set({ isLoading: false, error: null });
             region: userData.region,
             governorate: userData.governorate,
             password: userData.password,
-                country_id: userData.country_id,
-    regions_id: userData.regions_id,
-    governorates_id: userData.governorates_id,
-    // city_id: userData.city_id,
+            country_id: userData.country_id,
+            regions_id: userData.regions_id,
+            governorates_id: userData.governorates_id,
+            // city_id: userData.city_id,
           });
 
           // res looks like: { success, message, email }
@@ -104,50 +97,54 @@ set({ isLoading: false, error: null });
             throw new Error(res?.data.error || "Registration failed");
           }
         } catch (error) {
-          set({ error: error?.data?.error || "Registration failed", isLoading: false });
+          set({
+            error: error?.data?.error || "Registration failed",
+            isLoading: false,
+          });
           throw error;
         }
       },
 
+      // ✅ Verify auth by checking token existence and returning user from persisted state
       verifyAuth: async () => {
         try {
           const token = localStorage.getItem("token");
-          if (!token) return null;
+          const expiry = localStorage.getItem("token_expiry");
 
-          const user = await authApi.verifyToken();
-          set({ user });
-          return user;
-        } catch (error) {
-          localStorage.removeItem("token");
-          set({ user: null, token: null });
-          return null;
-        }
-      },
-
-       // ✅ Verify token and clear data if missing/invalid
-      verifyAuth: async () => {
-        try {
-          const token = localStorage.getItem("token");
-
+          // Check if token exists and is not expired
           if (!token) {
             get().clearAuth();
             return null;
           }
 
-          const user = await authApi.verifyToken();
-          if (!user) {
+          // Check token expiry
+          if (expiry && new Date().getTime() > parseInt(expiry, 10)) {
+            // Token expired, clear auth
             get().clearAuth();
             return null;
           }
 
-          set({ user, token });
+          // Get user from persisted state (zustand persist middleware)
+          const currentState = get();
+          const user = currentState.user;
+
+          if (!user) {
+            // If token exists but no user in state, clear auth
+            get().clearAuth();
+            return null;
+          }
+
+          // Ensure token is also set in state
+          if (currentState.token !== token) {
+            set({ token });
+          }
+
           return user;
         } catch (error) {
           get().clearAuth();
           return null;
         }
       },
-
 
       updateUser: (updatedData) =>
         set((state) => ({

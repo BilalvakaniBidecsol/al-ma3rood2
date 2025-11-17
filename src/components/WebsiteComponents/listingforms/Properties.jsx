@@ -34,7 +34,10 @@ const propertyListingSchema = z.object({
     "recently_renovated",
   ]),
   description: z.string().min(1, "Description is required"),
-  category_id: z.number().int().optional(),
+  category_id: z
+  .number({ required_error: "Category is Required" })
+  .int("Category must be a valid number"),
+
   // property_type: z.string().min(1, "Property type is required"),
   images: z.array(z.any()).min(1, "At least one image is required"),
   // Pricing

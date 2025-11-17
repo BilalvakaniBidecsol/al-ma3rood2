@@ -20,6 +20,7 @@ import {
   FaChartBar,
   FaChevronDown,
   FaChevronUp,
+  FaHandsHelping,
 } from "react-icons/fa";
 import { LiaFileUploadSolid } from "react-icons/lia";
 import { IoIosDocument } from "react-icons/io";
@@ -31,6 +32,7 @@ const Sidebar = () => {
   const [showSellingOptions, setShowSellingOptions] = useState(false);
   const [showBuyingOptions, setShowBuyingOptions] = useState(false);
   const [showJobOptions, setShowJobOptions] = useState(false);
+  const [showServicesOptions, setShowServicesOptions] = useState(false);
 
   const pathname = usePathname();
 
@@ -106,7 +108,7 @@ const Sidebar = () => {
             <span>{t("Favourites")}</span>
           </Link>
 
- {/* Jobs Dropdown */}
+          {/* Jobs Dropdown */}
           <div>
             <div
               onClick={() => setShowJobOptions(!showJobOptions)}
@@ -121,10 +123,7 @@ const Sidebar = () => {
 
             {showJobOptions && (
               <div className="ml-6 mt-2 space-y-2">
-                <Link
-                  href="/listing"
-                  className={subLinkClass("/listing")}
-                >
+                <Link href="/listing" className={subLinkClass("/listing")}>
                   <LiaFileUploadSolid />
                   <span>{t("List a Job")}</span>
                 </Link>
@@ -135,14 +134,53 @@ const Sidebar = () => {
                   <FaClipboardList />
                   <span>{t("Jobs List")}</span>
                 </Link>
-                 <Link href="/account/applied-jobs" className={subLinkClass("/applied-jobs")}>
- <FaClipboardList />
+                <Link
+                  href="/account/applied-jobs"
+                  className={subLinkClass("/applied-jobs")}
+                >
+                  <FaClipboardList />
                   <span>{t("Applied Jobs")}</span>
                 </Link>
-                 <Link href="/account/job-profile" className={subLinkClass("/job-profile")}>
-            <IoIosDocument />
-            <span>{t("Job Profile")}</span>
-          </Link>
+                <Link
+                  href="/account/job-profile"
+                  className={subLinkClass("/job-profile")}
+                >
+                  <IoIosDocument />
+                  <span>{t("Job Profile")}</span>
+                </Link>
+              </div>
+            )}
+          </div>
+
+          {/* Services Dropdown */}
+          <div>
+            <div
+              onClick={() => setShowServicesOptions(!showServicesOptions)}
+              className="flex items-center justify-between cursor-pointer text-green-500"
+            >
+              <div className="flex items-center gap-2">
+                <FaHandsHelping />
+                <span>{t("Services")}</span>
+              </div>
+              {showServicesOptions ? <FaChevronUp /> : <FaChevronDown />}
+            </div>
+
+            {showServicesOptions && (
+              <div className="ml-6 mt-2 space-y-2">
+                <Link
+                  href="/account/services"
+                  className={subLinkClass("/account/services")}
+                >
+                  <FaClipboardList />
+                  <span>{t("My bookings")}</span>
+                </Link>
+                <Link
+                  href="/account/services/clients"
+                  className={subLinkClass("/account/services/clients")}
+                >
+                  <FaClipboardList />
+                  <span>{t("My clients")}</span>
+                </Link>
               </div>
             )}
           </div>

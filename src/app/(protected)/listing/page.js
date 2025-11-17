@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
@@ -18,9 +18,14 @@ import ListingForm from "@/components/WebsiteComponents/listingforms/ListingForm
 import MotorListingForm from "@/components/WebsiteComponents/listingforms/MotorListingForm";
 import Properties from "@/components/WebsiteComponents/listingforms/Properties";
 import { toast } from "react-toastify";
-import { Car, HomeIcon, Package, Briefcase } from "lucide-react";
+import { Car, HomeIcon, Package, Briefcase, Wrench } from "lucide-react";
 import { useRouter } from "next/navigation";
 import JobListingForm from "@/components/WebsiteComponents/listingforms/JobListingForm";
+import CreateServiceListingForm from "@/app/(protected)/services/create/CreateServiceListingForm";
+import { categoriesApi } from "@/lib/api/category";
+import { locationsApi } from "@/lib/api/location";
+import { useServicesStore } from "@/lib/stores/servicesStore";
+import { transformServiceCategories, transformRegionsResponse } from "@/lib/utils/serviceTransformers";
 
 export function toFieldName(label) {
   return label
@@ -137,7 +142,13 @@ const Page = () => {
   const [listingType, setListingType] = useState(null);
   const [showListingTypeSelection, setShowListingTypeSelection] =
     useState(true);
+  const [serviceMeta, setServiceMeta] = useState({
+    categories: [],
+    regions: [],
+    isLoading: false,
+  });
   const router = useRouter();
+  const setServiceMetaInStore = useServicesStore((state) => state.setServiceMeta);
 
   const handleCreateListing = async (data) => {
     try {
@@ -160,6 +171,45 @@ const handleListingTypeSelect = (type) => {
     setShowListingTypeSelection(false);
   }
 };
+
+  useEffect(() => {
+    if (listingType !== "service") return;
+    let active = true;
+    setServiceMeta((prev) => ({ ...prev, isLoading: true }));
+    (async () => {
+      try {
+        const [categoryTree, locationData] = await Promise.all([
+          categoriesApi.getCategoryTree("services"),
+          locationsApi.getAllLocations(),
+        ]);
+        if (!active) return;
+        console.log('categoryTreeeeee', categoryTree);
+        const formattedCategories = transformServiceCategories(
+          categoryTree?.data ?? categoryTree?.categories ?? categoryTree ?? []
+        ).filter((category) => category.id);
+        const formattedRegions = transformRegionsResponse(locationData);
+        const meta = {
+          categories: formattedCategories,
+          regions: formattedRegions,
+          isLoading: false,
+        };
+        setServiceMeta(meta);
+        // Also store in Zustand for use in other components
+        setServiceMetaInStore(meta);
+      } catch (error) {
+        if (!active) return;
+        const errorMeta = { categories: [], regions: [], isLoading: false };
+        setServiceMeta(errorMeta);
+        setServiceMetaInStore(errorMeta);
+        toast.error(
+          error?.message || "Unable to load service categories right now."
+        );
+      }
+    })();
+    return () => {
+      active = false;
+    };
+  }, [listingType, setServiceMetaInStore]);
 
   const handleBackToListingType = () => {
     setListingType(null);
@@ -270,6 +320,26 @@ const handleListingTypeSelect = (type) => {
   </div>
 </div>
 
+            <div
+              className="bg-white rounded-xl shadow-lg p-8 border-2 border-transparent hover:border-green-500 transition-all duration-300 cursor-pointer group"
+              onClick={() => handleListingTypeSelect("service")}
+            >
+              <div className="text-center">
+                <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-green-200 transition-colors">
+                  <Wrench className="w-10 h-10 text-green-600" />
+                </div>
+                <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+                  Services
+                </h3>
+                <p className="text-gray-600 mb-6">
+                  Offer professional services such as tradies, wellness, events, or tutoring.
+                </p>
+                <div className="text-sm text-gray-500">
+                  Collect the essentials clients need: expertise, coverage areas, availability, and pricing.
+                </div>
+              </div>
+            </div>
+
           </div>
 
           <div className="text-center mt-8">
@@ -318,6 +388,34 @@ const handleListingTypeSelect = (type) => {
           <Properties/>
 
           {/* <PropertyListingForm onSubmit={handleCreateListing} /> */}
+        </div>
+      </div>
+    );
+  }
+
+  if (listingType === "service") {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <div className="max-w-4xl mx-auto px-4 py-8">
+          <div className="mb-6">
+            <button
+              onClick={handleBackToListingType}
+              className="flex items-center text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+            >
+              <IoIosArrowForward className="w-4 h-4 rotate-180 mr-2" />
+              Back to listing type selection
+            </button>
+          </div>
+          {serviceMeta.isLoading ? (
+            <div className="rounded-3xl border border-dashed border-gray-300 bg-white p-10 text-center text-sm text-gray-500">
+              Loading service form…
+            </div>
+          ) : (
+            <CreateServiceListingForm
+              categories={serviceMeta.categories}
+              regions={serviceMeta.regions}
+            />
+          )}
         </div>
       </div>
     );

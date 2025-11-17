@@ -7,6 +7,7 @@ import propertiesApi, { motorSearchFilters } from "@/lib/api/properties";
 import { useTranslation } from "react-i18next";
 import PropertyCard from "./PropertyCard";
 import { useLocationStore } from "@/lib/stores/locationStore";
+import Breadcrumbs from "@/components/WebsiteComponents/ReuseableComponenets/Breadcrumbs";
 
 const allowedTabs = [
     { key: "For Sale", name: "For Sale", icon: "./house.png" },
@@ -374,9 +375,15 @@ useEffect(() => {
 
       {/* Hero Section */}
       <div
-        className="w-full h-64 sm:h-72 lg:h-80 rounded-b-[60px] text-white px-4 sm:px-8 py-10 sm:py-12 relative flex items-center"
+        className="w-full h-64 sm:h-72 lg:h-80 rounded-b-[60px] text-white px-4 sm:px-8 py-10 sm:py-12 relative flex flex-col"
         style={{ background: "rgb(23, 95, 72)" }}
       >
+        <Breadcrumbs
+        items={[{ label: "Home", href: "/" }, { label: "Properties" }]}
+        styles={{
+          nav: "flex justify-start px-2 md:px-10 pb-6 text-sm font-medium",
+        }}
+      />
         <div className="max-w-6xl mx-auto w-full">
           <h1
             className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug mb-6 sm:mb-8"

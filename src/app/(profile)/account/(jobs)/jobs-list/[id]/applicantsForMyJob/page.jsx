@@ -61,7 +61,8 @@ export default function ApplicantsForMyJob() {
   // ✅ Filter applicants based on active tab
   const filteredApplicants = applicants.filter((applicant) => {
     if (activeTab === "All applicants") return true;
-    if (activeTab === "Not suitable") return applicant.job_status === "notSuitable";
+    if (activeTab === "Not suitable")
+      return applicant.job_status === "notSuitable";
     if (activeTab === "Shortlist") return applicant.job_status === "shortList";
     return true;
   });
@@ -149,43 +150,51 @@ export default function ApplicantsForMyJob() {
                       <MessageSquare size={16} /> View Cover Letter
                     </a>
                   )}
-                  <button onClick={() => toast.info("Profile view is under development from backend")} className="flex items-center gap-1 text-blue-600 cursor-pointer hover:underline">
+                  <button
+                    onClick={() =>
+                      toast.info(
+                        "Profile view is under development from backend"
+                      )
+                    }
+                    className="flex items-center gap-1 text-blue-600 cursor-pointer hover:underline"
+                  >
                     <User size={16} /> Show Profile
                   </button>
                 </div>
               </div>
 
-       {/* Right: Actions */}
-{applicant.job_status?.toLowerCase() !== "hired" && (
-  <div className="flex gap-3 mt-4 md:mt-0">
-    {applicant.job_status === "shortList" ? (
-      <button
-        onClick={() => handleStatusUpdate(applicant.id, "hired")}
-        className="px-4 py-2 bg-green-100 text-green-700 font-medium rounded-lg hover:bg-green-200 transition"
-      >
-        Hire
-      </button>
-    ) : (
-      <>
-        <button
-          onClick={() => handleStatusUpdate(applicant.id, "shortList")}
-          className="px-4 py-2 bg-blue-100 text-blue-700 font-medium rounded-lg hover:bg-blue-200 transition"
-        >
-          Add to shortlist
-        </button>
-        <button
-          onClick={() => handleStatusUpdate(applicant.id, "notSuitable")}
-          className="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition"
-        >
-          Not suitable
-        </button>
-      </>
-    )}
-  </div>
-)}
-
-
-
+              {/* Right: Actions */}
+              {applicant.job_status?.toLowerCase() !== "hired" && (
+                <div className="flex gap-3 mt-4 md:mt-0">
+                  {applicant.job_status === "shortList" ? (
+                    <button
+                      onClick={() => handleStatusUpdate(applicant.id, "hired")}
+                      className="px-4 py-2 bg-green-100 text-green-700 font-medium rounded-lg hover:bg-green-200 transition"
+                    >
+                      Hire
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() =>
+                          handleStatusUpdate(applicant.id, "shortList")
+                        }
+                        className="px-4 py-2 bg-blue-100 text-blue-700 font-medium rounded-lg hover:bg-blue-200 transition"
+                      >
+                        Add to shortlist
+                      </button>
+                      <button
+                        onClick={() =>
+                          handleStatusUpdate(applicant.id, "notSuitable")
+                        }
+                        className="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition"
+                      >
+                        Not suitable
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>

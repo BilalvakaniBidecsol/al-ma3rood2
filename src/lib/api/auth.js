@@ -4,7 +4,6 @@ import { useAuthStore } from "../../lib/stores/authStore";
 export const authApi = {
   login: (credentials) => axiosClient.post("/user/login", credentials),
   register: (userData) => axiosClient.post("/user/register", userData),
-  verifyToken: () => axiosClient.get("/user/verify"),
   logout: () => axiosClient.post("/user/logout"),
     // Verification
   checkusername: (payload) => axiosClient.post("user/username-check", payload),
