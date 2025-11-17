@@ -455,13 +455,14 @@ const MotorsClient = ({ category, initialProducts, pagination }) => {
         className="w-full h-64 sm:h-72 lg:h-80 rounded-b-[60px] text-white px-4 sm:px-8 py-4 sm:py-12 relative flex flex-col"
         style={{ background: "rgb(23, 95, 72)" }}
       >
-        <div>
+        <div className="pb-6">
         <Breadcrumbs
         items={[{ label: "Home", href: "/" }, { label: "Motors" }]}
         styles={{
-          nav: "flex justify-start px-2 md:px-10 pt4 pb-6 text-sm font-medium",
+          nav: "flex justify-start px-2 md:px-10 pt4 text-sm font-medium",
         }}
       />
+      <div className="mt-3 border-b border-white opacity-40 mx-8"></div>
       </div>
         <div className="max-w-6xl mx-auto w-full">
           <h1
