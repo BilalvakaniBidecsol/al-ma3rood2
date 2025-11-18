@@ -81,7 +81,8 @@ export default function ServicesBookingsClient() {
         "provider-confirmed",
         "pending-buyer-confirmation",
       ].includes(booking.status) &&
-      booking.status !== "buyer-confirmed"
+      booking.status !== "buyer-confirmed" &&
+      !(Array.isArray(booking.activity) && booking.activity.some(a => a.type === "marked_complete" && a.actor === "buyer"))
     ) {
       actions.push({
         label: "Cancel booking",
@@ -136,7 +137,7 @@ export default function ServicesBookingsClient() {
         <p className="text-sm text-slate-600">
           Manage confirmations, reschedules, and completion right here. Need to
           offer services?{" "}
-          <Link href="/services/create" className="text-blue-600 underline">
+          <Link href="/listing" className="text-blue-600 underline">
             Create a service listing
           </Link>
           .

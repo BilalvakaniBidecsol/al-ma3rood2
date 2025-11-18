@@ -2,7 +2,7 @@ import { LayoutGrid, List } from "lucide-react";
 
 const sortOptions = [
   { value: "featured", label: "Featured" },
-  { value: "rating", label: "Top rated" },
+  // { value: "rating", label: "Top rated" },
   { value: "price-low-high", label: "Price: Low to High" },
   { value: "price-high-low", label: "Price: High to Low" },
 ];

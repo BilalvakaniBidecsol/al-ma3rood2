@@ -108,7 +108,7 @@ export default function FilterBar({
             <Search className="h-4 w-4" aria-hidden="true" />
             {isSearching ? "Searching…" : "Search services"}
           </button>
-          <button
+          {/* <button
             type="button"
             onClick={() => setIsExpanded((prev) => !prev)}
             className="inline-flex h-10 items-center gap-2 rounded-full border border-slate-200 px-4 text-sm font-medium text-slate-700 transition hover:bg-slate-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 sm:hidden"
@@ -116,7 +116,7 @@ export default function FilterBar({
           >
             Filters
             <span aria-hidden="true">{isExpanded ? "−" : "+"}</span>
-          </button>
+          </button> */}
         </div>
       </div>
 

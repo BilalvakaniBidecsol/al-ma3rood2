@@ -378,12 +378,16 @@ useEffect(() => {
         className="w-full h-64 sm:h-72 lg:h-80 rounded-b-[60px] text-white px-4 sm:px-8 py-10 sm:py-12 relative flex flex-col"
         style={{ background: "rgb(23, 95, 72)" }}
       >
+        <div className="pb-6 w-full">
         <Breadcrumbs
         items={[{ label: "Home", href: "/" }, { label: "Properties" }]}
         styles={{
-          nav: "flex justify-start px-2 md:px-10 pb-6 text-sm font-medium",
+          nav: "flex justify-start px-2 md:px-10 text-sm font-medium",
         }}
       />
+      
+          <div className="mt-3 border-b border-white opacity-40 mx-2 md:mx-8"></div>
+      </div>
         <div className="max-w-6xl mx-auto w-full">
           <h1
             className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-snug mb-6 sm:mb-8"

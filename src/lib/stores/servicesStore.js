@@ -6,7 +6,7 @@ const initialState = {
   selectedRegion: "",
   selectedArea: "",
   priceRange: [0, 5000],
-  sortBy: "featured",
+  sortBy: "price-low-high",
   viewMode: "grid",
   // Service metadata (categories and regions)
   categories: [],

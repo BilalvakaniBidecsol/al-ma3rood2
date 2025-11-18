@@ -46,30 +46,32 @@ export default function ProfilePage({ params }) {
        <div className="w-full rounded-xl overflow-hidden bg-white">
         {/* Cover Image */}
         <div className="relative h-40 sm:h-48 md:h-56 w-full">
-          <Image
-            src={
-              profile?.user?.background_photo
-                ? `${Image_URL}${profile?.user?.background_photo}`
-                : "/images/default-cover.jpg"
-            }
-            alt="Cover"
-            fill
-            className="object-cover"
-          />
+            {profile?.user?.background_photo ? (
+        <Image
+          src={`${Image_URL}${profile?.user?.background_photo}`}
+          alt="Cover"
+          fill
+          onError={() => setImgError(true)}   // <-- handle broken image
+          className="object-cover"
+        />
+      ) : (
+        /* Fallback if no image OR if image crashed */
+        <div className="w-full h-full bg-gray-300" />
+      )}
           {/* Profile Image */}
-          <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-8">
-            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-4 border-white overflow-hidden shadow-md">
-              <Image
-                src={
-                  profile?.user?.profile_photo
-                    ? `${Image_URL}${profile?.user?.profile_photo}`
-                    : "/images/default-avatar.jpg"
-                }
-                alt="Profile"
-                width={112}
-                height={112}
-                className="object-cover"
-              />
+          <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-8 ">
+            <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-gray-300 border-4 border-white overflow-hidden shadow-md">
+              {profile?.user?.profile_photo ? (
+                            <Image
+                              src={`${Image_URL}${profile?.user?.profile_photo}`}
+                              alt="Profile"
+                              fill
+                              sizes="128px"
+                              className="object-contain rounded-full"
+                            />
+                          ) : (
+                            profile?.user?.name?.charAt(0)?.toUpperCase()
+                          )}
             </div>
           </div>
         </div>

@@ -181,6 +181,13 @@ const Sidebar = () => {
                   <FaClipboardList />
                   <span>{t("My clients")}</span>
                 </Link>
+                <Link
+                  href="/account/services/my-services"
+                  className={subLinkClass("/account/services/my-services")}
+                >
+                  <FaClipboardList />
+                  <span>{t("My Services")}</span>
+                </Link>
               </div>
             )}
           </div>

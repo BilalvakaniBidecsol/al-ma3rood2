@@ -176,13 +176,15 @@ export default function ServicesBrowser({
 
     const fetchListings = async () => {
       try {
+        // Get current filter values from store when search is triggered
+        const currentState = useServicesStore.getState();
         const response = await servicesApi.getServices({
-          query,
-          category: selectedCategory,
-          region: selectedRegion,
-          area: selectedArea,
-          priceRange,
-          sortBy,
+          query: currentState.query,
+          category: currentState.selectedCategory,
+          region: currentState.selectedRegion,
+          area: currentState.selectedArea,
+          priceRange: currentState.priceRange,
+          sortBy: currentState.sortBy,
         });
         const results = Array.isArray(response?.data) ? response.data : [];
         if (!ignore) {
@@ -224,12 +226,6 @@ export default function ServicesBrowser({
   }, [
     enrichListing,
     hasHydrated,
-    query,
-    selectedCategory,
-    selectedRegion,
-    selectedArea,
-    priceRange,
-    sortBy,
     searchToken,
   ]);
 
@@ -246,6 +242,14 @@ export default function ServicesBrowser({
   const handleSearch = useCallback(() => {
     setSearchToken((token) => token + 1);
   }, []);
+
+  const handleSortChange = useCallback((value) => {
+    setSortBy(value);
+    // Trigger search immediately when sort changes
+    if (hasHydrated) {
+      setSearchToken((token) => token + 1);
+    }
+  }, [hasHydrated, setSortBy]);
 
   return (
     <div className="space-y-6 lg:space-y-8">
@@ -272,7 +276,7 @@ export default function ServicesBrowser({
       <ResultsHeader
         totalResults={listings.length}
         sortBy={sortBy}
-        onSortChange={setSortBy}
+        onSortChange={handleSortChange}
         viewMode={viewMode}
         onViewModeChange={setViewMode}
         isLoading={isLoading}

@@ -33,6 +33,13 @@ function MakeOfferModal({ isOpen, onClose, product, onOfferMade }) {
       setError('Please enter a valid offer amount.');
       return;
     }
+    const offerAmount = parseFloat(amount);
+    const buyNowPrice = parseFloat(product?.buy_now || 0);
+    if (buyNowPrice > 0 && offerAmount > buyNowPrice) {
+      setError(`Your offer cannot exceed the Buy Now price ($${buyNowPrice}).`);
+      toast.error(`Your offer cannot exceed the Buy Now price ($${buyNowPrice}).`);
+      return;
+    }
     setLoading(true);
     try {
       const formData = new FormData();
@@ -86,7 +93,23 @@ function MakeOfferModal({ isOpen, onClose, product, onOfferMade }) {
               min="0"
               step="0.01"
               value={amount}
-              onChange={e => setAmount(e.target.value)}
+              onChange={e => {
+                const value = e.target.value;
+                setAmount(value);
+                setError('');
+                const offerAmount = parseFloat(value);
+                const buyNowPrice = parseFloat(product?.buy_now || 0);
+                if (value && !isNaN(offerAmount) && buyNowPrice > 0 && offerAmount > buyNowPrice) {
+                  setError(`Your offer cannot exceed the Buy Now price ($${buyNowPrice}).`);
+                }
+              }}
+              onBlur={() => {
+                const offerAmount = parseFloat(amount);
+                const buyNowPrice = parseFloat(product?.buy_now || 0);
+                if (amount && !isNaN(offerAmount) && buyNowPrice > 0 && offerAmount > buyNowPrice) {
+                  setError(`Your offer cannot exceed the Buy Now price ($${buyNowPrice}).`);
+                }
+              }}
               placeholder="0.00"
               className="w-full bg-gray-50 border border-gray-200 rounded-lg pl-8 pr-4 py-2 text-gray-900 focus:ring-2 focus:ring-green-500 focus:border-green-500 outline-none transition
 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"

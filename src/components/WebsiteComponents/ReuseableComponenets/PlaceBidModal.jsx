@@ -135,7 +135,7 @@ const PlaceBidModal = ({ isOpen, onClose, product, onBidPlaced }) => {
         {/* Bid Input */}
         <form onSubmit={handleSubmit} className="mb-6">
           <label className="block mb-2 font-medium text-gray-700 text-sm text-left">
-            {t("Your bid")}
+            {autoBid ? t("Your Maximum Bid") : t("Your bid")}
           </label>
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             <div className="relative w-full">

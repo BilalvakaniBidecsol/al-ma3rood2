@@ -32,7 +32,7 @@ export default async function Page({ searchParams }) {
     subcategory: searchParams?.subcategory || "",
     region: searchParams?.region || "",
     area: searchParams?.area || "",
-    sortBy: searchParams?.sortBy || "featured",
+    sortBy: searchParams?.sortBy || "price-low-high",
   };
 
   if (searchParams?.priceMin) {

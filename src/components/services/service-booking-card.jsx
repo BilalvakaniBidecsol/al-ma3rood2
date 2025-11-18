@@ -81,12 +81,14 @@ export function ServiceBookingCard({
     ? booking.status.replace(/-/g, " ")
     : "pending";
   const buyerNote = booking.buyerNote || booking.buyer_note || "";
-  const quotePrice = booking.quote?.price;
+  const quotePrice = booking.quote?.price || "N/A";
   const quoteCurrency = booking.quote?.currency || "SAR";
   const quotePriceUnit =
     booking.quote?.priceUnit || booking.quote?.price_unit || "";
+  const askingPrice = booking.service?.price || "N/A";
+  const askingPriceUnit = booking.service?.priceUnit || "";
 
-    console.log("aaaaaa booking", booking);
+  console.log("aaaaaa booking", booking);
 
   return (
     <article className="rounded-3xl border border-slate-200 bg-white shadow-sm">
@@ -163,11 +165,11 @@ export function ServiceBookingCard({
                 <SaudiRiyal className="h-4 w-4 text-slate-400" />
                 <div>
                   <dt className="text-xs uppercase tracking-wide text-slate-500">
-                    Quoted price
+                    Quoted price - Asking Price
                   </dt>
                   <dd className="font-medium text-slate-900">
                     {/* {formatCurrency(quotePrice, quoteCurrency)} */}
-                    {quotePrice}
+                    {quotePrice} - {askingPrice}
                   </dd>
                 </div>
               </div>
@@ -357,47 +359,47 @@ export function ServiceBookingCard({
                   </div>
                 )}
 
-                {perspective === "provider" && booking?.booking_details?.region_name && (
-                  <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
-                    <MapPin className="h-5 w-5 text-slate-400" />
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Region
-                      </p>
-                      <p className="text-sm font-medium text-slate-900">
-                        {booking?.booking_details?.region_name || "N/A"}
-                      </p>
-                    </div>
+                <div className="flex items-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+                  <MapPin className="h-5 w-5 text-slate-400" />
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Region
+                    </p>
+                    <p className="text-sm font-medium text-slate-900">
+                      {perspective === "provider"
+                        ? booking?.booking_details?.region_name || "N/A"
+                        : service.regionLabel || "N/A"}
+                    </p>
                   </div>
-                )}
+                </div>
 
-                {perspective === "provider" && booking?.booking_details?.governorate_name && (
-                  <div className="flex items5-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
-                    <MapPin className="h-5 w-5 text-slate-400" />
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Governorate
-                      </p>
-                      <p className="text-sm font-medium text-slate-900">
-                        {booking?.booking_details?.governorate_name || "N/A"}
-                      </p>
-                    </div>
+                <div className="flex items5-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+                  <MapPin className="h-5 w-5 text-slate-400" />
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Governorate
+                    </p>
+                    <p className="text-sm font-medium text-slate-900">
+                      {perspective === "provider"
+                        ? booking?.booking_details?.governorate_name || "N/A"
+                        : service.governorateLabel || "N/A"}
+                    </p>
                   </div>
-                )}
+                </div>
 
-                {perspective === "provider" && booking?.booking_details?.address && (
-                  <div className="flex items5-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
-                    <MapPin className="h-5 w-5 text-slate-400" />
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
-                        Address
-                      </p>
-                      <p className="text-sm font-medium text-slate-900">
-                        {booking?.booking_details?.address || "N/A"}
-                      </p>
-                    </div>
+                <div className="flex items5-center gap-3 rounded-2xl bg-slate-50 px-4 py-3">
+                  <MapPin className="h-5 w-5 text-slate-400" />
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+                      Address
+                    </p>
+                    <p className="text-sm font-medium text-slate-900">
+                      {perspective === "provider"
+                        ? booking?.booking_details?.address || "N/A"
+                        : service.address || "N/A"}
+                    </p>
                   </div>
-                )}
+                </div>
               </div>
             </div>
           </div>

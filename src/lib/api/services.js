@@ -4,7 +4,7 @@ import axiosPublicClient from "./axiosPublicClient";
 function buildListParams(filters = {}) {
   const params = {};
   if (filters.query) {
-    params.search = filters.query.trim();
+    params.keyword = filters.query.trim();
   }
 
   const categorySource = filters.subcategory || filters.category;
@@ -60,6 +60,11 @@ export const servicesApi = {
   getUserServices: async (filters = {}) => {
     const params = buildListParams(filters);
     return axiosClient.get("/user/services", { params });
+  },
+  updateService: async (serviceId, formData) => {
+    return axiosClient.post(`/user/services/update/${serviceId}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   },
 };
 

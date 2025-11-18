@@ -31,7 +31,7 @@ const CvView = ({ data = [], onAdd, onDelete }) => {
             >
               <div>
                 <p className="font-semibold text-gray-800">
-                  {"CV Document " + (index + 1) }
+                  {cv?.name}
                 </p>
                 <a
                   href={`${Image_URL}${cv.file_path}`}

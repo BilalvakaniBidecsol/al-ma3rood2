@@ -58,12 +58,16 @@ const JobApplicationModal = ({ isOpen, onClose, jobId }) => {
     }
   };
 
+  const validateCvFile = (file) => {
+  return file && file.type === "application/pdf";
+};
+
   const handleNewCvUpload = (e) => {
     setErrors({});
     const file = e.target.files[0];
-    if (validateFile(file)) setNewCvFile(file);
+    if (validateCvFile(file)) setNewCvFile(file);
     else {
-      toast.error("Please upload PDF, DOC, or DOCX only.");
+      toast.error("Please upload PDF only.");
       e.target.value = "";
     }
   };
@@ -250,7 +254,7 @@ const JobApplicationModal = ({ isOpen, onClose, jobId }) => {
                   checked={cvChoice === "new"}
                   onChange={() => setCvChoice("new")}
                 />
-                Upload New CV
+                Upload New CV (PDF Only)
               </label>
             </div>
 
@@ -266,7 +270,7 @@ const JobApplicationModal = ({ isOpen, onClose, jobId }) => {
                   {cvs.length > 0 ? (
                     cvs.map((cv, i) => (
                       <option key={cv.id} value={cv.id}>
-                        {cv.file_name || `CV #${i + 1}`}
+                        {cv.name || `CV #${i + 1}`}
                       </option>
                     ))
                   ) : (
@@ -281,7 +285,7 @@ const JobApplicationModal = ({ isOpen, onClose, jobId }) => {
               <div>
                 <input
                   type="file"
-                  accept=".pdf,.doc,.docx"
+                  accept=".pdf"
                   onChange={handleNewCvUpload}
                   className="w-full text-sm border border-gray-300 rounded-md px-2 py-2 cursor-pointer focus:ring-1 focus:ring-[#175f48]"
                 />

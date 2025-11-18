@@ -7,6 +7,7 @@ import { Image_URL } from "@/config/constants";
 import { Mail, Phone, FileText, MessageSquare, User } from "lucide-react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Link from "next/link";
 
 export default function ApplicantsForMyJob() {
   const { id } = useParams();
@@ -150,21 +151,17 @@ export default function ApplicantsForMyJob() {
                       <MessageSquare size={16} /> View Cover Letter
                     </a>
                   )}
-                  <button
-                    onClick={() =>
-                      toast.info(
-                        "Profile view is under development from backend"
-                      )
-                    }
+                  <Link
+                    href={`/profile/${applicant.id}`}
                     className="flex items-center gap-1 text-blue-600 cursor-pointer hover:underline"
                   >
                     <User size={16} /> Show Profile
-                  </button>
+                  </Link>
                 </div>
               </div>
 
               {/* Right: Actions */}
-              {applicant.job_status?.toLowerCase() !== "hired" && (
+              {applicant.job_status?.toLowerCase() !== "hired" && applicant.job_status !== "notSuitable" && (
                 <div className="flex gap-3 mt-4 md:mt-0">
                   {applicant.job_status === "shortList" ? (
                     <button

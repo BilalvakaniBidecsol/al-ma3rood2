@@ -73,14 +73,12 @@ function normalizeService(service = {}) {
     slug: service.slug,
     title: service.title,
     subtitle: service.subtitle,
-    regionLabel:
-      service.regionLabel || service.region_label || service.region || "",
-    areaLabel:
-      service.areaLabel ||
-      service.governorate_label ||
-      service.governorate ||
-      service.area ||
-      "",
+    regionLabel: service.region?.name || "",
+    governorateLabel: service.governorate?.name || "",
+    price: Number.isFinite(Number(service.price))
+      ? Math.round(Number(service.price))
+      : service.price || "",
+    priceUnit: service.price_unit || "",
     photo: {
       url: `${Image_URL}${service?.images?.[0]?.image_path}` || "/placeholder.svg",
       alt: service.title || "Service",
@@ -107,7 +105,7 @@ function normalizeBooking(rawBooking) {
     bookingId,
     status: rawBooking.status,
     booking_details: rawBooking.booking_details || null,
-    service: normalizeService(rawBooking.service || rawBooking.listing),
+    service: normalizeService(rawBooking.service),
     quote: normalizeQuote(rawBooking.quote),
     schedule: normalizeSchedule(rawBooking.schedule),
     buyer: normalizeActor(rawBooking.buyer),
@@ -116,12 +114,10 @@ function normalizeBooking(rawBooking) {
     buyerNote: rawBooking.buyer_note || rawBooking.buyerNote || "",
     providerNote: rawBooking.provider_note || rawBooking.providerNote || "",
     buyerMarkedCompleteAt:
-      rawBooking.buyer_marked_complete_at ||
-      rawBooking.buyerMarkedCompleteAt ||
+      rawBooking.booking_details?.buyer_marked_complete_at ||
       null,
     providerMarkedCompleteAt:
-      rawBooking.provider_marked_complete_at ||
-      rawBooking.providerMarkedCompleteAt ||
+      rawBooking.booking_details?.provider_marked_complete_at ||
       null,
     activity: normalizeActivity(
       rawBooking.activity || rawBooking.timeline || [],

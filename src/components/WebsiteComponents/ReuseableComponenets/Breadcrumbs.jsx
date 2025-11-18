@@ -24,7 +24,7 @@ function Breadcrumbs({
           {item.href && idx !== items.length - 1 ? (
             <Link
               href={item.href}
-              className="hover:text-green-600 transition-colors"
+              className="hover:text-gray-200 transition-colors"
             >
               {t(item.label)}
             </Link>

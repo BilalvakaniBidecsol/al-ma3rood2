@@ -39,7 +39,7 @@ governorate_id: z.string({ required_error: "Governorate is required" }).nullable
         invalid_type_error: "Invalid work type selected"
     }),
 
-    minimum_pay_type: z.enum(["hourly", "daily"], {
+    minimum_pay_type: z.enum(["hourly", "daily", "weekly", "monthly"], {
         required_error: "Pay Type is required",
     }),
     minimum_pay_amount: z.string().min(1, "Pay Amount is required").refine(val => {
@@ -488,8 +488,8 @@ if (Array.isArray(initialValues.key_points)) {
     const payTypeOptions = [
         { value: "hourly", label: "Hourly" },
         { value: "daily", label: "Daily" },
-        // { value: "weekly", label: "Weekly" },
-        // { value: "monthly", label: "Monthly" },
+        { value: "weekly", label: "Weekly" },
+        { value: "monthly", label: "Monthly" },
         // { value: "yearly", label: "Yearly" },
     ];
     
@@ -524,7 +524,7 @@ if (Array.isArray(initialValues.key_points)) {
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Company Name*</label>
             <Controller name="company_name" control={control} render={({ field }) => (
-                <input {...field} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="e.g. Bidec Solution" />
+                <input {...field} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="e.g. Company Name" />
             )} />
             {errors.company_name && <p className="text-red-500 text-sm mt-1">{errors.company_name.message}</p>}
           </div>
@@ -864,7 +864,7 @@ Line 2: 3+ years experience...`} />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Contact Name*</label>
               <Controller name="contact_name" control={control} render={({ field }) => (
-                  <input {...field} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="e.g. Kashaf Hr" />
+                  <input {...field} type="text" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="e.g. HR Name" />
               )} />
               {errors.contact_name && <p className="text-red-500 text-sm mt-1">{errors.contact_name.message}</p>}
             </div>
@@ -882,7 +882,7 @@ Line 2: 3+ years experience...`} />
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Contact Email*</label>
               <Controller name="contact_email" control={control} render={({ field }) => (
-                  <input {...field} type="email" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="e.g. hr@bidecsol.com" />
+                  <input {...field} type="email" className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="e.g. hr@abc.com" />
               )} />
               {errors.contact_email && <p className="text-red-500 text-sm mt-1">{errors.contact_email.message}</p>}
             </div>
