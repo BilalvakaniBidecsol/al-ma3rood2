@@ -347,7 +347,7 @@ export default function BookServiceForm({ service }) {
                 {...register("governorateId")}
                 type="text"
                 className="mt-1 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
-                placeholder="Enter governorate ID"
+                placeholder="Enter governorate"
               />
             )}
             {errors.governorateId && (

@@ -18,10 +18,10 @@ const GridLayout = () => {
   // const [loading, setLoading] = useState(false);
   // const [showDropdown, setShowDropdown] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-const [results, setResults] = useState([]);
-const [pastSearches, setPastSearches] = useState([]);
-const [loading, setLoading] = useState(false);
-const [showDropdown, setShowDropdown] = useState(false);
+  const [results, setResults] = useState([]);
+  const [pastSearches, setPastSearches] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
 
   const { staticCategories, setSelectedStaticCategory } =
     useStaticCategoryStore(); // 👈 get from store
@@ -38,13 +38,15 @@ const [showDropdown, setShowDropdown] = useState(false);
     };
   }, []);
 
- // Fetch results when typing
+  // Fetch results when typing
   useEffect(() => {
     if (searchTerm.length > 2) {
       const timer = setTimeout(async () => {
         setLoading(true);
         try {
-          const res = await listingsApi.getListingsFilterByAllCategories({query: searchTerm});
+          const res = await listingsApi.getListingsFilterByAllCategories({
+            query: searchTerm,
+          });
           setResults(res?.web_suggestions || []);
           setShowDropdown(true);
           console.log("Search results:", res);
@@ -63,43 +65,42 @@ const [showDropdown, setShowDropdown] = useState(false);
     }
   }, [searchTerm]);
 
-// Fetch past searches on mount
-useEffect(() => {
-  const fetchPastSearches = async () => {
-    try {
-      const res = await listingsApi.getListingsFilterByAllCategories({});
-      setPastSearches(res?.past_searches || []);
-    } catch (error) {
-      console.error("Error fetching past searches:", error);
-    }
-  };
-  fetchPastSearches();
-}, []);
+  // Fetch past searches on mount
+  useEffect(() => {
+    const fetchPastSearches = async () => {
+      try {
+        const res = await listingsApi.getListingsFilterByAllCategories({});
+        setPastSearches(res?.past_searches || []);
+      } catch (error) {
+        console.error("Error fetching past searches:", error);
+      }
+    };
+    fetchPastSearches();
+  }, []);
 
-// When input is clicked → show dropdown (past searches if no term)
-const handleFocus = () => {
-  setShowDropdown(true);
-};
+  // When input is clicked → show dropdown (past searches if no term)
+  const handleFocus = () => {
+    setShowDropdown(true);
+  };
 
   const handleSelectProduct = async (listing) => {
     setShowDropdown(false);
     setSearchTerm("");
-      try {
-    // Call API with title as keyword
-    const res = await listingsApi.listingsSearchHistory({
-      keyword: listing.title,
-    });
+    try {
+      // Call API with title as keyword
+      const res = await listingsApi.listingsSearchHistory({
+        keyword: listing.title,
+      });
 
-    console.log("Search results for clicked product:", res);
-
-  } catch (error) {
-    console.error("Error fetching product search:", error);
-  }
+      console.log("Search results for clicked product:", res);
+    } catch (error) {
+      console.error("Error fetching product search:", error);
+    }
     router.push(`/marketplace/${listing.category?.slug}/${listing?.slug}`);
   };
 
   const handleCategoryClick = (card) => {
-    setSelectedStaticCategory(card.type); 
+    setSelectedStaticCategory(card.type);
     console.log("card", card);
 
     if (card.route) {
@@ -231,69 +232,71 @@ const handleFocus = () => {
               </div>
             )} */}
             {showDropdown && (
-  <div
-    ref={dropdownRef}
-    className={`absolute top-14 w-[82vw] md:w-full md:max-w-[37.5rem] bg-white border rounded-md shadow-lg z-50 max-h-64 overflow-y-auto ${( results.length === 0 && pastSearches.length === 0 ) ? 'hidden' : 'block'}`}  >
-    {searchTerm.length > 2 ? (
-      results.length > 0 ? (
-        results.map((item) => (
-          <div
-            key={item.id}
-            onClick={() => handleSelectProduct(item)}
-            className="p-3 hover:bg-gray-100 cursor-pointer flex items-start gap-3 transition-all"
-          >
-            <img
-  src={
-    item?.images?.[0]?.image_path
-      ? `${Image_URL}/${item.images[0].image_path}`
-      : Image_NotFound
-  }
-  alt={item?.title || "No Image"}
-  className="min-w-12 h-12 object-cover rounded"
-  onError={(e) => {
-    e.target.onerror = null; // Prevent infinite loop
-    e.target.src = Image_NotFound; // Show fallback icon if image fails to load
-  }}
-/>
+              <div
+                ref={dropdownRef}
+                className={`absolute top-14 w-[82vw] md:w-full md:max-w-[37.5rem] bg-white border rounded-md shadow-lg z-50 max-h-64 overflow-y-auto ${
+                  results.length === 0 && pastSearches.length === 0
+                    ? "hidden"
+                    : "block"
+                }`}
+              >
+                {searchTerm.length > 2 ? (
+                  results.length > 0 ? (
+                    results.map((item) => (
+                      <div
+                        key={item.id}
+                        onClick={() => handleSelectProduct(item)}
+                        className="p-3 hover:bg-gray-100 cursor-pointer flex items-start gap-3 transition-all"
+                      >
+                        <img
+                          src={
+                            item?.images?.[0]?.image_path
+                              ? `${Image_URL}/${item.images[0].image_path}`
+                              : Image_NotFound
+                          }
+                          alt={item?.title || "No Image"}
+                          className="min-w-12 h-12 object-cover rounded"
+                          onError={(e) => {
+                            e.target.onerror = null; // Prevent infinite loop
+                            e.target.src = Image_NotFound; // Show fallback icon if image fails to load
+                          }}
+                        />
 
-            <div>
-              <p className="text-sm text-start text-black font-medium">
-                {item.title}
-              </p>
-              <p className="text-xs text-start text-black">
-                <span className="price">$</span>
-                {Number(item.buy_now_price)}
-              </p>
-            </div>
-          </div>
-        ))
-      ) : (
-        <div className="p-4 text-gray-500 text-center">
-          {"No results found"}
-        </div>
-      )
-    ) : (
-      // Show past searches if no term
-      pastSearches.length > 0 ? (
-        pastSearches.map((search, index) => (
-          <div
-            key={index}
-            onClick={() => setSearchTerm(search)}
-            className="p-3 hover:bg-gray-100 cursor-pointer text-black text-start text-sm"
-          >
-          {search}
-          </div>
-        ))
-      ) : (
-        <div className="p-4 text-gray-500 text-center">
-          {/* {"No past searches"} */}
-        </div>
-        // <></>
-      )
-    )}
-  </div>
-)}
-
+                        <div>
+                          <p className="text-sm text-start text-black font-medium">
+                            {item.title}
+                          </p>
+                          <p className="text-xs text-start text-black">
+                            <span className="price">$</span>
+                            {Number(item.buy_now_price)}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-4 text-gray-500 text-center">
+                      {"No results found"}
+                    </div>
+                  )
+                ) : // Show past searches if no term
+                pastSearches.length > 0 ? (
+                  pastSearches.map((search, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setSearchTerm(search)}
+                      className="p-3 hover:bg-gray-100 cursor-pointer text-black text-start text-sm"
+                    >
+                      {search}
+                    </div>
+                  ))
+                ) : (
+                  <div className="p-4 text-gray-500 text-center">
+                    {/* {"No past searches"} */}
+                  </div>
+                  // <></>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -315,22 +318,24 @@ const handleFocus = () => {
               >
                 {card.route ? (
                   // <Link href={card.route} className="block h-full">
-                    <div className={`relative ${card.height} text-white hover:text-green-600 transition`}>
-                      <Image
-                        src={card.image}
-                        alt={card.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                      />
-                      <div className="absolute inset-0 flex items-start justify-center bg-black/20">
-                        <h2 className="text-3xl md:text-4xl font-bold pt-6 drop-shadow-lg tracking-tight">
-                          {t(card.title)}
-                        </h2>
-                      </div>
+                  <div
+                    className={`relative ${card.height} text-white hover:text-green-600 transition`}
+                  >
+                    <Image
+                      src={card.image}
+                      alt={card.title}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                    />
+                    <div className="absolute inset-0 flex items-start justify-center bg-black/20">
+                      <h2 className="text-3xl md:text-4xl font-bold pt-6 drop-shadow-lg tracking-tight">
+                        {t(card.title)}
+                      </h2>
                     </div>
-                  // </Link>
+                  </div>
                 ) : (
+                  // </Link>
                   <div className={`relative ${card.height}`}>
                     <Image
                       src={card.image}

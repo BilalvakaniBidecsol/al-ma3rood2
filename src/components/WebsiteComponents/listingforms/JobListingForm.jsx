@@ -542,7 +542,7 @@ if (Array.isArray(initialValues.key_points)) {
           
           {/* Region ID (Placeholder) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Region ID (Location)*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Region</label>
             <Controller
               name="region_id"
               control={control} 
@@ -571,7 +571,7 @@ if (Array.isArray(initialValues.key_points)) {
 
           {/* Governorate ID (Placeholder) */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Governorate ID*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Governorate</label>
             <Controller
               name="governorate_id"
               control={control} 
