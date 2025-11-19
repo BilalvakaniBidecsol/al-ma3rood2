@@ -387,7 +387,9 @@ const MarketplaceCard = ({
 
         {visibleCards.length > 0 ? (
           visibleCards.map((card, index) => {
-            const lastSlug = card.category?.slug?.split("/").pop() || "unknown";
+            const lastSlug = card.category?.slug?.includes("/")
+              ? card.category.slug.split("/").pop()
+              : card.category?.slug || "unknown";
 
             return (
               <Link

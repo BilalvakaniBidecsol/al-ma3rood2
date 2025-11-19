@@ -7,10 +7,9 @@ import { toast } from "react-toastify";
 import { listingsApi } from "@/lib/api/listings";
 import { useTranslation } from "react-i18next";
 
-
 function OffersModal({ offers = [], open, onClose, onAccept, onDecline }) {
   if (!open) return null;
-    const { t } = useTranslation();
+  const { t } = useTranslation();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
@@ -66,7 +65,7 @@ function OffersModal({ offers = [], open, onClose, onAccept, onDecline }) {
                       {t("User")}: {offer.user?.name}
                     </span>
                     <span className="text-xs text-orange-500">
-                     {t("Message")}: {offer.message}
+                      {t("Message")}: {offer.message}
                     </span>
                   </div>
                 </div>
@@ -76,7 +75,8 @@ function OffersModal({ offers = [], open, onClose, onAccept, onDecline }) {
                       className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
                       onClick={() => onAccept(offer)}
                     >
- {t("Accept offer")}                    </button>
+                      {t("Accept offer")}{" "}
+                    </button>
                     <button
                       className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300 transition"
                       onClick={() => onDecline(offer)}
@@ -109,7 +109,7 @@ function AcceptBidModal({
   onReject,
 }) {
   if (!open) return null;
-    const { t } = useTranslation();
+  const { t } = useTranslation();
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6 relative">
@@ -123,12 +123,17 @@ function AcceptBidModal({
         <h2 className="text-xl font-bold mb-4">{t("Highest Bid")}</h2>
         <div className="mb-4 text-gray-700">
           <p className="mb-2">
-            The reserve price (<span className="price">$</span>{reservePrice}){t("was")}{" "}
+            The reserve price (<span className="price">$</span>
+            {reservePrice}){t("was")}{" "}
             <span className="font-bold text-red-600">{t("not met")}</span>.
           </p>
           <p className="mb-2">
-            {t("The highest bid is")} <span className="font-bold"><span className="price">$</span>{bid?.amount}</span>{" "}
-           {t("by")}{" "}
+            {t("The highest bid is")}{" "}
+            <span className="font-bold">
+              <span className="price">$</span>
+              {bid?.amount}
+            </span>{" "}
+            {t("by")}{" "}
             <span className="font-semibold">
               {bid?.user?.username || "Unknown"}
             </span>
@@ -146,7 +151,9 @@ function AcceptBidModal({
             </span>
             .
           </p> */}
-          <p className="mb-2">{t("You can choose to accept or reject this bid.")}</p>
+          <p className="mb-2">
+            {t("You can choose to accept or reject this bid.")}
+          </p>
         </div>
         <div className="flex gap-2 mt-4">
           <button
@@ -226,10 +233,16 @@ export default function ListingCard({ listing, actions }) {
 
           {/* Info */}
           <div className="flex-1">
-            <p className="text-xs text-gray-500 mb-1">
-             {t("Closing:")} {new Date(listing.closingDate).toDateString()}
-            </p>
-            <p className="text-md font-semibold text-gray-800 mb-1">
+            <div className="flex justify-between items-center gap-2">
+              <span className="text-xs text-gray-500 mb-1 uppercase">
+                {t("Listing Type:")} {listing.listing_type}
+              </span>
+              {listing.closingDate && (<span className="text-xs text-gray-500 mb-1 uppercase">
+                {t("Closing Date:")}{" "}
+                {new Date(listing.closingDate).toDateString()}
+              </span>)}
+            </div>
+            <p className="text-md font-semibold text-gray-800 my-1">
               {listing.title}
             </p>
           </div>
@@ -240,14 +253,17 @@ export default function ListingCard({ listing, actions }) {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 text-sm text-gray-600 px-4 sm:px-6">
         <div className="flex gap-6 mt-2 items-center">
           {/* <span>👁️‍🗨️ {listing.watchers} {t("watchers")}</span> */}
-          <span>👁️ {listing.views} {t("views")}</span>
+          <span>
+            👁️ {listing.views} {t("views")}
+          </span>
           {offers.length > 0 && (
             <span
               className="bg-green-100 text-green-700 px-2 py-1 rounded cursor-pointer hover:bg-green-200 ml-2 text-xs font-semibold"
               onClick={() => setOffersOpen(true)}
               title="View offers"
             >
-              {offers.length} {t("Offer")}{offers.length !== 1 ? "s" : ""}
+              {offers.length} {t("Offer")}
+              {offers.length !== 1 ? "s" : ""}
             </span>
           )}
           {/* Accept Bid Tag */}
@@ -257,7 +273,8 @@ export default function ListingCard({ listing, actions }) {
               onClick={() => setAcceptBidOpen(true)}
               title="Highest Bid"
             >
-{t("Show Highest Bid")}</span>
+              {t("Show Highest Bid")}
+            </span>
           )}
         </div>
         <div className="text-right sm:text-left mt-2 sm:mt-0">
@@ -287,7 +304,7 @@ export default function ListingCard({ listing, actions }) {
           )
         )}
       </div>
-      
+
       <OffersModal
         offers={offers}
         open={offersOpen}

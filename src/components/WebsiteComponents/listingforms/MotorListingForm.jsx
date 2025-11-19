@@ -166,7 +166,10 @@ const carPartsData = [
       {
         name: "Radiator",
         compatibleModels: ["Land Cruiser", "Prado", "Hilux"],
-        years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+        years: [
+          2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
+          2021, 2022, 2023, 2024,
+        ],
       },
       {
         name: "Alternator",
@@ -206,7 +209,10 @@ const carPartsData = [
       {
         name: "Radiator",
         compatibleModels: ["Patrol", "X-Terra", "Navara"],
-        years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+        years: [
+          2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
+          2021, 2022, 2023, 2024,
+        ],
       },
       {
         name: "Alternator",
@@ -236,7 +242,10 @@ const carPartsData = [
       {
         name: "Radiator",
         compatibleModels: ["Pajero", "Montero Sport", "L200"],
-        years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+        years: [
+          2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
+          2021, 2022, 2023, 2024,
+        ],
       },
     ],
   },
@@ -456,7 +465,10 @@ const carPartsData = [
       {
         name: "Radiator",
         compatibleModels: ["D-Max", "MU-X"],
-        years: [2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024],
+        years: [
+          2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020,
+          2021, 2022, 2023, 2024,
+        ],
       },
     ],
   },
@@ -504,7 +516,7 @@ const carPartsData = [
 
 const getMaxDate = () => {
   const today = new Date();
- 
+
   today.setDate(today.getDate() + 60);
   return today;
 };
@@ -539,7 +551,9 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
   const [currentCategories, setCurrentCategories] = useState([]);
   const [loadingCategories, setLoadingCategories] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [vehicle_type, setVehicleType] = useState(categoryStack.length > 0 ? categoryStack?.[0]?.name : selectedCategory?.name);
+  const [vehicle_type, setVehicleType] = useState(
+    categoryStack.length > 0 ? categoryStack?.[0]?.name : selectedCategory?.name
+  );
   // const vehicle_type =
   //   categoryStack.length > 0 ? categoryStack?.[0]?.name : selectedCategory?.name;
 
@@ -547,13 +561,12 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
   const [vehicleData, setVehicleData] = useState([]);
   const [loadingVehicleData, setLoadingVehicleData] = useState(false);
 
-
   const stepFields = [
-  ["category_id"], // Step 0
-  ["title", "description", "condition", "make", "model", "year"], // Step 1
-  ["images"], // Step 2
-  ["buy_now_price", "start_price", "reserve_price"], // Step 3
-];
+    ["category_id"], // Step 0
+    ["title", "description", "condition", "make", "model", "year"], // Step 1
+    ["images"], // Step 2
+    ["buy_now_price", "start_price", "reserve_price"], // Step 3
+  ];
 
   // Load vehicle data based on vehicle type
   useEffect(() => {
@@ -565,7 +578,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
 
       setLoadingVehicleData(true);
       try {
-        console.log('type',vehicle_type)
+        console.log("type", vehicle_type);
         const vehicleType = getVehicleTypeFromCategory(vehicle_type);
         const data = await getTransformedVehicleData(vehicleType);
         setVehicleData(data);
@@ -633,7 +646,8 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
 
         if (copy.model && matchedMake.models.length > 0) {
           const matchedModel = matchedMake.models.find(
-            (m) => m.name.toLowerCase().trim() === copy.model.toLowerCase().trim()
+            (m) =>
+              m.name.toLowerCase().trim() === copy.model.toLowerCase().trim()
           );
 
           if (matchedModel) {
@@ -887,10 +901,10 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
     } catch (error) {
       setIsSubmitting(false);
       console.error("Error creating motor listing:", error);
-       
+
       // ✅ Handle Laravel 422 Validation Errors
-      
-    // if (error.response) {
+
+      // if (error.response) {
       const validationErrors = error.data.data;
       if (validationErrors && typeof validationErrors === "object") {
         Object.entries(validationErrors).forEach(([field, messages]) => {
@@ -898,16 +912,15 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
             toast.error(`${msg}`);
           });
         });
-      }
-       else {
+      } else {
         toast.error(error.response.data.message || "Validation failed");
       }
-      
-    // } 
-    // else {
-    //   toast.error("Failed to create motor listing. Please try again.");
-    // }
-    } 
+
+      // }
+      // else {
+      //   toast.error("Failed to create motor listing. Please try again.");
+      // }
+    }
     // finally {
     //   setIsSubmitting(false);
     // }
@@ -918,12 +931,12 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
   //     setActiveStep(activeStep + 1);
   //   }
   // };
-   const nextStep = async () => {
-    if (activeStep >= steps.length - 1) return; 
+  const nextStep = async () => {
+    if (activeStep >= steps.length - 1) return;
 
     // Get the fields specific to the current step
     const fieldsToValidate = stepFields[activeStep];
-    
+
     // Use r-h-f's trigger to validate only the necessary fields
     const isValid = await trigger(fieldsToValidate, { shouldFocus: true });
 
@@ -1038,9 +1051,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           Vehicle Details
         </h2>
-        <p className="text-lg text-gray-600">
-          Tell us about your vehicle
-        </p>
+        <p className="text-lg text-gray-600">Tell us about your vehicle</p>
       </div>
 
       {vehicle_type === "Car parts & accessories" && (
@@ -1201,7 +1212,10 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
           )}
         /> */}
               {conditions.map((item) => (
-                <label key={item.key} className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
+                <label
+                  key={item.key}
+                  className="flex items-center gap-3 cursor-pointer hover:bg-gray-100 p-2 rounded-md"
+                >
                   <input
                     type="radio"
                     value={item.key}
@@ -1222,17 +1236,6 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Color
               </label>
-              {/* <Controller
-          name="color"
-          control={control}
-          defaultValue="#000000"
-          render={({ field }) => (
-            <div className="flex items-center gap-3">
-              <input type="color" value={field.value} onChange={field.onChange} className="w-12 h-10 border border-gray-300 rounded-md cursor-pointer"/>
-              <input type="text" value={field.value} onChange={field.onChange} className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500" placeholder="#000000"/>
-            </div>
-          )}
-        /> */}
               <Controller
                 name="color"
                 control={control}
@@ -1258,7 +1261,10 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
                 name="description"
                 control={control}
                 rules={{ required: "Description is required" }}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
                   <div className="rounded-md">
                     <QuillEditor
                       value={value}
@@ -1427,7 +1433,10 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
                 render={({ field }) => (
                   <div className="space-y-2 grid grid-cols-1 md:grid-cols-2">
                     {conditions.map((item) => (
-                      <label key={item.key} className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md">
+                      <label
+                        key={item.key}
+                        className="flex items-center gap-2 cursor-pointer hover:bg-gray-100 p-2 rounded-md"
+                      >
                         <input
                           type="radio"
                           value={item.key}
@@ -1542,6 +1551,8 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
             </div>
           )} */}
 
+            <div className="hidden md:block mt-12" />
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Kilometers
@@ -1559,6 +1570,8 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
                 )}
               />
             </div>
+
+            <div className="hidden md:block mt-12" />
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -1584,6 +1597,9 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
                 </p>
               )}
             </div>
+
+            <div className="hidden md:block mt-12" />
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Description *
@@ -1591,7 +1607,10 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               <Controller
                 name="description"
                 control={control}
-                render={({ field: { onChange, value }, fieldState: { error } }) => (
+                render={({
+                  field: { onChange, value },
+                  fieldState: { error },
+                }) => (
                   <div className="rounded-md">
                     <QuillEditor
                       value={value}
@@ -1690,7 +1709,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Buy Now Price 
+                Buy Now Price
               </label>
               <Controller
                 name="buy_now_price"
@@ -1738,7 +1757,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
             <>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Start Price 
+                  Start Price
                 </label>
                 <Controller
                   name="start_price"
@@ -1762,7 +1781,7 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  o Reserve Price 
+                  o Reserve Price
                 </label>
                 <Controller
                   name="reserve_price"
@@ -1816,43 +1835,44 @@ const MotorListingForm = ({ initialValues, mode = "create" }) => {
           </div> */}
 
             {/* <div> */}
-              
-              <div className="mt-2">
-                     <label className="block text-sm font-medium text-gray-700 mb-2">
+
+            <div className="mt-2">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Expiry Date & Time
               </label>
-                      <Controller
-                        control={control}
-                        name="expire_at"
-                        rules={{ required: true }}
-                        render={({ field }) => (
-                          <DatePicker
-                            {...field}
-                            selected={field.value}
-                            onChange={(date) =>
-                              setValue("expire_at", date, { shouldValidate: true })
-                            }
-                            showTimeSelect
-                            timeFormat="hh:mm aa"
-                            dateFormat="yyyy-MM-dd h:mm aa"
-                            minDate={new Date()}
-                            maxDate={getMaxDate()}
-                            className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring
+              <Controller
+                control={control}
+                name="expire_at"
+                rules={{ required: true }}
+                render={({ field }) => (
+                  <DatePicker
+                    {...field}
+                    selected={field.value}
+                    onChange={(date) =>
+                      setValue("expire_at", date, { shouldValidate: true })
+                    }
+                    showTimeSelect
+                    timeFormat="hh:mm aa"
+                    dateFormat="yyyy-MM-dd h:mm aa"
+                    minDate={new Date()}
+                    maxDate={getMaxDate()}
+                    className={`w-full border px-4 py-2 rounded focus:outline-none focus:ring
                           [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none
-                          ${errors.expire_at
-                                ? "border-red-500 focus:border-red-500"
-                                : "border-gray-300 focus:border-green-400"
-                              }`}
-                            placeholderText={t("Select date and time")}
-                          />
-                        )}
-                      />
-                      {errors.expire_at && (
-                        <p className="text-red-500 text-sm mt-1">
-                          {errors.expire_at.message}
-                        </p>
-                      )}
-                    </div>
+                          ${
+                            errors.expire_at
+                              ? "border-red-500 focus:border-red-500"
+                              : "border-gray-300 focus:border-green-400"
+                          }`}
+                    placeholderText={t("Select date and time")}
+                  />
+                )}
+              />
+              {errors.expire_at && (
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.expire_at.message}
+                </p>
+              )}
+            </div>
             {/* </div> */}
 
             {/* {watchedVehicleType !== "Car parts & accessories" && (

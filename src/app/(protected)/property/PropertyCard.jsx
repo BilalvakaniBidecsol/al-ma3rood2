@@ -130,9 +130,10 @@ const PropertyCard = ({ listing, viewMode }) => {
 
           {/* Description */}
           {listing.description && (
-            <p className="text-[10px] line-clamp-2 leading-snug opacity-90">
-              {listing.description}
-            </p>
+            <p
+              className="text-[10px] line-clamp-2 leading-snug opacity-90"
+              dangerouslySetInnerHTML={{ __html: listing.description }}
+            />
           )}
         </div>
       </Link>

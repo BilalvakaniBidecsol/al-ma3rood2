@@ -10,7 +10,7 @@ const articles = [
       "Eliminated reader info read elimination demand into grocers' needs.",
     image: "/latest1.png",
     author: "zidan",
-    date: "3 Nov 2023",
+    date: "3 Nov 2025",
   },
   {
     title: "The Friday Checkout: Food insecurity keeps retailers off balance",
@@ -18,7 +18,7 @@ const articles = [
       "Eliminated reader info read elimination demand into grocers' needs.",
     image: "/latest2.png",
     author: "zidan",
-    date: "3 Nov 2023",
+    date: "3 Nov 2025",
   },
   {
     title: "Consumer want grocer to use AI to help them save money Dunnhumby",
@@ -26,7 +26,7 @@ const articles = [
       "Eliminated reader info read elimination demand into grocers' needs.",
     image: "/latest3.png",
     author: "zidan",
-    date: "3 Nov 2023",
+    date: "3 Nov 2025",
   },
   {
     title:
@@ -35,7 +35,7 @@ const articles = [
       "Eliminated reader info read elimination demand into grocers' needs.",
     image: "/latest4.png",
     author: "zidan",
-    date: "3 Nov 2023",
+    date: "3 Nov 2025",
   },
 ];
 

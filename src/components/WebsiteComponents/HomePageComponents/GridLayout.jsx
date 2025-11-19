@@ -84,6 +84,10 @@ const GridLayout = () => {
   };
 
   const handleSelectProduct = async (listing) => {
+    const catSlug = listing.category?.slug?.includes("/")
+      ? listing.category.slug.split("/").pop()
+      : listing.category?.slug || "unknown";
+
     setShowDropdown(false);
     setSearchTerm("");
     try {
@@ -91,22 +95,116 @@ const GridLayout = () => {
       const res = await listingsApi.listingsSearchHistory({
         keyword: listing.title,
       });
-
-      console.log("Search results for clicked product:", res);
     } catch (error) {
       console.error("Error fetching product search:", error);
     }
-    router.push(`/marketplace/${listing.category?.slug}/${listing?.slug}`);
+    switch (listing.listing_type) {
+      case "marketplace":
+        router.push(`/marketplace/${catSlug}/${listing?.slug}`);
+        break;
+      case "property":
+      case "motors":
+        router.push(`/${listing.listing_type}/${listing?.slug}`);
+        break;
+      default:
+        switch (listing.type) {
+          case "services":
+            router.push(`/services/${listing?.slug}`);
+            break;
+          case "jobs":
+            router.push(`/jobs/${listing?.slug}`);
+            break;
+        }
+        break;
+    }
   };
 
   const handleCategoryClick = (card) => {
     setSelectedStaticCategory(card.type);
-    console.log("card", card);
-
     if (card.route) {
       router.push(card.route);
     }
   };
+
+  // Subcomponent for dropdown item rendering
+  function DropdownResultItem({ item, onSelect }) {
+    function getImageSrc() {
+      if (item.type === "listing" || item.type === "service") {
+        return item?.images?.[0]?.image_path
+          ? `${Image_URL}/${item.images[0].image_path}`
+          : Image_NotFound;
+      }
+      if (item.type === "job") {
+        return item?.logo
+          ? `${Image_URL}/${item.logo}`
+          : Image_NotFound;
+      }
+      return Image_NotFound;
+    }
+
+    return (
+      <div
+        onClick={() => onSelect(item)}
+        className="p-3 hover:bg-gray-100 cursor-pointer flex items-start gap-3 transition-all"
+      >
+        <img
+          src={getImageSrc()}
+          alt={item?.title || "No Image"}
+          className="min-w-12 h-12 object-cover rounded"
+          onError={e => {
+            e.target.onerror = null;
+            e.target.src = Image_NotFound;
+          }}
+        />
+        <DropdownResultContent item={item} />
+      </div>
+    );
+  }
+
+  function DropdownResultContent({ item }) {
+    if (item.type === "listing") {
+      return (
+        <div>
+          <p className="text-sm text-start text-black font-medium">
+            {item.title}
+          </p>
+          <p className="text-xs text-start text-black">
+            <span className="price">$</span>
+            {Number(item.buy_now_price)}
+          </p>
+        </div>
+      );
+    }
+
+    if (item.type === "service") {
+      return (
+        <div>
+          <p className="text-sm text-start text-black font-medium">
+            {item.title}
+          </p>
+          <p className="text-xs text-start text-black">
+            <span className="price">$</span>
+            {Number(item.price)} {item.price_unit}
+          </p>
+        </div>
+      );
+    }
+
+    if (item.type === "job") {
+      return (
+        <div>
+          <p className="text-sm text-start text-black font-medium">
+            {item.title}
+          </p>
+          <p className="text-xs text-start text-black">
+            @{item.company_name}
+          </p>
+        </div>
+      );
+    }
+
+    return null;
+  }
 
   return (
     <>
@@ -234,52 +332,24 @@ const GridLayout = () => {
             {showDropdown && (
               <div
                 ref={dropdownRef}
-                className={`absolute top-14 w-[82vw] md:w-full md:max-w-[37.5rem] bg-white border rounded-md shadow-lg z-50 max-h-64 overflow-y-auto ${
-                  results.length === 0 && pastSearches.length === 0
-                    ? "hidden"
-                    : "block"
-                }`}
+                className="absolute top-14 w-[82vw] md:w-full md:max-w-[37rem] bg-white border rounded-md shadow-lg z-50 max-h-64 overflow-y-auto"
               >
                 {searchTerm.length > 2 ? (
                   results.length > 0 ? (
-                    results.map((item) => (
-                      <div
+                    results.map((item) =>
+                      <DropdownResultItem
                         key={item.id}
-                        onClick={() => handleSelectProduct(item)}
-                        className="p-3 hover:bg-gray-100 cursor-pointer flex items-start gap-3 transition-all"
-                      >
-                        <img
-                          src={
-                            item?.images?.[0]?.image_path
-                              ? `${Image_URL}/${item.images[0].image_path}`
-                              : Image_NotFound
-                          }
-                          alt={item?.title || "No Image"}
-                          className="min-w-12 h-12 object-cover rounded"
-                          onError={(e) => {
-                            e.target.onerror = null; // Prevent infinite loop
-                            e.target.src = Image_NotFound; // Show fallback icon if image fails to load
-                          }}
-                        />
-
-                        <div>
-                          <p className="text-sm text-start text-black font-medium">
-                            {item.title}
-                          </p>
-                          <p className="text-xs text-start text-black">
-                            <span className="price">$</span>
-                            {Number(item.buy_now_price)}
-                          </p>
-                        </div>
-                      </div>
-                    ))
+                        item={item}
+                        onSelect={handleSelectProduct}
+                      />
+                    )
                   ) : (
                     <div className="p-4 text-gray-500 text-center">
-                      {"No results found"}
+                      No results found
                     </div>
                   )
-                ) : // Show past searches if no term
-                pastSearches.length > 0 ? (
+                ) : (
+                  pastSearches.length > 0 &&
                   pastSearches.map((search, index) => (
                     <div
                       key={index}
@@ -289,11 +359,6 @@ const GridLayout = () => {
                       {search}
                     </div>
                   ))
-                ) : (
-                  <div className="p-4 text-gray-500 text-center">
-                    {/* {"No past searches"} */}
-                  </div>
-                  // <></>
                 )}
               </div>
             )}

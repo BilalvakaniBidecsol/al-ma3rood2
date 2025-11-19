@@ -161,7 +161,7 @@ export default function ApplicantsForMyJob() {
               </div>
 
               {/* Right: Actions */}
-              {applicant.job_status?.toLowerCase() !== "hired" && applicant.job_status !== "notSuitable" && (
+              {applicant.job_status?.toLowerCase() !== "hired" && (
                 <div className="flex gap-3 mt-4 md:mt-0">
                   {applicant.job_status === "shortList" ? (
                     <button

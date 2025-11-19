@@ -141,7 +141,7 @@ function LoginPageContent() {
   // useEffect(() => {
   //   const token = localStorage.getItem("token");
   //   if (token) {
-  //     router.replace("/"); 
+  //     router.replace("/");
   //   }
   // }, [router]);
 
@@ -158,20 +158,20 @@ function LoginPageContent() {
   //     console.log("Login failed:", err);
   //   }
   // };
-const handleLogin = async (credentials) => {
-  try {
-    const res = await login(credentials.email, credentials.password);
-console.log('Res', res);
-("Login response:", res);
-    if (res.success && res.user) {
-      window.location.href = "/";
-    } else if (res.error == 'Emails is not verified yet' && res.email) {
-      router.push(`/verification?email=${encodeURIComponent(res.email)}`);
+  const handleLogin = async (credentials) => {
+    try {
+      const res = await login(credentials.email, credentials.password);
+      console.log("Res", res);
+      "Login response:", res;
+      if (res.success && res.user) {
+        window.location.href = "/";
+      } else if (res.error == "Emails is not verified yet" && res.email) {
+        router.push(`/verification?email=${encodeURIComponent(res.email)}`);
+      }
+    } catch (err) {
+      console.log("Unexpected login error:", err);
     }
-  } catch (err) {
-    console.log("Unexpected login error:", err);
-  }
-};
+  };
 
   return (
     <div className="flex flex-col md:flex-row w-full h-screen">
@@ -185,23 +185,22 @@ console.log('Res', res);
 
       {/* LEFT: Form Section */}
       <div className="w-full md:w-[60%] flex flex-col justify-center items-center px-4 py-8 bg-white min-h-screen md:min-h-full">
-        
         <div className="flex justify-center mb-6">
-  <Link href="/">
-    <Image
-      src="/Ma3rood-logo-green.png"
-      alt="Ma3rood Logo"
-      width={180}
-      height={60}
-      priority
-      className="cursor-pointer"
-    />
-  </Link>
-</div>
+          <Link href="/">
+            <Image
+              src="/Ma3rood-logo-green.png"
+              alt="Ma3rood Logo"
+              width={180}
+              height={60}
+              priority
+              className="cursor-pointer"
+            />
+          </Link>
+        </div>
         <div className="w-full max-w-sm space-y-4">
           {/* Logo */}
-        {/* Logo */}
-{/* <div className="flex justify-center mt-6 mb-6">
+          {/* Logo */}
+          {/* <div className="flex justify-center mt-6 mb-6">
   <Link href="/">
     <Image
       src="/Ma3rood-logo-green.png"
@@ -213,7 +212,6 @@ console.log('Res', res);
     />
   </Link>
 </div> */}
-
 
           <h2 className="text-2xl font-semibold text-gray-800 text-center mb-2">
             {isForgotMode ? t("Forgot Password") : t("Login")}
@@ -236,26 +234,26 @@ console.log('Res', res);
             setIsForgotMode={setIsForgotMode}
           />
 
-{!isForgotMode && (
-  <>
-          <p className="mt-4 text-center">
-            {t("Don't have an account?")}{" "}
-            <Link href="/register" className="text-green-600">
-              {t("Register")}
-            </Link>
-          </p>
+          {!isForgotMode && (
+            <>
+              <p className="mt-4 text-center">
+                {t("Don't have an account?")}{" "}
+                <Link href="/register" className="text-green-600">
+                  {t("Register")}
+                </Link>
+              </p>
 
-          <p className="mt-1 text-center text-sm text-gray-600">
-            {t("By logging in, you agree to our")}{" "}
-            <Link
-              href="/privacy"
-              className="text-green-600 hover:text-green-800"
-            >
-              {t("Privacy Policy")}
-            </Link>
-          </p>
-          </>
-)}
+              <p className="mt-1 text-center text-sm text-gray-600">
+                {t("By logging in, you agree to our")}{" "}
+                <Link
+                  href="/privacy"
+                  className="text-green-600 hover:text-green-800"
+                >
+                  {t("Privacy Policy")}
+                </Link>
+              </p>
+            </>
+          )}
         </div>
       </div>
 

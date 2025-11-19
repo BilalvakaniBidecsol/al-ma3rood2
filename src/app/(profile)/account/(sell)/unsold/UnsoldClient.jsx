@@ -221,6 +221,7 @@ export default function UnsoldClient() {
             listing={{
               id: listing.id,
               title: listing.title,
+              listing_type: listing.listing_type,
               reserve_price: listing.reserve_price,
               bids: listing.bids,
               status: listing.status,
@@ -231,9 +232,9 @@ export default function UnsoldClient() {
               image: listing.images?.[0]?.image_path
                 ? `${Image_URL}${listing.images[0].image_path}`
                 : "/default-image.jpg",
-              link: `/marketplace/${listing.category?.slug?.split("/").pop() || "unknown"}/${
-                listing.slug
-              }`,
+              link: `/marketplace/${
+                listing.category?.slug?.split("/").pop() || "unknown"
+              }/${listing.slug}`,
             }}
             // actions={commonActions(listing)}
             actions={[

@@ -79,7 +79,7 @@ export default function SellingClient() {
       const listData = response?.data || [];
       setAllListings(listData);
 
-      console.log('RES', listData)
+      console.log("RES", listData);
     } catch (error) {
       console.error("Failed to fetch listings:", error);
     } finally {
@@ -88,7 +88,6 @@ export default function SellingClient() {
   };
 
   const applyFilter = () => {
-
     const now = new Date();
     let threshold;
 
@@ -131,7 +130,9 @@ export default function SellingClient() {
       {/* <h1 className="text-2xl font-bold text-green-600 uppercase mb-1 mt-5">
         {t("Selling")}
       </h1> */}
-      <p className="text-sm mb-4 mt-3">{allListings.length} {"- "} {t("Listings")}</p>
+      <p className="text-sm mb-4 mt-3">
+        {allListings.length} {"- "} {t("Listings")}
+      </p>
 
       <div className="mb-4">
         <select
@@ -141,7 +142,7 @@ export default function SellingClient() {
         >
           {filters.map((item) => (
             <option key={item.value} value={item.value}>
-             {t(item.label)}
+              {t(item.label)}
             </option>
           ))}
         </select>
@@ -161,6 +162,7 @@ export default function SellingClient() {
               title: listing.title,
               price: listing.buy_now_price || "N/A",
               views: listing.view_count || 0,
+              listing_type: listing.listing_type,
               watchers: 0,
               offers: listing.selling_offers || [],
               slug: listing.slug,
@@ -168,9 +170,9 @@ export default function SellingClient() {
               image: listing.images?.[0]?.image_path
                 ? `${Image_URL}${listing.images[0].image_path}`
                 : "/default-image.jpg",
-              link: `/marketplace/${listing.category?.slug?.split("/").pop() || "unknown"}/${
-                listing.slug
-              }`,
+              link: `/marketplace/${
+                listing.category?.slug?.split("/").pop() || "unknown"
+              }/${listing.slug}`,
             }}
             // actions={commonActions(listing.slug)}
             //             const commonActions = (id) => [
@@ -181,7 +183,10 @@ export default function SellingClient() {
             actions={[
               // { label: "Promote listing", href: `/promote/${listing?.id}` },
               { label: "Promote listing" },
-              { label: "Edit listing", href: `/listing/viewlisting?slug=${listing?.slug}` },
+              listing.bids_count == 0 && {
+                label: "Edit listing",
+                href: `/listing/viewlisting?slug=${listing?.slug}`,
+              },
               {
                 label: "See similar",
                 onClick: () =>

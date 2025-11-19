@@ -165,11 +165,13 @@ export default function Page() {
             key={listing.id}
             listing={{
               id: listing.id,
+              listing_type: listing.listing_type,
+              bids: listing.bids || [],
+              offers: listing.selling_offers || [],
               title: listing.title,
               price: listing.buy_now_price || "N/A",
               views: listing.view_count || 0,
               watchers: 0,
-              offers: listing.selling_offers || [],
               slug: listing.slug,
               closingDate: listing.expire_at || "",
               image: listing.images?.[0]?.image_path
